@@ -1,13 +1,13 @@
 import './App.css';
-import Home from "./Home";
+import Home from "./pages/Home";
 import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import logo from "./logo.svg";
-import Explore from "./Explore";
-import Booking from "./Booking";
-import Travelinfo from "./Travelinfo";
-import Help from "./Help";
-import Login from "./Login";
-import Signup from "./Signup";
+import Explore from "./pages/Explore";
+import Booking from "./pages/Booking";
+import Travelinfo from "./pages/Travelinfo";
+import Help from "./pages/Help";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 function Nav() {
     return (
@@ -15,16 +15,14 @@ function Nav() {
             <div
                 className="flex flex-wrap items-center justify-between max-w-screen-xl px-1 mx-auto"
             >
-                <a href="#" className="flex items-center">
-                    <Link to="/">
-                        <img
-                            src={logo}
-                            className="h-full w-full sm:h-11 p-1.5"
-                            style={{width: "200px", height: "65px"}}
-                            alt="QAriline Logo"
-                        />
-                    </Link>
-                </a>
+                <Link to="/" className="flex items-center">
+                    <img
+                        src={logo}
+                        className="h-full w-full sm:h-11 p-1.5"
+                        style={{width: "200px", height: "65px"}}
+                        alt="QAriline Logo"
+                    />
+                </Link>
 
                 <div className="relative lg:order-2">
                     <input type="text" placeholder="Tìm kiếm ..."
