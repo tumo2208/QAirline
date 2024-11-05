@@ -1,0 +1,22 @@
+{
+  "name": "qairline",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sequelize/postgres": "^7.0.0-alpha.43",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.8.0",
+    "sequelize": "^6.37.5"
+  }
+}
