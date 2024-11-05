@@ -5,3 +5,7 @@
 .navItem {
   @apply block font-bold py-2 pl-1 pr-1 lg:m-auto text-black bg-purple-700 border-b-4  lg:bg-transparent lg:border-transparent lg:text-black lg:pb-1 lg:hover:text-blue-700 lg:hover:border-blue-700;
 }
+
+.footerItem {
+  @apply lg:hover:underline lg:hover:text-blue-700;
+}
