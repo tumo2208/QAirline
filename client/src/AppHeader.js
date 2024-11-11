@@ -4,7 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 function AppHeader() {
     return (
-        <nav className="sticky top-0 font-bold border-gray-200 p-1 h-50"
+        <nav className="sticky z-10 top-0 font-bold border-gray-200 p-1 h-50"
              style={{height: "75px", backgroundColor: "#eaf6f6"}}>
             <div
                 className="flex flex-wrap items-center justify-between max-w-screen-xl px-1 mx-auto"
