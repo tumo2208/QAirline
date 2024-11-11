@@ -1,5 +1,6 @@
 import {Link} from "react-router-dom";
 import logo from "./logo.svg";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 function AppHeader() {
     return (
@@ -19,9 +20,9 @@ function AppHeader() {
 
                 <div className="relative lg:order-2">
                     <input type="text" placeholder="Tìm kiếm ..."
-                           className="border border-gray-300 rounded-xl px-3 py-1 focus:outline-none focus:border-blue-500"/>
+                           className="border border-gray-300 font-normal rounded-xl px-3 py-1 focus:outline-none focus:border-blue-500"/>
                     <button className="absolute right-2 top-1 text-gray-500">
-                        🔍
+                        <FontAwesomeIcon icon="fa-solid fa-magnifying-glass" />
                     </button>
                 </div>
 
@@ -91,7 +92,7 @@ function AppHeader() {
                             <Link
                                 to="/help"
                                 className="navItem"
-                            >Trợ giúp</Link>
+                            >Vé của tôi</Link>
                         </li>
                     </ul>
                 </div>
