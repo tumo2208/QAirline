@@ -1,3 +1,5 @@
+import './Home.css';
+
 function Home() {
     return (
         <div className="Home">
@@ -56,9 +58,7 @@ function Home() {
                                     <select
                                         className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm">
                                         <option value="1">Hạng Phổ thông</option>
-                                        <option value="2">Hạng Phổ thông đặc biệt</option>
                                         <option value="3">Hạng Thương gia</option>
-                                        <option value="4">Hạng Nhất</option>
                                     </select>
                                 </div>
                                 <div style={{flex: 1}}>
@@ -96,12 +96,6 @@ function Home() {
                     </div>
                 </div>
                 <div  style={{flex:5}}></div>
-            </div>
-
-            <div className="section2 max-w-screen-xl mx-auto p-6">
-                <h1 className="text-4xl font-bold text-black mb-4">
-                    Săn Vé Máy Bay Tết
-                </h1>
             </div>
 
             <div className="section3 max-w-screen-xl mx-auto p-6">
@@ -181,7 +175,6 @@ function Home() {
                             <span className="ml-2">&rarr;</span>
                         </button>
                     </div>
-
                 </div>
 
                 <div className="foreign">
@@ -260,8 +253,145 @@ function Home() {
 
             <div className="section3 max-w-screen-xl mx-auto p-6">
                 <h1 className="text-4xl font-bold text-black mb-4">
-                    Dịch vụ bổ trợ
+                    📍Điểm Đến Hấp Dẫn
                 </h1>
+                <div className="slider flex items-center justify-center relative w-[1140px] h-[400px] overflow-hidden shadow-lg">
+                    <div className="slide-track flex space-x-2 animate-scroll bg-cover relative" style={{width: 'calc(400px * 18)'}}>
+                        <div className="w-[400px] h-[400px] bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Phu Quoc.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Phú Quốc</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Hanoi.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Hà Nội</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Da Nang.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Đà Nẵng</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Ho Chi Minh City.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">TP. Hồ Chí Minh</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Seoul.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Seoul</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Da Nang.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Đà Nẵng</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Moscow.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Moscow</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Singapore.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Singapore</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Paris.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Paris</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Phu Quoc.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Phú Quốc</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Da Lat.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Đà Lạt</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Tokyo.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Tokyo</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Da Lat.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Đà Lạt</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Paris.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Paris</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Hoi An.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Hội An</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Singapore.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Singapore</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Hanoi.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Hà Nội</p>
+                            </div>
+                        </div>
+                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                             style={{backgroundImage: "url('/images/places/Tokyo.jpg')"}}>
+                            <div
+                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                <p className="text-lg font-semibold">Tokyo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex justify-center items-center mt-8 mb-2">
+                    <button type="button"
+                            className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-125 px-5 py-2.5 text-center">
+                        Khám phá ngay
+                        <span className="ml-2">&rarr;</span>
+                    </button>
+                </div>
             </div>
         </div>
     )

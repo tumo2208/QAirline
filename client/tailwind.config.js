@@ -8,6 +8,15 @@ module.exports = {
       textUnderlineOffset: {
         'custom': '4px',
       },
+      keyframes: {
+        scroll: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(calc(-400px * 9))' },
+        },
+      },
+      animation: {
+        scroll: 'scroll 80s linear infinite',
+      },
     },
   },
   plugins: [
