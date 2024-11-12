@@ -6,6 +6,7 @@ import Travelinfo from "./pages/Travelinfo";
 import Help from "./pages/Help";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 import AppHeader from "./AppHeader";
 import AppFooter from "./AppFooter";
 
@@ -24,6 +25,7 @@ function App() {
                     <Route path="/help" element={<Help/>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/signup" element={<Signup/>}/>
+                    <Route path="/:full_name/profile" element={<Profile />} />
                 </Routes>
 
                 <AppFooter/>
