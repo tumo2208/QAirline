@@ -4,8 +4,8 @@ import Explore from "./components/Explore";
 import Booking from "./components/Booking";
 import Travelinfo from "./components/Travelinfo";
 import Help from "./components/Help";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
+import Login from "./components/Account/Login";
+import Signup from "./components/Account/Signup";
 import AppHeader from "./AppHeader";
 import AppFooter from "./AppFooter";
 
