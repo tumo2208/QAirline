@@ -6,6 +6,7 @@ import Travelinfo from "./components/Travelinfo";
 import Help from "./components/Help";
 import Login from "./components/Account/Login";
 import Signup from "./components/Account/Signup";
+import Profile from "./components/Profile";
 import AppHeader from "./AppHeader";
 import AppFooter from "./AppFooter";
 
@@ -24,6 +25,7 @@ function App() {
                     <Route path="/help" element={<Help/>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/signup" element={<Signup/>}/>
+                    <Route path="/profile" element={<Profile />} />
                 </Routes>
 
                 <AppFooter/>

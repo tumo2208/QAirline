@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 
 // Import models
 const Airport = require("./models/Airport");
@@ -11,30 +12,26 @@ const Booking = require("./models/Booking");
 const Aircraft = require("./models/Aircraft");
 
 // Import routes
-// const airportRoute = require("./routes/airportRoute");
-// const flightRoute = require("./routes/flightRoute");
-// const userRoute = require("./routes/userRoute");
-// const bookingRoute = require("./routes/bookingRoute");
-// const aircraftRoute = require("./routes/aircraftRoute");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
+app.use(cookieParser());
 
 // routes
 // app.use("/api/products", productRoute);
 
 const cors = require("cors");
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3001',
+    credentials: true,
+}));
 
 // Routes
-// app.use("/api/airports", airportRoute);
-// app.use("/api/flights", flightRoute);
-// app.use("/api/users", userRoute);
-// app.use("/api/bookings", bookingRoute);
-// app.use("/api/aircrafts", aircraftRoute);
+app.use('/', authRoutes);
 
 
 app.get("/", (req, res) => {
