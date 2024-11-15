@@ -2,23 +2,37 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-const userVerification = async (req, res) => {
+const userVerification = async (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
-        return res.status(401).json({ message: "No token, authorization denied" });
+        return res.status(400).json({ message: "No token, authorization denied" });
     }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
-        if (!user) {
-            return res.status(404).json({ status: false, message: "User not found." });
+    jwt.verify(token, process.env.JWT_SECRET, async (err, data) => {
+        if (err) {
+            return res.status(400).json({ message: "Token is not valid" });
+        } else {
+            const user = await User.findById(data.id);
+            if (user) {
+                return res.status(200).json({ 
+                    message: "User is verified", 
+                    user: {
+                        full_name: user.full_name,
+                        email: user.email,
+                        gender: user.gender,
+                        age: user.age,
+                        nationality: user.nationality,
+                        dob: user.dob,
+                        phone_number: user.phone_number,
+                        passport: user.passport,
+                        created_at: user.created_at
+                    }
+                });
+            } else {
+                return res.status(400).json({ message: "User not found", status: false });
+            }
         }
-        req.user = user;
-        next();
-    } catch (error) {
-        res.status(400).json({ status: false, message: "Invalid token." });
-    }
+    })
 };
 
 module.exports = userVerification;

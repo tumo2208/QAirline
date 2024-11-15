@@ -13,6 +13,7 @@
     "@sequelize/postgres": "^7.0.0-alpha.43",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.4.5",
