@@ -12,7 +12,7 @@ const Booking = require("./models/Booking");
 const Aircraft = require("./models/Aircraft");
 
 // Import routes
-const authRoutes = require("./routes/authRoutes");
+const authRoutes = require("./routes/AuthRoute");
 // const airportRoute = require("./routes/airportRoute");
 const flightRoute = require("./routes/FlightRoute");
 // const userRoute = require("./routes/userRoute");
