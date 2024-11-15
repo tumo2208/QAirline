@@ -1,4 +1,4 @@
-import Home from "./components/Home";
+import Home from "./components/Home/Home";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Explore from "./components/Explore";
 import Booking from "./components/Booking";
