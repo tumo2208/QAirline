@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link} from "react-router-dom";
 import axios from 'axios';
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3000/login', { email, password }, { withCredentials: true });
+            const response = await axios.post('http://localhost:3001/login', { email, password }, { withCredentials: true });
             if (response.data.message === "Login successful") {
-                navigate(`/profile`);
+                window.location.href = 'http://localhost:3000/';
             }
         } catch (error) {
             setError("Incorrect email or password");
@@ -58,7 +57,7 @@ function Login() {
                             {error && <div className="text-red-500 mt-2">{error}</div>}
 
                             <div className="text-right mt-2">
-                                <Link to="/forgot-password" className="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700">Quên mật khẩu?</Link>
+                                <Link to="/forgotpassword" className="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700">Quên mật khẩu?</Link>
                             </div>
 
                             <button type="submit" className="w-full block bg-blue-500 hover:bg-blue-400 focus:bg-blue-400 text-white font-semibold rounded-lg px-4 py-3 mt-3">
