@@ -98,7 +98,8 @@ function Home() {
                         </form>
                     </div>
                 </div>
-                <div  style={{flex:5}}></div>
+                <div  style={{flex:5}}>
+                </div>
             </div>
 
             <div className="section3 max-w-screen-xl mx-auto p-6">

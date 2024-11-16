@@ -9,3 +9,7 @@
 .footerItem {
   @apply lg:hover:underline lg:hover:text-blue-700;
 }
+
+.profileMenuItem {
+  @apply cursor-pointer text-slate-800 flex w-full text-sm items-center rounded-md p-3 transition-all hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-300;
+}
