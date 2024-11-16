@@ -91,13 +91,6 @@ function Signup() {
                             </div>
 
                             <div className="mt-4">
-                                <label className="font-semibold block text-gray-700">Số điện thoại</label>
-                                <input type="tel" name="" id="" placeholder="Nhập số điện thoại"
-                                       className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500
-                      focus:bg-white focus:outline-none" required/>
-                            </div>
-
-                            <div className="mt-4">
                                 <label className="font-semibold block text-gray-700">Mật khẩu</label>
                                 <input type="password" name="" id="" placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)"
                                        minLength="8"

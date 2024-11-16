@@ -1,16 +1,19 @@
 import './Home.css';
 
 function Home() {
+    const booking = document.querySelector(".booking")
+    const checkin = document.querySelector(".checkin");
+    const myBooking = document.querySelector(".myBooking");
     return (
         <div className="Home">
-            <div className="section1 flex flex-wrap items-center bg-cover"
+            <div className="section1 flex flex-wrap items-center bg-cover bg-center"
                  style={{backgroundImage: "url('/images/background.png')", height: "600px"}}>
                 <div className="pl-6 pr-6 pb-6 flex justify-center items-center" style={{flex:6}}>
                     <div className="mx-auto mt-8 bg-white rounded-xl shadow-lg p-6">
                         <div className="flex justify-around text-center mb-4">
-                            <button className="text-blue-700 font-bold pb-2 border-b-4 border-blue-700">✈️ Đặt vé</button>
-                            <button className="text-gray-500 font-bold pb-2 lg:hover:border-b-4 lg:hover:text-blue-700 lg:hover:border-blue-700">🛂 Làm thủ tục</button>
-                            <button className="text-gray-500 font-bold pb-2 lg:hover:border-b-4 lg:hover:text-blue-700 lg:hover:border-blue-700">🎫 Quản lý đặt chỗ</button>
+                            <button className="booking text-blue-700 font-bold pb-2 border-b-4 border-blue-700">✈️ Đặt vé</button>
+                            <button className="checkin text-gray-500 font-bold pb-2 lg:hover:border-b-4 lg:hover:text-blue-700 lg:hover:border-blue-700">🛂 Làm thủ tục</button>
+                            <button className="myBooking text-gray-500 font-bold pb-2 lg:hover:border-b-4 lg:hover:text-blue-700 lg:hover:border-blue-700">🎫 Quản lý đặt chỗ</button>
                         </div>
 
                         <form className="space-y-2">
