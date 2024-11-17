@@ -7,6 +7,7 @@ const seatClassSchema = new Schema({
 });
 
 const aircraftSchema = new Schema({
+    aircraft_number: { type: String, required: true },
     manufacturer: { type: String, required: true },
     seat_number: { type: Number, required: true },
     seat_classes: [seatClassSchema],

@@ -1,10 +1,11 @@
 const express = require('express');
-const {getAllFlights, getFlightsOneWay, getFlightsRoundTrip } = require('../controller/FlightController');
+const {getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight } = require('../controller/FlightController');
 
 const router = express.Router();
 
-router.post('/allflights', getAllFlights);
-router.post('/oneway/:departCity/:arriveCity/:departDate', getFlightsOneWay);
-router.post('/roundtrip/:departCity/:arriveCity/:departDate/:arriveDate', getFlightsRoundTrip);
+router.get('/allflights', getAllFlights);
+router.get('/oneway', getFlightsOneWay);
+router.get('/roundtrip', getFlightsRoundTrip);
+router.post('/addflight', addFlight);
 
 module.exports = router;
