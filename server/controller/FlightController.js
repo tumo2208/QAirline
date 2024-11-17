@@ -44,6 +44,12 @@ const getAllFlights = async (req, res) => {
  */
 const getFlights = async (departCity, arriveCity, departDate) => {
     try {
+        const startOfDay = new Date(departDate);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(departDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
         return await Flight.aggregate([
             {
                 $lookup: {
@@ -65,7 +71,10 @@ const getFlights = async (departCity, arriveCity, departDate) => {
                 $match: {
                     'departure_airport.city': departCity,
                     'arrival_airport.city': arriveCity,
-                    'departure_time': departDate
+                    'departure_time': {
+                        $gte: startOfDay,
+                        $lte: endOfDay
+                    }
                 }
             },
             {
