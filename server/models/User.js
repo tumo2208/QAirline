@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const { DATE } = require('sequelize');
 const { Schema } = mongoose;
-const {nationalities} = require('../shared/SharedData');
+const {nationalities} = require('../../client/src/shared/SharedData');
 
 // const nationalities = [
 //     "Vietnam", "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina",
