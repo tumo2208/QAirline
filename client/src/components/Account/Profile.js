@@ -24,13 +24,22 @@ function Profile() {
         return date.toLocaleDateString('vi-VN');
     }
 
-    if (!user) return <div>Loading...</div>;
+    if (!user) return (
+        <div className="w-full bg-purple-50 opacity-75 z-50">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+                  integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ=="
+                  crossOrigin="anonymous" referrerPolicy="no-referrer"/>
+            <div className="flex justify-center items-center py-[30vh]">
+                <div className="fas fa-circle-notch fa-spin fa-5x text-blue-700"></div>
+            </div>
+        </div>
+    );
 
     return (
         <section className="bg-purple-50 box-border justify-center items-center">
             <div className="rounded-2xl flex p-5 space-x-10 justify-center items-center">
                 <div className="md:block lg:block hidden ">
-                    <img className="rounded-2xl  object-cover object-center"
+                <img className="rounded-2xl  object-cover object-center"
                          src="https://i.imgur.com/uWIJU3R.png"
                          alt=""/>
                 </div>
@@ -89,7 +98,7 @@ function Profile() {
                         </div>
                         <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                             <dt className="text-sm font-medium text-gray-500">
-                                Số hộ chiếu
+                                Số hộ chiếu / CCCD
                             </dt>
                             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-1">
                                 {user.passport}
