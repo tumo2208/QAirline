@@ -31,6 +31,7 @@ const {nationalities} = require('../../client/src/shared/SharedData');
 //     "Vanuatu", "Vatican City", "Venezuela", "Yemen", "Zambia", "Zimbabwe"
 // ];
 
+
 const userSchema = new Schema({
     full_name: { type: String, required: true },
     gender: { type: String, enum: ['Male', 'Female', 'Others'], required: true },
@@ -58,17 +59,8 @@ const userSchema = new Schema({
             message: "Phone number must be 10 characters long!"
         }
     },
-    passport: { 
-        type: String, 
-        unique: true,
-        required: true,
-        validate: {
-            validator: function (v) {
-                return v.length >= 8 && v.length <= 15;
-            },
-            message: "Passport must be between 8 and 15 characters!"
-        }
-    },
+    identification_id: { type: String, required: true, unique: true },
+    id_type: { type: String, enum: ['Citizen ID', 'Passport'] },
     created_at: { type: Date, default: Date.now }
 });
 

@@ -24,7 +24,8 @@ const userVerification = async (req, res, next) => {
                         nationality: user.nationality,
                         dob: user.dob,
                         phone_number: user.phone_number,
-                        passport: user.passport,
+                        identification_id: user.identification_id,
+                        id_type: user.id_type,
                         created_at: user.created_at
                     }
                 });
