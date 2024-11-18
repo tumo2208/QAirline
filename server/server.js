@@ -4,13 +4,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 
-// Import models
-const Airport = require("./models/Airport");
-const Flight = require("./models/Flight");
-const User = require("./models/User");
-const Booking = require("./models/Booking");
-const Aircraft = require("./models/Aircraft");
-
 // Import routes
 const authRoutes = require("./routes/AuthRoute");
  const airportAircraftRoute = require("./routes/AirportAircraftRoute");
@@ -50,6 +43,7 @@ app.get("/", (req, res) => {
 mongoose.connect(process.env.MONGODB_URL)
 .then(() => {
     console.log('Connected!');
+
     app.listen(3001, () => {
         console.log('Server is running on port 3001');
     }); 
