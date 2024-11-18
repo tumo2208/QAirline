@@ -30,15 +30,11 @@ const { Schema } = mongoose;
 // });
 
 const ticketSchema = new Schema({
+    ticket_code: { type: String, required: true },
+    passenger_id: { type: String, ref: 'Passenger', required: true },
     flight_id: { type: String, ref: 'Flight', required: true },
-    booking_date: { type: Date, default: Date.now },
-    customer_type: { type: String, enum: ['Adult', 'Child', 'Infant'], required: true },
-    customer_details: {
-        type: Schema.Types.Mixed,
-        required: true
-    },
+    seat_number: { type: String, required: true},
     class_type: { type: String, enum: ['Economy', 'Business'], required: true },
-    seat_number: { type: String, required: true },
     price: { type: Number, required: true },
 });
 

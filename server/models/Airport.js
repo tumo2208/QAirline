@@ -6,7 +6,7 @@ const airportSchema = new Schema({
     city: { type: String, required: true },
     country: { type: String, required: true },
     airport_code: { type: String, required: true, unique: true },
-    isInternational: { type: Boolean, default: false },
+    is_international: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('Airport', airportSchema);

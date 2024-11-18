@@ -9,13 +9,15 @@ const seatFlightSchema = new Schema({
 
 const flightSchema = new Schema({
     flight_number: { type: String, required: true },
+    is_international: { type: Boolean, required: true },
     aircraft_id: { type: Schema.Types.ObjectId, ref: 'Aircraft', required: true },
     departure_airport_id: { type: Schema.Types.ObjectId, ref: 'Airport', required: true },
     arrival_airport_id: { type: Schema.Types.ObjectId, ref: 'Airport', required: true },
     departure_time: { type: Date, required: true },
     arrival_time: { type: Date, required: true },
+    delay_time: { type: Number, default: 0 },
     available_seats: [seatFlightSchema],
-    status: { type: String, enum: ['Scheduled', 'Delayed', 'Cancelled'], required: true },
+    status: { type: String, enum: ['Scheduled', 'Delayed', 'Cancelled'], required: true }
 });
 
 // Temporary
