@@ -105,40 +105,64 @@ function checkIdentification(identifiation_id) {
     }
 }
 
-const updateIdentification = async (req, res) => {
-    const { identification_id } = req.body;
+const update = async (req, res) => {
     const userId = req.user.id;
+    const { full_name, gender, dob, nationality, email, phone_number, identification_id } = req.body;
 
     try {
-        let id_type = '';
+        const updates = {};
 
-        if (!checkIdentification(identification_id)) {
-            return res.status(400).json({ message: "Invalid identification format. Must be a valid citizen ID or passport." });
+        if (full_name) updates.full_name = full_name;
+        if (gender) updates.gender = gender;
+        if (dob) updates.dob = dob;
+        if (nationality) updates.nationality = nationality;
+        if (email) {
+            const emailExists = await User.findOne({ email });
+            if (emailExists && emailExists.id !== userId) {
+                return res.status(400).json({ message: "Email is already in use" });
+            }
+            updates.email = email;
+        }
+        if (phone_number) {
+            const phoneExists = await User.findOne({ phone_number });
+            if (phoneExists && phoneExists.id !== userId) {
+                return res.status(400).json({ message: "Phone number is already in use" });
+            }
+            updates.phone_number = phone_number;
+        }
+        if (identification_id) {
+            const idType = checkIdentification(identification_id);
+            if (!idType) {
+                return res.status(400).json({ message: "Invalid identification format" });
+            }
+            updates.identification_id = identification_id;
+            updates.id_type = idType;
         }
 
-        id_type = checkIdentification(identification_id);
-
-        // Update the user's identification
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { identification_id, id_type },
-            { new: true }
-        );
-
+        // Update the user in the database
+        const user = await User.findByIdAndUpdate(userId, updates, { new: true });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
         res.status(200).json({
-            message: "Identification updated successfully",
-            identification_id: user.identification_id,
-            id_type: user.id_type
+            message: "Profile updated successfully",
+            user: {
+                full_name: user.full_name,
+                email: user.email,
+                gender: user.gender,
+                dob: user.dob,
+                nationality: user.nationality,
+                phone_number: user.phone_number,
+                identification_id: user.identification_id,
+                id_type: user.id_type,
+                created_at: user.created_at,
+            },
         });
-
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error updating identification" });
+        res.status(500).json({ message: "Error updating user" });
     }
 };
 
-module.exports = { login, profile, register, updateIdentification };
+module.exports = { login, profile, register, update };
