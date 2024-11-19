@@ -59,4 +59,24 @@ class Infant {
     }
 }
 
-module.exports = {nationalities, Adult, Children, Infant};
+function determineNextChair(flight, aircraft, class_type) {
+    let seatMax = 0;
+    aircraft.seat_classes.forEach(seatClass => {
+        if (seatClass.class_type === class_type) {
+            seatMax = seatClass.seat_count;
+        }
+    });
+    let numUsed = 0;
+    flight.available_seats.forEach(seatClass => {
+        if (seatClass.class_type === class_type) {
+            numUsed = seatClass.seat_count;
+        }
+    })
+    numUsed = seatMax - numUsed;
+    const nextSeatNumber = numUsed + 1;
+    const rowNumber = (nextSeatNumber - 1) % 6 + 1;
+    const columnChar = String.fromCharCode(Math.floor((nextSeatNumber - 1) / 6) + 65);
+    return `${rowNumber}${columnChar}`;
+}
+
+module.exports = {nationalities, Adult, Children, Infant, determineNextChair};

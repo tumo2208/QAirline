@@ -30,6 +30,7 @@ const { Schema } = mongoose;
 // });
 
 const ticketSchema = new Schema({
+    booking_id: {type: Schema.Types.ObjectId, required: true},
     customer_type: { type: String, enum: ['Adult', 'Child', 'Infant'], required: true },
     customer_details: {
         type: Schema.Types.Mixed,

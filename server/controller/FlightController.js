@@ -1,6 +1,6 @@
 const Flight = require('../models/Flight');
-const Airport = require('../models/Airport');
 const Aircraft = require('../models/Aircraft');
+const moment = require('moment-timezone');
 
 const getAllFlights = async (req, res) => {
     try {
@@ -9,7 +9,7 @@ const getAllFlights = async (req, res) => {
                 $lookup: {
                     from: 'airports',
                     localField: 'departure_airport_id',
-                    foreignField: '_id',
+                    foreignField: 'airport_code',
                     as: 'departure_airport'
                 }
             },
@@ -17,7 +17,7 @@ const getAllFlights = async (req, res) => {
                 $lookup: {
                     from: 'airports',
                     localField: 'arrival_airport_id',
-                    foreignField: '_id',
+                    foreignField: 'airport_code',
                     as: 'arrival_airport'
                 }
             },
@@ -44,18 +44,15 @@ const getAllFlights = async (req, res) => {
  */
 const getFlights = async (departCity, arriveCity, departDate) => {
     try {
-        const startOfDay = new Date(departDate);
-        startOfDay.setHours(0, 0, 0, 0);
-
-        const endOfDay = new Date(departDate);
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").startOf('day').toDate();
+        const endOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").endOf('day').toDate();
 
         return await Flight.aggregate([
             {
                 $lookup: {
                     from: 'airports',
                     localField: 'departure_airport_id',
-                    foreignField: '_id',
+                    foreignField: 'airport_code',
                     as: 'departure_airport'
                 }
             },
@@ -63,7 +60,7 @@ const getFlights = async (departCity, arriveCity, departDate) => {
                 $lookup: {
                     from: 'airports',
                     localField: 'arrival_airport_id',
-                    foreignField: '_id',
+                    foreignField: 'airport_code',
                     as: 'arrival_airport'
                 }
             },
@@ -207,8 +204,8 @@ const addFlight = async (req, res) => {
     } = req.body;
 
     try {
-        const canSchedule = await canMakeNewFlight(flightID, aircraftID, departureTime, arrivalTime);
-        if (!canSchedule) {
+        const canMake = await canMakeNewFlight(flightID, aircraftID, departureTime, arrivalTime);
+        if (!canMake) {
             return res.status(400).json({ error: 'Cant make new flight.' });
         }
 

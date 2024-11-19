@@ -10,8 +10,8 @@ const seatFlightSchema = new Schema({
 const flightSchema = new Schema({
     flight_number: { type: String, required: true, unique: true },
     aircraft_id: { type: String, ref: 'Aircraft', required: true },
-    departure_airport_id: { type: Schema.Types.ObjectId, ref: 'Airport', required: true },
-    arrival_airport_id: { type: Schema.Types.ObjectId, ref: 'Airport', required: true },
+    departure_airport_id: { type: String, ref: 'Airport', required: true },
+    arrival_airport_id: { type: String, ref: 'Airport', required: true },
     departure_time: { type: Date, required: true },
     arrival_time: { type: Date, required: true },
     available_seats: [seatFlightSchema],
