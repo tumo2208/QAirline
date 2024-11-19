@@ -12,27 +12,20 @@ const userVerification = async (req, res, next) => {
         if (err) {
             return res.status(400).json({ message: "Token is not valid" });
         } else {
-            const user = await User.findById(data.id);
-            if (user) {
-                return res.status(200).json({ 
-                    message: "User is verified", 
-                    user: {
-                        full_name: user.full_name,
-                        email: user.email,
-                        gender: user.gender,
-                        age: user.age,
-                        nationality: user.nationality,
-                        dob: user.dob,
-                        phone_number: user.phone_number,
-                        passport: user.passport,
-                        created_at: user.created_at
-                    }
-                });
-            } else {
-                return res.status(400).json({ message: "User not found", status: false });
+            try {
+                const user = await User.findById(data.id);
+                if (user) {
+                    req.user = user; 
+                    next();
+                } else {
+                    return res.status(400).json({ message: "User not found", status: false });
+                }
+            } catch (error) {
+                console.error(error);
+                return res.status(500).json({ message: "Server error" });
             }
         }
-    })
+    });
 };
 
 module.exports = userVerification;

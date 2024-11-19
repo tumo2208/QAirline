@@ -44,6 +44,12 @@ const getAllFlights = async (req, res) => {
  */
 const getFlights = async (departCity, arriveCity, departDate) => {
     try {
+        const startOfDay = new Date(departDate);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(departDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
         return await Flight.aggregate([
             {
                 $lookup: {
@@ -65,7 +71,10 @@ const getFlights = async (departCity, arriveCity, departDate) => {
                 $match: {
                     'departure_airport.city': departCity,
                     'arrival_airport.city': arriveCity,
-                    'departure_time': departDate
+                    'departure_time': {
+                        $gte: startOfDay,
+                        $lte: endOfDay
+                    }
                 }
             },
             {
@@ -144,7 +153,7 @@ const getFlightsRoundTrip = async (req, res) => {
 async function canMakeNewFlight(flightID, aircraftID, departureTime, arrivalTime) {
 
     // Handle for case aircraft not exist
-    const aircraft = await Aircraft.find({
+    const aircraft = await Aircraft.findOne({
         aircraft_number: aircraftID
     });
     if (!aircraft) {
@@ -152,7 +161,7 @@ async function canMakeNewFlight(flightID, aircraftID, departureTime, arrivalTime
     }
 
     // Handle for case overlap ID
-    const conflictIDFlights = await Flight.find({
+    const conflictIDFlights = await Flight.findOne({
         flight_number: flightID
     });
     if (conflictIDFlights) {
@@ -166,7 +175,7 @@ async function canMakeNewFlight(flightID, aircraftID, departureTime, arrivalTime
     const twelveHoursAfter = new Date(arrivalTime);
     twelveHoursAfter.setHours(twelveHoursAfter.getHours() + 12);
 
-    const conflictTimeFlights = await Flight.find({
+    const conflictTimeFlights = await Flight.findOne({
         aircraft_id: aircraftID,
         $or: [
             {
@@ -200,10 +209,10 @@ const addFlight = async (req, res) => {
     try {
         const canSchedule = await canMakeNewFlight(flightID, aircraftID, departureTime, arrivalTime);
         if (!canSchedule) {
-            return res.status(400).json({ error: 'The aircraft is not available within 12 hours before or after the requested time.' });
+            return res.status(400).json({ error: 'Cant make new flight.' });
         }
 
-        const aircraft = await Aircraft.find({
+        const aircraft = await Aircraft.findOne({
             aircraft_number: aircraftID
         });
 
