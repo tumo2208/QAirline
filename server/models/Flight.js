@@ -8,7 +8,7 @@ const seatFlightSchema = new Schema({
 });
 
 const flightSchema = new Schema({
-    flight_number: { type: String, required: true },
+    flight_number: { type: String, required: true, unique: true },
     aircraft_id: { type: String, ref: 'Aircraft', required: true },
     departure_airport_id: { type: Schema.Types.ObjectId, ref: 'Airport', required: true },
     arrival_airport_id: { type: Schema.Types.ObjectId, ref: 'Airport', required: true },
@@ -17,22 +17,5 @@ const flightSchema = new Schema({
     available_seats: [seatFlightSchema],
     status: { type: String, enum: ['Scheduled', 'Delayed', 'Cancelled'], required: true },
 });
-
-// Temporary
-// flightSchema.pre('save', async function (next) {
-//     if (!this.isNew) return next();
-//
-//     const aircraft = await mongoose.model('Aircraft').findById(this.aircraft_id);
-//     if (aircraft) {
-//         this.available_seats = aircraft.seat_classes.map(seatClass => ({
-//             class_type: seatClass.class_type,
-//             seat_count: seatClass.seat_count,
-//         }));
-//     } else {
-//         return next(new Error('Aircraft not found for the flight.'));
-//     }
-//
-//     next();
-// });
 
 module.exports = mongoose.model('Flight', flightSchema);

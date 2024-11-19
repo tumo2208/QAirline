@@ -30,8 +30,6 @@ const { Schema } = mongoose;
 // });
 
 const ticketSchema = new Schema({
-    flight_id: { type: String, ref: 'Flight', required: true },
-    booking_date: { type: Date, default: Date.now },
     customer_type: { type: String, enum: ['Adult', 'Child', 'Infant'], required: true },
     customer_details: {
         type: Schema.Types.Mixed,
