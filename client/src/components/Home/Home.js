@@ -1,9 +1,35 @@
 import './Home.css';
+import {useState} from "react";
 
 function Home() {
-    const booking = document.querySelector(".booking")
-    const checkin = document.querySelector(".checkin");
-    const myBooking = document.querySelector(".myBooking");
+    const [activeForm, setActiveForm] = useState("booking_form");
+    const [roundTrip, setRoundTrip] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
+    const [passengers, setPassengers] = useState({
+        adults: 1,
+        children: 0,
+        infants: 0,
+    });
+    const decrement_button = document.querySelectorAll(".decrement");
+    const increment_button = document.querySelectorAll(".increment");
+
+    // Hàm tăng/giảm số lượng hành khách
+    const handlePassengerChange = (type, operation) => {
+        setPassengers((prev) => {
+            const newCount =
+                operation === "increment"
+                    ? prev[type] + 1
+                    : Math.max(0, prev[type] - 1);
+            return { ...prev, [type]: newCount };
+        });
+    };
+
+    // Tạo chuỗi hiển thị hành khách
+    const getPassengerSummary = () => {
+        const { adults, children, infants } = passengers;
+        return `${adults} người lớn, ${children} trẻ em, ${infants} trẻ sơ sinh`;
+    };
+
     return (
         <div className="Home">
             <div className="section1 flex flex-wrap items-center bg-cover bg-center"
@@ -11,94 +37,218 @@ function Home() {
                 <div className="pl-6 pr-6 pb-6 flex justify-center items-center" style={{flex:6}}>
                     <div className="mx-auto mt-8 bg-white rounded-xl shadow-lg p-6">
                         <div className="flex justify-around text-center mb-4">
-                            <button className="booking text-blue-700 font-bold pb-2 border-b-4 border-blue-700">✈️ Đặt vé</button>
-                            <button className="checkin text-gray-500 font-bold pb-2 lg:hover:border-b-4 lg:hover:text-blue-700 lg:hover:border-blue-700">🛂 Làm thủ tục</button>
-                            <button className="myBooking text-gray-500 font-bold pb-2 lg:hover:border-b-4 lg:hover:text-blue-700 lg:hover:border-blue-700">🎫 Quản lý đặt chỗ</button>
+                            <button
+                                className={`text-gray-500 font-bold pb-2 ${
+                                    activeForm === "booking_form" ? "text-blue-700 border-b-4 border-blue-700" : "lg:hover:text-blue-700 lg:hover:border-blue-700"
+                                }`}
+                                onClick={() => setActiveForm("booking_form")}
+                            >✈️ Đặt vé
+                            </button>
+                            <button
+                                className={`text-gray-500 font-bold pb-2 ${
+                                    activeForm === "myBooking_form" ? "text-blue-700 border-b-4 border-blue-700" : "lg:hover:text-blue-700 lg:hover:border-blue-700"
+                                }`}
+                                onClick={() => setActiveForm("myBooking_form")}
+                            >🎫 Quản lý đặt chỗ
+                            </button>
                         </div>
 
-                        <form className="space-y-2">
-                            <div className="space-x-4">
-                                <label className="inline-flex items-center">
-                                    <input type="radio" name="trip-type" className="form-radio text-yellow-500" checked/>
-                                    <span className="ml-1 text-gray-600 text-sm font-medium">Một chiều</span>
-                                </label>
-                                <label className="inline-flex items-center">
-                                    <input type="radio" name="trip-type" className="form-radio text-yellow-500"/>
-                                    <span className="ml-1 text-gray-600 text-sm font-medium">Khứ hồi</span>
-                                </label>
-                            </div>
+                        {activeForm === "booking_form" && (
+                            <form className="space-y-2" onSubmit={(e) => e.preventDefault()}>
+                                <div className="space-x-4">
+                                    <label className="inline-flex items-center">
+                                        <input type="radio" name="trip-type" className="form-radio text-yellow-500" onClick={() => setRoundTrip(true)}
+                                               checked={roundTrip === true}/>
+                                        <span className="ml-1 text-gray-600 text-sm font-medium">Khứ hồi</span>
+                                    </label>
+                                    <label className="inline-flex items-center">
+                                        <input type="radio" name="trip-type" className="form-radio text-yellow-500" onClick={() => setRoundTrip(false)}
+                                               checked={roundTrip === false}/>
+                                        <span className="ml-1 text-gray-600 text-sm font-medium">Một chiều</span>
+                                    </label>
+                                </div>
 
-                            <div className="flex gap-2">
-                                <div style={{flex:5}}>
-                                    <label className="text-gray-600 text-sm font-medium"> Điểm khởi hành</label>
+                                <div className="flex gap-2">
+                                    <div style={{flex: 5}}>
+                                        <label className="text-gray-600 text-sm font-medium"> Điểm khởi hành</label>
+                                        <input type="text"
+                                               className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                    </div>
+                                    <div style={{flex: 3}}>
+                                        <label className="text-gray-600 text-sm font-medium"> Ngày đi</label>
+                                        <input type="date"
+                                               className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                    </div>
+                                </div>
+
+
+                                <div className="flex gap-2">
+                                    <div style={{flex: 5}}>
+                                        <label className="text-gray-600 text-sm font-medium"> Điểm đến</label>
+                                        <input type="text"
+                                               className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                    </div>
+                                    {roundTrip && (
+                                        <div style={{flex: 3}}>
+                                            <label className="text-gray-600 text-sm font-medium"> Ngày về</label>
+                                            <input type="date"
+                                                   className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <div style={{flex: 4}}>
+                                        <label className="text-gray-600 text-sm font-medium"> Hạng vé</label>
+                                        <select
+                                            className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm">
+                                            <option value="1">Hạng Phổ thông</option>
+                                            <option value="3">Hạng Thương gia</option>
+                                        </select>
+                                    </div>
+
+                                    <div style={{flex: 6}}>
+                                        <label className="text-gray-600 text-sm font-medium"> Số hành khách</label>
+                                        <div className="relative w-full max-w-sm mx-auto">
+                                            <div
+                                                className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm flex justify-between items-center cursor-pointer"
+                                                onClick={() => setIsOpen(!isOpen)}
+                                            >
+                                                <span
+                                                    className="text-gray-700 text-sm">{getPassengerSummary()}</span>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className={`h-5 w-5 transform transition-transform ${
+                                                        isOpen ? "rotate-180" : ""
+                                                    }`}
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M19 9l-7 7-7-7"
+                                                    />
+                                                </svg>
+                                            </div>
+
+                                            {isOpen && (
+                                                <div
+                                                    className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-2">
+                                                    <div className="flex items-center justify-between p-3">
+                                                        <div className="flex flex-col items-center justify-between" style={{flex:1}}>
+                                                            <p className="text-gray-700 font-semibold">Người lớn</p>
+                                                            <p className="text-sm text-gray-500">12 tuổi trở lên</p>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <button
+                                                                className="decrement px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                                onClick={() => handlePassengerChange("adults", "decrement")}
+                                                            >
+                                                                −
+                                                            </button>
+                                                            <span>{passengers.adults}</span>
+                                                            <button
+                                                                className="increment px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                                onClick={() => handlePassengerChange("adults", "increment")}
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div
+                                                        className="flex items-center justify-between p-3 border-t border-gray-200">
+                                                        <div className="flex flex-col items-center justify-between" style={{flex:1}}>
+                                                            <p className="text-gray-700 font-semibold">Trẻ em</p>
+                                                            <p className="text-sm text-gray-500">2-11 tuổi</p>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <button
+                                                                className="decrement px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                                onClick={() => handlePassengerChange("children", "decrement")}
+                                                            >
+                                                                −
+                                                            </button>
+                                                            <span>{passengers.children}</span>
+                                                            <button
+                                                                className="increment px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                                onClick={() => handlePassengerChange("children", "increment")}
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div
+                                                        className="flex items-center justify-between p-3 border-t border-gray-200">
+                                                        <div className="flex flex-col items-center justify-between" style={{flex:1}}>
+                                                            <p className="text-gray-700 font-semibold">Trẻ sơ sinh</p>
+                                                            <p className="text-sm text-gray-500">Dưới 2 tuổi</p>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <button
+                                                                className="decrement px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                                onClick={() => handlePassengerChange("infants", "decrement")}
+                                                            >
+                                                                −
+                                                            </button>
+                                                            <span>{passengers.infants}</span>
+                                                            <button
+                                                                className="increment px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                                onClick={() => handlePassengerChange("infants", "increment")}
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center">
+                                    <a href="#" className="hover:underline text-sm text-blue-700 mr-2">Mã khuyến mại</a>
+                                    <div className="flex items-center bg-white rounded p-1 text-gray-700">
+                                        <span className="mr-1">🏷️</span>
+                                        <input type="text"
+                                               className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                    </div>
+                                </div>
+
+                                <button
+                                    className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg p-3">
+                                    Tìm chuyến bay
+                                </button>
+                            </form>
+                        )}
+
+                        {activeForm === "myBooking_form" && (
+                            <form className="space-y-6 p-12" onSubmit={(e) => e.preventDefault()}>
+                                <div>
+                                    <label className="text-gray-600 text-sm font-medium">Họ và tên</label>
                                     <input type="text"
                                            className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
                                 </div>
-                                <div style={{flex:3}}>
-                                    <label className="text-gray-600 text-sm font-medium"> Ngày đi</label>
-                                    <input type="date"
-                                           className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
-                                </div>
-                            </div>
-
-
-                            <div className="flex gap-2">
-                                <div style={{flex:5}}>
-                                    <label className="text-gray-600 text-sm font-medium"> Điểm đến</label>
+                                <div>
+                                    <label className="text-gray-600 text-sm font-medium"> Mã đặt chỗ</label>
                                     <input type="text"
                                            className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
                                 </div>
-                                <div style={{flex:3}}>
-                                    <label className="text-gray-600 text-sm font-medium"> Ngày về</label>
-                                    <input type="date"
-                                           className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-2">
-                                <div style={{flex: 1}}>
-                                    <label className="text-gray-600 text-sm font-medium"> Hạng vé</label>
-                                    <select
-                                        className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm">
-                                        <option value="1">Hạng Phổ thông</option>
-                                        <option value="3">Hạng Thương gia</option>
-                                    </select>
-                                </div>
-                                <div style={{flex: 1}}>
-                                    <label className="text-gray-600 text-sm font-medium"> Số hành khách</label>
-                                    <select
-                                        className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm">
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center">
-                                <a href="#" className="hover:underline text-sm text-blue-700 mr-2">Mã khuyến mại</a>
-                                <div className="flex items-center bg-white rounded p-1 text-gray-700">
-                                    <span className="mr-1">🏷️</span>
-                                    <input type="text"
-                                           className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
-                                </div>
-                            </div>
-
-                            <button
-                                className="w-full bg-green-500 hover:bg-green-700 text-white font-bold rounded-lg p-3">
-                                Tìm chuyến bay
-                            </button>
-                        </form>
+                                <button
+                                    className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg p-3">
+                                    Tra cứu
+                                </button>
+                            </form>
+                        )}
                     </div>
                 </div>
-                <div  style={{flex:5}}>
+                <div style={{flex: 5}}>
                 </div>
             </div>
 
