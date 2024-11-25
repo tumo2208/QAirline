@@ -13,10 +13,9 @@ const Aircraft = require("./models/Aircraft");
 
 // Import routes
 const authRoutes = require("./routes/AuthRoute");
-// const airportRoute = require("./routes/airportRoute");
+ const airportAircraftRoute = require("./routes/AirportAircraftRoute");
 const flightRoute = require("./routes/FlightRoute");
 const bookingRoute = require("./routes/BookingRoute");
-// const aircraftRoute = require("./routes/aircraftRoute");
 
 const app = express();
 
@@ -36,11 +35,10 @@ app.use(cors({
 
 // Routes
 app.use('/', authRoutes);
-// app.use("/api/airports", airportRoute);
+app.use("/api/airportAircraft", airportAircraftRoute);
 app.use("/api/flights", flightRoute);
 // app.use("/api/users", userRoute);
 app.use("/api/bookings", bookingRoute);
-// app.use("/api/aircrafts", aircraftRoute);
 
 
 app.get("/", (req, res) => {
