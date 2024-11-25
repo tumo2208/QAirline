@@ -10,8 +10,7 @@ function Home() {
         children: 0,
         infants: 0,
     });
-    const decrement_button = document.querySelectorAll(".decrement");
-    const increment_button = document.querySelectorAll(".increment");
+    const total_seats = passengers.adults + passengers.children;
 
     // Hàm tăng/giảm số lượng hành khách
     const handlePassengerChange = (type, operation) => {
@@ -20,6 +19,10 @@ function Home() {
                 operation === "increment"
                     ? prev[type] + 1
                     : Math.max(0, prev[type] - 1);
+
+            if (type === "adults" && prev.infants > newCount) {
+                return { ...prev, [type]: newCount, infants: newCount };
+            }
             return { ...prev, [type]: newCount };
         });
     };
@@ -97,127 +100,144 @@ function Home() {
                                     )}
                                 </div>
 
-                                <div className="flex gap-2">
-                                    <div style={{flex: 4}}>
-                                        <label className="text-gray-600 text-sm font-medium"> Hạng vé</label>
-                                        <select
-                                            className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm">
-                                            <option value="1">Hạng Phổ thông</option>
-                                            <option value="3">Hạng Thương gia</option>
-                                        </select>
-                                    </div>
-
-                                    <div style={{flex: 6}}>
-                                        <label className="text-gray-600 text-sm font-medium"> Số hành khách</label>
-                                        <div className="relative w-full max-w-sm mx-auto">
-                                            <div
-                                                className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm flex justify-between items-center cursor-pointer"
-                                                onClick={() => setIsOpen(!isOpen)}
+                                <div className="select-none">
+                                    <label className="text-gray-600 text-sm font-medium"> Số hành khách</label>
+                                    <div className="relative w-full max-w-sm mx-auto">
+                                        <div
+                                            className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm flex justify-between items-center cursor-pointer"
+                                            onClick={() => setIsOpen(!isOpen)}
+                                        >
+                                            <svg
+                                                viewBox="0 0 640 512"
+                                                fill="currentColor"
+                                                height="1.5em"
+                                                width="1.5em"
                                             >
-                                                <span
-                                                    className="text-gray-700 text-sm">{getPassengerSummary()}</span>
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className={`h-5 w-5 transform transition-transform ${
-                                                        isOpen ? "rotate-180" : ""
-                                                    }`}
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M19 9l-7 7-7-7"
-                                                    />
-                                                </svg>
-                                            </div>
+                                                <path
+                                                    d="M352 128c0 70.7-57.3 128-128 128S96 198.7 96 128 153.3 0 224 0s128 57.3 128 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4c98.5 0 178.3 79.8 178.3 178.3 0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM609.3 512H471.4c5.4-9.4 8.6-20.3 8.6-32v-8c0-60.7-27.1-115.2-69.8-151.8 2.4-.1 4.7-.2 7.1-.2h61.4c89.1 0 161.3 72.2 161.3 161.3 0 17-13.8 30.7-30.7 30.7zM432 256c-31 0-59-12.6-79.3-32.9 19.7-26.6 31.3-59.5 31.3-95.1 0-26.8-6.6-52.1-18.3-74.3C384.3 40.1 407.2 32 432 32c61.9 0 112 50.1 112 112s-50.1 112-112 112z"/>
+                                            </svg>
+                                            <span className="text-gray-700 text-sm">{getPassengerSummary()}</span>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className={`h-5 w-5 transform transition-transform ${
+                                                    isOpen ? "rotate-180" : ""
+                                                }`}
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M19 9l-7 7-7-7"
+                                                />
+                                            </svg>
+                                        </div>
 
-                                            {isOpen && (
-                                                <div
-                                                    className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-2">
-                                                    <div className="flex items-center justify-between p-3">
-                                                        <div className="flex flex-col items-center justify-between" style={{flex:1}}>
-                                                            <p className="text-gray-700 font-semibold">Người lớn</p>
-                                                            <p className="text-sm text-gray-500">12 tuổi trở lên</p>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <button
-                                                                className="decrement px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
-                                                                onClick={() => handlePassengerChange("adults", "decrement")}
-                                                            >
-                                                                −
-                                                            </button>
-                                                            <span>{passengers.adults}</span>
-                                                            <button
-                                                                className="increment px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
-                                                                onClick={() => handlePassengerChange("adults", "increment")}
-                                                            >
-                                                                +
-                                                            </button>
-                                                        </div>
+                                        {isOpen && (
+                                            <div
+                                                className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-2">
+                                            <div className="flex items-center justify-between p-3">
+                                                    <div className="flex flex-col items-center justify-between"
+                                                         style={{flex: 1}}>
+                                                        <p className="text-gray-700 font-semibold">Người lớn</p>
+                                                        <p className="text-sm text-gray-500">12 tuổi trở lên</p>
                                                     </div>
-
-
-                                                    <div
-                                                        className="flex items-center justify-between p-3 border-t border-gray-200">
-                                                        <div className="flex flex-col items-center justify-between" style={{flex:1}}>
-                                                            <p className="text-gray-700 font-semibold">Trẻ em</p>
-                                                            <p className="text-sm text-gray-500">2-11 tuổi</p>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <button
-                                                                className="decrement px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
-                                                                onClick={() => handlePassengerChange("children", "decrement")}
-                                                            >
-                                                                −
-                                                            </button>
-                                                            <span>{passengers.children}</span>
-                                                            <button
-                                                                className="increment px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
-                                                                onClick={() => handlePassengerChange("children", "increment")}
-                                                            >
-                                                                +
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-
-                                                    <div
-                                                        className="flex items-center justify-between p-3 border-t border-gray-200">
-                                                        <div className="flex flex-col items-center justify-between" style={{flex:1}}>
-                                                            <p className="text-gray-700 font-semibold">Trẻ sơ sinh</p>
-                                                            <p className="text-sm text-gray-500">Dưới 2 tuổi</p>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <button
-                                                                className="decrement px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
-                                                                onClick={() => handlePassengerChange("infants", "decrement")}
-                                                            >
-                                                                −
-                                                            </button>
-                                                            <span>{passengers.infants}</span>
-                                                            <button
-                                                                className="increment px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
-                                                                onClick={() => handlePassengerChange("infants", "increment")}
-                                                            >
-                                                                +
-                                                            </button>
-                                                        </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <button
+                                                            className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                            onClick={() => handlePassengerChange("adults", "decrement")}
+                                                            disabled={passengers.adults === 1}
+                                                        >
+                                                            −
+                                                        </button>
+                                                        <span>{passengers.adults}</span>
+                                                        <button
+                                                            className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                            onClick={() => handlePassengerChange("adults", "increment")}
+                                                            disabled={total_seats === 9}
+                                                        >
+                                                            +
+                                                        </button>
                                                     </div>
                                                 </div>
-                                            )}
-                                        </div>
+
+
+                                                <div
+                                                    className="flex items-center justify-between p-3 border-t border-gray-200">
+                                                    <div className="flex flex-col items-center justify-between"
+                                                         style={{flex: 1}}>
+                                                        <p className="text-gray-700 font-semibold">Trẻ em</p>
+                                                        <p className="text-sm text-gray-500">2-11 tuổi</p>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <button
+                                                            className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                            onClick={() => handlePassengerChange("children", "decrement")}
+                                                            disabled={passengers.children === 0}
+                                                        >
+                                                            −
+                                                        </button>
+                                                        <span>{passengers.children}</span>
+                                                        <button
+                                                            className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                            onClick={() => handlePassengerChange("children", "increment")}
+                                                            disabled={total_seats === 9}
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+
+                                                <div
+                                                    className="flex items-center justify-between p-3 border-t border-gray-200">
+                                                    <div className="flex flex-col items-center justify-between"
+                                                         style={{flex: 1}}>
+                                                        <p className="text-gray-700 font-semibold">Trẻ sơ sinh</p>
+                                                        <p className="text-sm text-gray-500">Dưới 2 tuổi</p>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <button
+                                                            className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                            onClick={() => handlePassengerChange("infants", "decrement")}
+                                                            disabled={passengers.infants === 0}
+                                                        >
+                                                            −
+                                                        </button>
+                                                        <span>{passengers.infants}</span>
+                                                        <button
+                                                            className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
+                                                            onClick={() => handlePassengerChange("infants", "increment")}
+                                                            disabled={passengers.infants === passengers.adults}
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
                                 <div className="flex items-center">
-                                    <a href="#" className="hover:underline text-sm text-blue-700 mr-2">Mã khuyến mại</a>
+                                    <a href="#" className="hover:underline text-sm text-blue-700 mr-2">Mã khuyến mãi</a>
                                     <div className="flex items-center bg-white rounded p-1 text-gray-700">
-                                        <span className="mr-1">🏷️</span>
                                         <input type="text"
                                                className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                        <button className="absolute right-2 top-1.5 text-gray-500">
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                fill="currentColor"
+                                                height="1.5em"
+                                                width="1.5em"
+                                            >
+                                                <path
+                                                    d="M10 18a7.952 7.952 0 004.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0018 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"/>
+                                            </svg>
+                                        </button>
+
                                     </div>
                                 </div>
 
