@@ -12,7 +12,7 @@ function Signup() {
     const [gender, setGender] = useState("Male");
     const [nationality, setNationality] = useState("Vietnam");
     const [dob, setDob] = useState("");
-    const [passport, setPassport] = useState("");
+    const [identification_id, setIdentificationId] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
@@ -58,7 +58,7 @@ function Signup() {
                 email,
                 phone_number,
                 password,
-                passport
+                identification_id,
             },
             { withCredentials: true },
           );
@@ -151,9 +151,9 @@ function Signup() {
                             <label className="font-semibold block text-gray-700">Số hộ chiếu</label>
                             <input
                                 type="text"
-                                value={passport}
-                                onChange={(e) => setPassport(e.target.value)}
-                                placeholder="Nhập số hộ chiếu"
+                                value={identification_id}
+                                onChange={(e) => setIdentificationId(e.target.value)}
+                                placeholder="Nhập mã định danh của bạn"
                                 minLength="8"
                                 maxLength="15"
                                 className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
