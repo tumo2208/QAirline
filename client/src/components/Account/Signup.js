@@ -124,9 +124,9 @@ function Signup() {
                         <div className="flex-1">
                             <label className="font-semibold block text-gray-700">Số điện thoại</label>
                             <input
-                                type="text" 
-                                name="" 
-                                id="" 
+                                type="text"
+                                name=""
+                                id=""
                                 value={phone_number}
                                 onChange={(e) => setPhone(e.target.value)}
                                 placeholder='Nhập số điện thoại'
