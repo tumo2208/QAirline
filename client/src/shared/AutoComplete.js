@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import autocompleter from "autocompleter";
 
-export function AutocompleteInput({ suggestions , style}) {
+export function AutocompleteInput({ suggestions , style, value, onChange}) {
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -41,15 +41,18 @@ export function AutocompleteInput({ suggestions , style}) {
                 suggestions_items.forEach((item) => {
                     item.className = "hidden";
                 })
+                onChange({target : { value: item.city} });
             },
         });
-    }, [suggestions]);
+    }, [suggestions, onChange]);
 
     return (
         <input
             ref={inputRef}
             type="text"
             className={style}
+            value={value}
+            onChange={onChange}
         />
     );
 }

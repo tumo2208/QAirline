@@ -4,8 +4,8 @@ const {getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight } = requi
 const router = express.Router();
 
 router.get('/allflights', getAllFlights);
-router.get('/oneway', getFlightsOneWay);
-router.get('/roundtrip', getFlightsRoundTrip);
+router.post('/oneway', getFlightsOneWay);
+router.post('/roundtrip', getFlightsRoundTrip);
 router.post('/addflight', addFlight);
 
 module.exports = router;

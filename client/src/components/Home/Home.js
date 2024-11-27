@@ -1,12 +1,12 @@
 import './Home.css';
 import {useEffect, useState} from "react";
 import {AutocompleteInput} from "../../shared/AutoComplete";
-import {airportsInfo} from "../../shared/SharedData";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
     const [activeForm, setActiveForm] = useState("booking_form");
-    const [roundTrip, setRoundTrip] = useState(true);
+    const [roundTrip, setRoundTrip] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [passengers, setPassengers] = useState({
         adults: 1,
@@ -14,6 +14,13 @@ function Home() {
         infants: 0,
     });
     const total_seats = passengers.adults + passengers.children;
+
+    const navigate = useNavigate();
+    const [departure, setDeparture] = useState("");
+    const [destination, setDestination] = useState("");
+    const [departureDate, setDepartureDate] = useState("");
+    const [returnDate, setReturnDate] = useState("");
+    const [error, setError] = useState("");
 
     // Hàm tăng/giảm số lượng hành khách
     const handlePassengerChange = (type, operation) => {
@@ -55,6 +62,48 @@ function Home() {
         fetchSuggestions();
     }, []);
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!departure || !destination || !departureDate) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        try {
+            let response;
+
+            const requestBody = {
+                departCity: departure,
+                arriveCity: destination,
+                departDate: departureDate
+            };
+
+            if (roundTrip === true) {
+                requestBody.arriveDate = returnDate;
+            }
+
+            if (roundTrip === false) {
+                response = await axios.post("http://localhost:3001/api/flights/oneway", requestBody);
+            } else {
+                response = await axios.post("http://localhost:3001/api/flights/roundtrip", requestBody);
+            }
+
+            if (response.status === 200) {
+                navigate("/booking", { 
+                    state: {
+                        flights: response.data,
+                        tripType: roundTrip ? "round-trip" : "one-way"
+                    }
+                });
+            } else {
+                navigate("/booking", { state: { flights: [] } });
+            }
+        } catch (error) {
+            navigate("/booking", { state: { flights: [] } });
+        }
+    };
+
     return (
         <div className="Home">
             <div className="section1 flex flex-wrap justify-center items-center bg-cover bg-center"
@@ -79,18 +128,28 @@ function Home() {
                         </div>
 
                         {activeForm === "booking_form" && (
-                            <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+                            <form className="space-y-3" onSubmit={handleSubmit}>
                                 <div className="space-x-5">
                                     <label className="inline-flex items-center">
-                                        <input type="radio" name="trip-type" className="form-radio text-yellow-500"
-                                               onClick={() => setRoundTrip(true)}
-                                               checked={roundTrip === true}/>
+                                        <input 
+                                            type="radio" 
+                                            name="trip-type" 
+                                            className="form-radio text-yellow-500"
+                                            value="one-way"
+                                            checked={roundTrip == true}
+                                            onChange={() => setRoundTrip(true)}
+                                        />
                                         <span className="ml-1 text-gray-600 text-sm font-medium">Khứ hồi</span>
                                     </label>
                                     <label className="inline-flex items-center">
-                                        <input type="radio" name="trip-type" className="form-radio text-yellow-500"
-                                               onClick={() => setRoundTrip(false)}
-                                               checked={roundTrip === false}/>
+                                        <input 
+                                            type="radio" 
+                                            name="trip-type" 
+                                            className="form-radio text-yellow-500"
+                                            value="round-trip"
+                                            checked={roundTrip == false}
+                                            onChange={() => setRoundTrip(false)}
+                                        />
                                         <span className="ml-1 text-gray-600 text-sm font-medium">Một chiều</span>
                                     </label>
                                 </div>
@@ -109,14 +168,22 @@ function Home() {
                                                 <path
                                                     d="M3 18h18v2H3zm18.509-9.473a1.61 1.61 0 00-2.036-1.019L15 9 7 6 5 7l6 4-4 2-4-2-1 1 4 4 14.547-5.455a1.611 1.611 0 00.962-2.018z"/>
                                             </svg>
-                                            <AutocompleteInput suggestions={suggestions}
-                                                               style="w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                            <AutocompleteInput 
+                                                suggestions={suggestions}
+                                                style="w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
+                                                value={departure}
+                                                onChange={(e) => setDeparture(e.target.value)}
+                                            />
                                         </div>
                                     </div>
                                     <div style={{flex: 3}}>
                                         <label className="text-gray-600 text-sm font-medium"> Ngày đi</label>
-                                        <input type="date"
-                                               className="w-full border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                        <input
+                                            type="date"
+                                            className="w-full border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
+                                            value={departureDate}
+                                            onChange={(e) => setDepartureDate(e.target.value)}
+                                        />
                                     </div>
                                 </div>
 
@@ -135,15 +202,24 @@ function Home() {
                                                 <path
                                                     d="M2.5 19h19v2h-19v-2m7.18-5.73l4.35 1.16 5.31 1.42c.8.21 1.62-.26 1.84-1.06.21-.79-.26-1.62-1.06-1.84l-5.31-1.42-2.76-9.03-1.93-.5v8.28L5.15 8.95l-.93-2.32-1.45-.39v5.17l1.6.43 5.31 1.43z"/>
                                             </svg>
-                                            <AutocompleteInput suggestions={suggestions}
-                                                               style="w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                            <AutocompleteInput 
+                                                suggestions={suggestions}
+                                                style="w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
+                                                value={destination}
+                                                onChange={(e) => setDestination(e.target.value)}
+                                            />
                                         </div>
                                     </div>
+
                                     {roundTrip && (
                                         <div style={{flex: 3}}>
                                             <label className="text-gray-600 text-sm font-medium"> Ngày về</label>
-                                            <input type="date"
-                                                   className="w-full border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                            <input 
+                                                type="date"
+                                                className="w-full border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
+                                                value={returnDate}
+                                                onChange={(e) => setReturnDate(e.target.value)}
+                                            />
                                         </div>
                                     )}
                                 </div>
@@ -211,7 +287,6 @@ function Home() {
                                                     </div>
                                                 </div>
 
-
                                                 <div
                                                     className="flex items-center justify-between p-3 border-t border-gray-200">
                                                     <div className="flex flex-col items-center justify-between"
@@ -270,16 +345,18 @@ function Home() {
                                 </div>
 
                                 <div className="flex items-center">
-                                    <a href="#" className="hover:underline text-sm text-blue-700 mr-2">Mã khuyến mãi</a>
+                                    <a href="example.com" className="hover:underline text-sm text-blue-700 mr-2">Mã khuyến mãi</a>
                                     <input type="text"
                                            className="border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
                                 </div>
 
                                 <button
-                                    className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg p-3">
+                                    className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg p-3"
+                                    type="submit">
                                     Tìm chuyến bay
                                 </button>
                             </form>
+                            
                         )}
 
                         {activeForm === "myBooking_form" && (
@@ -300,6 +377,7 @@ function Home() {
                                 </button>
                             </form>
                         )}
+                        {error && <p className="error">{error}</p>}
                     </div>
                 </div>
                 <div style={{flex: 5}}>
