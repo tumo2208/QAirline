@@ -51,6 +51,11 @@ function AppHeader() {
     return (
         <nav className="sticky z-10 top-0 font-bold border-gray-200 p-1 h-50"
              style={{height: "75px", backgroundColor: "#eaf6f6"}}>
+            <link rel="preconnect" href="https://fonts.googleapis.com"/>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin/>
+            <link
+                href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Pangolin&family=Potta+One&family=Protest+Revolution&display=swap"
+                rel="stylesheet"/>
             <div
                 className="flex flex-wrap items-center justify-between max-w-screen-xl px-1 mx-auto select-none"
             >
@@ -82,10 +87,10 @@ function AppHeader() {
                 {loginState ? (
                     <div id="menu-container" className="flex items-center lg:order-3 space-x-2">
                         <p className="font-semibold">{userName}</p>
-                        <div id="profile" >
-                            <img src= {`images/avatar/${userGender}.png`}
+                        <div id="profile">
+                            <img src={`images/avatar/${userGender}.png`}
                                  onClick={toggleMenu}
-                                 className="cursor-pointer w-12 h-12"  alt="user"/>
+                                 className="cursor-pointer w-12 h-12" alt="user"/>
 
                             {isMenuVisible && (
                                 <ul
@@ -251,6 +256,7 @@ function AppHeader() {
                 <div
                     className="items-center justify-between w-full lg:flex lg:w-auto lg:order-1"
                     id="mobile-menu-2"
+                    style={{fontFamily: "Pangolin, sans-serif", fontSize: "large"}}
                 >
                     <ul
                         className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0"
@@ -260,25 +266,25 @@ function AppHeader() {
                                 to="/explore"
                                 className="navItem"
                                 aria-current="page"
-                            >Khám phá</Link>
+                            >KHÁM PHÁ</Link>
                         </li>
                         <li>
                             <Link
                                 to="/booking"
                                 className="navItem"
-                            >Đặt vé</Link>
+                            >ĐẶT VÉ</Link>
                         </li>
                         <li>
                             <Link
                                 to="/travel-info"
                                 className="navItem"
-                            >Thông tin hành trình</Link>
+                            >THÔNG TIN HÀNH TRÌNH</Link>
                         </li>
                         <li>
                             <Link
                                 to="/help"
                                 className="navItem"
-                            >Vé của tôi</Link>
+                            >VÉ CỦA TÔI</Link>
                         </li>
                     </ul>
                 </div>

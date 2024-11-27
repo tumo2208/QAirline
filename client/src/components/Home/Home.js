@@ -90,17 +90,17 @@ function Home() {
             }
 
             if (response.status === 200) {
-                navigate("/booking", { 
+                navigate("/booking/flight-selection", {
                     state: {
                         flights: response.data,
                         tripType: roundTrip ? "round-trip" : "one-way"
                     }
                 });
             } else {
-                navigate("/booking", { state: { flights: [] } });
+                navigate("/booking/flight-selection", { state: { flights: [] } });
             }
         } catch (error) {
-            navigate("/booking", { state: { flights: [] } });
+            navigate("/booking/flight-selection", { state: { flights: [] } });
         }
     };
 
@@ -136,7 +136,7 @@ function Home() {
                                             name="trip-type" 
                                             className="form-radio text-yellow-500"
                                             value="one-way"
-                                            checked={roundTrip == true}
+                                            checked={roundTrip === true}
                                             onChange={() => setRoundTrip(true)}
                                         />
                                         <span className="ml-1 text-gray-600 text-sm font-medium">Khứ hồi</span>
@@ -147,7 +147,7 @@ function Home() {
                                             name="trip-type" 
                                             className="form-radio text-yellow-500"
                                             value="round-trip"
-                                            checked={roundTrip == false}
+                                            checked={roundTrip === false}
                                             onChange={() => setRoundTrip(false)}
                                         />
                                         <span className="ml-1 text-gray-600 text-sm font-medium">Một chiều</span>
@@ -270,6 +270,7 @@ function Home() {
                                                     </div>
                                                     <div className="flex items-center space-x-2">
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("adults", "decrement")}
                                                             disabled={passengers.adults === 1}
@@ -278,6 +279,7 @@ function Home() {
                                                         </button>
                                                         <span>{passengers.adults}</span>
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("adults", "increment")}
                                                             disabled={total_seats === 9}
@@ -296,6 +298,7 @@ function Home() {
                                                     </div>
                                                     <div className="flex items-center space-x-2">
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("children", "decrement")}
                                                             disabled={passengers.children === 0}
@@ -304,6 +307,7 @@ function Home() {
                                                         </button>
                                                         <span>{passengers.children}</span>
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("children", "increment")}
                                                             disabled={total_seats === 9}
@@ -323,6 +327,7 @@ function Home() {
                                                     </div>
                                                     <div className="flex items-center space-x-2">
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("infants", "decrement")}
                                                             disabled={passengers.infants === 0}
@@ -331,6 +336,7 @@ function Home() {
                                                         </button>
                                                         <span>{passengers.infants}</span>
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("infants", "increment")}
                                                             disabled={passengers.infants === passengers.adults}
