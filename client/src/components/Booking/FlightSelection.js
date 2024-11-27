@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-function Booking() {
+function FlightSelection() {
     const { state } = useLocation();
     const { flights, tripType } = state;
+    const navigate = useNavigate();
 
     const [showOutbound, setShowOutbound] = useState(true);
 
@@ -20,7 +21,12 @@ function Booking() {
     // Handle flight selection
     const handleSelect = (flight, classType) => {
         console.log(`Selected flight: ${flight.flight_number}, Class: ${classType}`);
-        alert(`Selected flight: ${flight.flight_number}, Class: ${classType}`);
+        navigate("/booking/passengers", {
+            state: {
+                flights: flight,
+                classType: classType,
+            }
+        });
     };
 
     return (
@@ -252,4 +258,4 @@ function Booking() {
     );
 }
 
-export default Booking;
+export default FlightSelection;

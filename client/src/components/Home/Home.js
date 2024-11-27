@@ -90,17 +90,17 @@ function Home() {
             }
 
             if (response.status === 200) {
-                navigate("/booking", { 
+                navigate("/booking/flight-selection", {
                     state: {
                         flights: response.data,
                         tripType: roundTrip ? "round-trip" : "one-way"
                     }
                 });
             } else {
-                navigate("/booking", { state: { flights: [] } });
+                navigate("/booking/flight-selection", { state: { flights: [] } });
             }
         } catch (error) {
-            navigate("/booking", { state: { flights: [] } });
+            navigate("/booking/flight-selection", { state: { flights: [] } });
         }
     };
 
@@ -136,7 +136,7 @@ function Home() {
                                             name="trip-type" 
                                             className="form-radio text-yellow-500"
                                             value="one-way"
-                                            checked={roundTrip == true}
+                                            checked={roundTrip === true}
                                             onChange={() => setRoundTrip(true)}
                                         />
                                         <span className="ml-1 text-gray-600 text-sm font-medium">Khứ hồi</span>
@@ -147,7 +147,7 @@ function Home() {
                                             name="trip-type" 
                                             className="form-radio text-yellow-500"
                                             value="round-trip"
-                                            checked={roundTrip == false}
+                                            checked={roundTrip === false}
                                             onChange={() => setRoundTrip(false)}
                                         />
                                         <span className="ml-1 text-gray-600 text-sm font-medium">Một chiều</span>
