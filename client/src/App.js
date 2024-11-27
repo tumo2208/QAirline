@@ -1,7 +1,7 @@
 import Home from "./components/Home/Home";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Explore from "./components/Explore";
-import Booking from "./components/Booking";
+import Booking from "./components/Booking/Booking";
 import Travelinfo from "./components/Travelinfo";
 import Help from "./components/Help";
 import Login from "./components/Account/Login";
@@ -24,7 +24,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home/>}/>
                     <Route path="/explore" element={<Explore/>}/>
-                    <Route path="/booking" element={<Booking/>}/>
+                    <Route path="/booking/*" element={<Booking/>}/>
                     <Route path="/travel-info" element={<Travelinfo />} />
                     <Route path="/help" element={<Help/>}/>
                     <Route path="/login" element={<Login/>}/>
