@@ -270,6 +270,7 @@ function Home() {
                                                     </div>
                                                     <div className="flex items-center space-x-2">
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("adults", "decrement")}
                                                             disabled={passengers.adults === 1}
@@ -278,6 +279,7 @@ function Home() {
                                                         </button>
                                                         <span>{passengers.adults}</span>
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("adults", "increment")}
                                                             disabled={total_seats === 9}
@@ -296,6 +298,7 @@ function Home() {
                                                     </div>
                                                     <div className="flex items-center space-x-2">
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("children", "decrement")}
                                                             disabled={passengers.children === 0}
@@ -304,6 +307,7 @@ function Home() {
                                                         </button>
                                                         <span>{passengers.children}</span>
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("children", "increment")}
                                                             disabled={total_seats === 9}
@@ -323,6 +327,7 @@ function Home() {
                                                     </div>
                                                     <div className="flex items-center space-x-2">
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("infants", "decrement")}
                                                             disabled={passengers.infants === 0}
@@ -331,6 +336,7 @@ function Home() {
                                                         </button>
                                                         <span>{passengers.infants}</span>
                                                         <button
+                                                            type="button"
                                                             className="px-3 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300"
                                                             onClick={() => handlePassengerChange("infants", "increment")}
                                                             disabled={passengers.infants === passengers.adults}
@@ -351,12 +357,12 @@ function Home() {
                                 </div>
 
                                 <button
+                                    type="submit"
                                     className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg p-3"
-                                    type="submit">
+                                >
                                     Tìm chuyến bay
                                 </button>
                             </form>
-                            
                         )}
 
                         {activeForm === "myBooking_form" && (
