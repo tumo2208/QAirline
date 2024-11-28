@@ -93,7 +93,8 @@ function Home() {
                 navigate("/booking/flight-selection", {
                     state: {
                         flights: response.data,
-                        tripType: roundTrip ? "round-trip" : "one-way"
+                        tripType: roundTrip ? "round-trip" : "one-way",
+                        passengers: passengers,
                     }
                 });
             } else {
