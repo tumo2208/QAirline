@@ -79,7 +79,7 @@ function FlightSelection() {
                 href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lilita+One&family=Pangolin&family=Potta+One&family=Protest+Revolution&display=swap"
                 rel="stylesheet"/>
             <div className="max-w-5xl mx-8 py-8"
-                 style={{flex:7}}>
+                 style={{flex: 7}}>
                 <div className="sticky top-20 z-20 bg-yellow-100 p-6 rounded-lg shadow-lg mb-6">
                     <div className="flex items-center justify-center space-x-4"
                          style={{fontFamily: "Barlow Condensed"}}>
@@ -105,9 +105,32 @@ function FlightSelection() {
 
                 <div className="space-y-4">
                     {outboundFlights.map((flight) => (
-                        <FlightCard flight={flight} onSelect={handleSelect} />
+                        <FlightCard flight={flight} onSelect={handleSelect}/>
                     ))}
                 </div>
+                <div className="flex w-full justify-between">
+                    <div className="text-left m-8">
+                        <button
+                            type="button"
+                            className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
+                            onClick={() => window.history.back()}
+                        >
+                            <span className="mr-2">↩</span>
+                            Quay lại
+                        </button>
+                    </div>
+                    <div className="text-right m-8">
+                        <button
+                            type="button"
+                            className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
+                            onClick={handleNext}
+                        >
+                            Tiếp theo
+                            <span className="ml-2">➜</span>
+                        </button>
+                    </div>
+                </div>
+
             </div>
             <div
                 style={{flex: 3}}>
@@ -117,7 +140,7 @@ function FlightSelection() {
     );
 }
 
-function FlightCard({ flight, onSelect }) {
+function FlightCard({flight, onSelect}) {
     return (
         <div>
             <div className="bg-white rounded-lg shadow flex justify-between">
@@ -126,7 +149,7 @@ function FlightCard({ flight, onSelect }) {
                     <p className="px-4 text-2xl font-bold">{new Date(flight.departure_time).toLocaleTimeString("en-GB", {
                         hour: "2-digit",
                         minute: "2-digit",
-                    })} -------------╰┈➤------------- {new Date(flight.arrival_time).toLocaleTimeString("en-GB", {
+                    })} ---------------╰┈➤--------------- {new Date(flight.arrival_time).toLocaleTimeString("en-GB", {
                         hour: "2-digit",
                         minute: "2-digit",
                     })}</p>
@@ -152,7 +175,8 @@ function FlightCard({ flight, onSelect }) {
                         <p className="font-bold whitespace-nowrap">{new Intl.NumberFormat("en-US", { style: "currency", currency: "VND" }).format(flight.available_seats[0]?.price)}</p>
                         <i className="text-sm text-white">Còn {flight.available_seats[0]?.seat_count} ghế</i>
                         <button
-                            className="absolute bottom-4 right-11 lg:hover:scale-110 text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-md">
+                            className="absolute bottom-4 right-11 lg:hover:scale-110 text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-md"
+                            onClick={onSelect(flight, "Economy")}>
                             LỰA CHỌN
                         </button>
                     </div>
@@ -163,7 +187,8 @@ function FlightCard({ flight, onSelect }) {
                         <p className="font-bold whitespace-nowrap">{new Intl.NumberFormat("en-US", { style: "currency", currency: "VND" }).format(flight.available_seats[1]?.price)}</p>
                         <i className="text-sm text-red-500">Còn {flight.available_seats[1]?.seat_count} ghế</i>
                         <button
-                            className="absolute bottom-4 right-11 text-xs lg:hover:scale-110 font-bold text-white bg-green-600 px-2 py-1 rounded-md">
+                            className="absolute bottom-4 right-11 text-xs lg:hover:scale-110 font-bold text-white bg-green-600 px-2 py-1 rounded-md"
+                            onClick={onSelect(flight, "Business")}>
                             LỰA CHỌN
                         </button>
                     </div>
