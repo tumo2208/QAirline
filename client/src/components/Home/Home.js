@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
     const [activeForm, setActiveForm] = useState("booking_form");
-    const [roundTrip, setRoundTrip] = useState(false);
+    const [roundTrip, setRoundTrip] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [passengers, setPassengers] = useState({
         adults: 1,
