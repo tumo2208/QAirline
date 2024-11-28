@@ -104,48 +104,9 @@ function FlightSelection() {
                 </div>
 
                 <div className="space-y-4">
-                    <div className="bg-white rounded-lg shadow flex justify-between">
-                        <div className="p-6">
-                            <p className="text-center">FL1001</p>
-                            <p className="px-4 text-2xl font-bold">10:35 -------------╰┈➤------------- 22:20</p>
-                            <div className="flex w-full justify-between">
-                                <div className="text-sm font-semibold text-left text-gray-500">
-                                    <p>Sân bay {outboundFlights[0]?.departure_airport?.name}</p>
-                                    <p className="pl-8">{outboundFlights[0].departure_airport_id}</p>
-                                </div>
-                                <div className="text-sm font-semibold text-right text-gray-500">
-                                    <p>Sân bay Cần Thơ</p>
-                                    <p className="pr-8">VCA</p>
-                                </div>
-                            </div>
-                            <p className="text-md text-center text-gray-500">⏱ Thời gian bay 10h45'</p>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                            <div
-                                className="text-center p-5 flex flex-col space-y-2 rounded w-full h-full bg-blue-400 relative">
-                                <p className="font-bold text-white text-lg">Phổ thông</p>
-                                <hr className="w-32"/>
-                                <p className="font-bold whitespace-nowrap">600,000 VND</p>
-                                <i className="text-sm text-white">Còn 80/80 ghế</i>
-                                <button
-                                    className="absolute bottom-4 right-11 lg:hover:scale-110 text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-md">
-                                    LỰA CHỌN
-                                </button>
-                            </div>
-                            <div
-                                className="relative space-y-2 text-center flex flex-col p-5 rounded w-full h-full bg-yellow-300">
-                                <p className="font-bold text-red-700 text-lg">Thương gia</p>
-                                <hr className="border-red-500 w-32"/>
-                                <p className="font-bold whitespace-nowrap">1,023,000 VND</p>
-                                <i className="text-sm text-red-500">Còn 120/120 ghế</i>
-                                <button
-                                    className="absolute bottom-4 right-11 text-xs lg:hover:scale-110 font-bold text-white bg-green-600 px-2 py-1 rounded-md">
-                                    LỰA CHỌN
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    {outboundFlights.map((flight) => (
+                        <FlightCard flight={flight} onSelect={handleSelect} />
+                    ))}
                 </div>
             </div>
             <div
@@ -161,8 +122,14 @@ function FlightCard({ flight, onSelect }) {
         <div>
             <div className="bg-white rounded-lg shadow flex justify-between">
                 <div className="p-6">
-                    <p className="text-center">{flight.number}</p>
-                    <p className="px-4 text-2xl font-bold">{new Date(flight.departure_time).toLocaleString()} -------------╰┈➤------------- {new Date(flight.arrival_time).toLocaleString()}</p>
+                    <p className="text-center">{flight.flight_number}</p>
+                    <p className="px-4 text-2xl font-bold">{new Date(flight.departure_time).toLocaleTimeString("en-GB", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} -------------╰┈➤------------- {new Date(flight.arrival_time).toLocaleTimeString("en-GB", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })}</p>
                     <div className="flex w-full justify-between">
                         <div className="text-sm font-semibold text-left text-gray-500">
                             <p>Sân bay {flight?.departure_airport?.name}</p>
@@ -173,23 +140,30 @@ function FlightCard({ flight, onSelect }) {
                             <p className="pr-8">{flight.arrival_airport_id}</p>
                         </div>
                     </div>
-                    <p className="text-md text-center text-gray-500">⏱ Thời gian bay {flightDuration(flight.departure_time, flight.arrival_time)}</p>
+                    <p className="text-md text-center text-gray-500">⏱ Thời gian
+                        bay {flightDuration(flight.departure_time, flight.arrival_time)}</p>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                    <div className="text-center p-5 rounded w-full h-full bg-blue-400 relative">
-                        <p className="font-bold text-red-700 text-lg pb-2">Phổ thông</p>
-                        <p className="font-bold">600,000 VND</p>
+                    <div
+                        className="text-center p-5 flex flex-col space-y-2 rounded w-full h-full bg-blue-400 relative">
+                        <p className="font-bold text-white text-lg">Phổ thông</p>
+                        <hr className="w-32"/>
+                        <p className="font-bold whitespace-nowrap">{new Intl.NumberFormat("en-US", { style: "currency", currency: "VND" }).format(flight.available_seats[0]?.price)}</p>
+                        <i className="text-sm text-white">Còn {flight.available_seats[0]?.seat_count} ghế</i>
                         <button
-                            className="absolute bottom-4 right-8 lg:hover:scale-110 text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-md">
+                            className="absolute bottom-4 right-11 lg:hover:scale-110 text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-md">
                             LỰA CHỌN
                         </button>
                     </div>
-                    <div className="relative text-center p-5 rounded w-full h-full bg-yellow-300">
-                        <p className="font-bold text-purple-500 text-lg pb-2">Thương gia</p>
-                        <p className="font-bold">1,023,000 VND</p>
+                    <div
+                        className="relative space-y-2 text-center flex flex-col p-5 rounded w-full h-full bg-yellow-300">
+                        <p className="font-bold text-red-700 text-lg">Thương gia</p>
+                        <hr className="border-red-500 w-32"/>
+                        <p className="font-bold whitespace-nowrap">{new Intl.NumberFormat("en-US", { style: "currency", currency: "VND" }).format(flight.available_seats[1]?.price)}</p>
+                        <i className="text-sm text-red-500">Còn {flight.available_seats[1]?.seat_count} ghế</i>
                         <button
-                            className="absolute bottom-4 right-8 text-xs lg:hover:scale-110 font-bold text-white bg-green-600 px-2 py-1 rounded-md">
+                            className="absolute bottom-4 right-11 text-xs lg:hover:scale-110 font-bold text-white bg-green-600 px-2 py-1 rounded-md">
                             LỰA CHỌN
                         </button>
                     </div>
