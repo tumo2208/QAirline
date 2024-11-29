@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import BookingInfo, {totalPrice} from "./BookingInfo";
 
 function FlightSelection() {
     const { state } = useLocation();
-    const { flights, tripType } = state;
+    const { flights, tripType, passengers } = state;
     const navigate = useNavigate();
 
     const [showOutbound, setShowOutbound] = useState(true);
+    const [selectedOutbound, setSelectedOutbound] = useState([]);
+    const [selectedReturn, setSelectedReturn] = useState([]);
+
+    const outboundCost = selectedOutbound?.flight?.available_seats.find(seat => seat.class_type === selectedOutbound.classType)?.price || 0;
+    const returnCost = selectedReturn?.flight?.available_seats.find(seat => seat.class_type === selectedReturn.classType)?.price || 0;
+
+    const totalCost = (outboundCost + returnCost) * (passengers.adults + passengers.children + 0.1 * passengers.infants);
 
     let outboundFlights = [];
     let returnFlights = [];
@@ -18,244 +26,289 @@ function FlightSelection() {
         outboundFlights = flights || [];
     }
 
-    // Handle flight selection
     const handleSelect = (flight, classType) => {
-        console.log(`Selected flight: ${flight.flight_number}, Class: ${classType}`);
-        navigate("/booking/passengers", {
-            state: {
-                flights: flight,
+        if (showOutbound) {
+            setSelectedOutbound({
+                flight: flight,
                 classType: classType,
+            });
+        } else {
+            setSelectedReturn({
+                flight: flight,
+                classType: classType,
+            });
+        }
+        alert("Chọn chuyến bay thành công");
+    };
+
+    const navigateToPassengers = (selectedFlights) => {
+        navigate("/booking/passengers", { state: { flights: selectedFlights } });
+    }
+
+    const handleNext = () => {
+        if (tripType === "one-way") {
+            if (!selectedOutbound) {
+                alert("Please select your flight.");
+                return;
             }
-        });
+            navigateToPassengers({ outbound: selectedOutbound });
+        } else if (tripType === "round-trip") {
+            if (showOutbound) {
+                if (!selectedOutbound) {
+                    alert("Please select your outbound flight.");
+                    return;
+                }
+                setShowOutbound(false);
+            } else {
+                if (!selectedReturn) {
+                    alert("Please select your return flight.");
+                    return;
+                }
+                navigateToPassengers({ outbound: selectedOutbound, return: selectedReturn });
+            }
+        }
+    }
+
+    const handleBack = () => {
+        if (tripType === "one-way") {
+            window.history.back()
+        } else if (tripType === "round-trip") {
+            if (showOutbound) {
+                window.history.back()
+            } else {
+                setShowOutbound(true);
+            }
+        }
     };
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h2
-                style={{
-                    textAlign: "center",
-                    fontSize: "36px",
-                    fontWeight: "bold",
-                    marginBottom: "10px",
-                }}
-            >
-                Flight Results
-            </h2>
-
-            {/* Flight Direction */}
-            <p
-                style={{
-                    textAlign: "center",
-                    fontSize: "18px",
-                    fontWeight: "500",
-                    color: "#555",
-                    marginBottom: "20px",
-                }}
-            >
-                {showOutbound
-                    ? `Outbound: ${outboundFlights[0]?.departure_airport?.city || "Depart"} → ${outboundFlights[0]?.arrival_airport?.city || "Arrive"}`
-                    : `Return: ${returnFlights[0]?.departure_airport?.city || "Arrive"} → ${returnFlights[0]?.arrival_airport?.city || "Depart"}`}
-            </p>
-
-            {showOutbound ? (
-                // Show Outbound Flights
-                <>
-                    {outboundFlights && outboundFlights.length > 0 ? (
-                        <>
-                            <h3>Outbound Flights</h3>
-                            {outboundFlights.map((flight) => (
-                                <div
-                                    key={flight.flight_number}
-                                    style={{
-                                        border: "1px solid #ccc",
-                                        borderRadius: "8px",
-                                        padding: "10px",
-                                        marginBottom: "15px",
-                                    }}
-                                >
-                                    <p>
-                                        <strong>Số hiệu chuyến bay:</strong>{" "}
-                                        {flight.flight_number}
-                                    </p>
-                                    <p>
-                                        <strong>Điểm đi:</strong>{" "}
-                                        {flight.departure_airport.city} -{" "}
-                                        {new Date(
-                                            flight.departure_time
-                                        ).toLocaleString()}
-                                    </p>
-                                    <p>
-                                        <strong>Điểm đến:</strong>{" "}
-                                        {flight.arrival_airport.city} -{" "}
-                                        {new Date(
-                                            flight.arrival_time
-                                        ).toLocaleString()}
-                                    </p>
-                                    <p>
-                                        <strong>Prices:</strong>
-                                    </p>
-                                    {flight.available_seats.map((seat) => (
-                                        <div
-                                            key={seat._id.$oid}
-                                            style={{
-                                                display: "flex",
-                                                justifyContent: "space-between",
-                                                alignItems: "center",
-                                                margin: "10px 0",
-                                            }}
-                                        >
-                                            <span>
-                                                {seat.class_type}:{" "}
-                                                {new Intl.NumberFormat("en-US", {
-                                                    style: "currency",
-                                                    currency: "VND",
-                                                }).format(seat.price)}
-                                            </span>
-                                            <button
-                                                onClick={() =>
-                                                    handleSelect(
-                                                        flight,
-                                                        seat.class_type
-                                                    )
-                                                }
-                                                style={{
-                                                    padding: "5px 10px",
-                                                    backgroundColor: "#007bff",
-                                                    color: "#fff",
-                                                    border: "none",
-                                                    borderRadius: "5px",
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                Select
-                                            </button>
+        <div>
+            <div className="bg-gray-100 flex">
+                <link rel="preconnect" href="https://fonts.googleapis.com"/>
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin/>
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lilita+One&family=Pangolin&family=Potta+One&family=Protest+Revolution&display=swap"
+                    rel="stylesheet"/>
+                <div className="max-w-5xl mx-8 py-8"
+                     style={{flex: 7}}>
+                    {showOutbound ? (
+                        <div>
+                            <div className="sticky top-20 z-20 bg-yellow-100 p-6 rounded-lg shadow-lg mb-6">
+                                <div className="flex items-center justify-between"
+                                     style={{fontFamily: "Barlow Condensed"}}>
+                                    <div className="flex flex-col items-center justify-center">
+                                        <div className="text-2xl font-semibold">
+                                            📅 Ngày
                                         </div>
-                                    ))}
+                                        <p className="text-lg">{convertDateFormat(outboundFlights[0].departure_time)}</p>
+                                    </div>
+                                    <div className="flex items-center justify-center space-x-4">
+                                        <div className="text-3xl font-bold">
+                                            {outboundFlights[0]?.departure_airport?.city || "Depart"}
+                                        </div>
+                                        <div className="px-10 text-blue-600">
+                                            <svg
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                height="2em"
+                                                width="2em"
+                                            >
+                                                <path
+                                                    d="M8.4 12H2.8L1 15H0V5h1l1.8 3h5.6L6 0h2l4.8 8H18a2 2 0 110 4h-5.2L8 20H6l2.4-8z"/>
+                                            </svg>
+                                        </div>
+                                        <div className="text-3xl font-bold">
+                                            {outboundFlights[0]?.arrival_airport?.city || "Arrival"}
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-center justify-center">
+                                        <div className="text-2xl font-semibold">
+                                            👫 Số hành khách
+                                        </div>
+                                        <p className="text-lg">{passengers.adults + passengers.children + passengers.infants}</p>
+                                    </div>
                                 </div>
-                            ))}
-                        </>
+                            </div>
+
+                            <div className="space-y-4">
+                                {outboundFlights.map((flight) => (
+                                    <FlightCard flight={flight} onSelect={handleSelect}/>
+                                ))}
+                            </div>
+                        </div>
                     ) : (
-                        <p style={{ textAlign: "center", color: "#555" }}>
-                            Không có máy bay nào phù hợp yêu cầu của bạn
-                        </p>
+                        <div>
+                            <div className="sticky top-20 z-20 bg-yellow-100 p-6 rounded-lg shadow-lg mb-6">
+                                <div className="flex items-center justify-between"
+                                     style={{fontFamily: "Barlow Condensed"}}>
+                                    <div className="flex flex-col items-center justify-center">
+                                        <div className="text-2xl font-semibold">
+                                            📅 Ngày
+                                        </div>
+                                        <p className="text-lg">{convertDateFormat(returnFlights[0].arrival_time)}</p>
+                                    </div>
+                                    <div className="flex items-center justify-center space-x-4">
+                                        <div className="text-3xl font-bold">
+                                            {returnFlights[0]?.departure_airport?.city || "Depart"}
+                                        </div>
+                                        <div className="px-10 text-blue-600">
+                                            <svg
+                                                viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                height="2em"
+                                                width="2em"
+                                            >
+                                                <path
+                                                    d="M8.4 12H2.8L1 15H0V5h1l1.8 3h5.6L6 0h2l4.8 8H18a2 2 0 110 4h-5.2L8 20H6l2.4-8z"/>
+                                            </svg>
+                                        </div>
+                                        <div className="text-3xl font-bold">
+                                            {returnFlights[0]?.arrival_airport?.city || "Arrival"}
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-center justify-center">
+                                        <div className="text-2xl font-semibold">
+                                            👫 Số hành khách
+                                        </div>
+                                        <p className="text-lg">{passengers.adults + passengers.children + passengers.infants}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {returnFlights.map((flight) => (
+                                    <FlightCard flight={flight} onSelect={handleSelect}/>
+                                ))}
+                            </div>
+                        </div>
                     )}
-                    {tripType === "round-trip" && (
+                </div>
+                <div
+                    style={{flex: 3}}>
+                    <BookingInfo outboundFlight={selectedOutbound} returnFlight={selectedReturn} tripType={tripType}
+                                 passengers={passengers}/>
+                </div>
+            </div>
+            <div className="sticky bottom-0 z-20 bg-blue-200 p-5 rounded-lg shadow-lg">
+                <div className="flex w-full items-center justify-between">
+                    <div className="text-left mx-8">
                         <button
-                            onClick={() => setShowOutbound(false)}
-                            style={{
-                                marginTop: "20px",
-                                padding: "10px 20px",
-                                backgroundColor: "#007bff",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                            }}
+                            type="button"
+                            className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
+                            onClick={() => handleBack()}
                         >
-                            Next
+                            <span className="mr-2 font-bold text-lg">←</span>
+                            Quay lại
                         </button>
-                    )}
-                </>
-            ) : (
-                // Show Return Flights
-                <>
-                    {returnFlights && returnFlights.length > 0 ? (
-                        <>
-                            <h3>Return Flights</h3>
-                            {returnFlights.map((flight) => (
-                                <div
-                                    key={flight.flight_number}
-                                    style={{
-                                        border: "1px solid #ccc",
-                                        borderRadius: "8px",
-                                        padding: "10px",
-                                        marginBottom: "15px",
-                                    }}
-                                >
-                                    <p>
-                                        <strong>Số hiệu chuyến bay:</strong>{" "}
-                                        {flight.flight_number}
-                                    </p>
-                                    <p>
-                                        <strong>Điểm đi:</strong>{" "}
-                                        {flight.departure_airport.city} -{" "}
-                                        {new Date(
-                                            flight.departure_time
-                                        ).toLocaleString()}
-                                    </p>
-                                    <p>
-                                        <strong>Điểm đến:</strong>{" "}
-                                        {flight.arrival_airport.city} -{" "}
-                                        {new Date(
-                                            flight.arrival_time
-                                        ).toLocaleString()}
-                                    </p>
-                                    <p>
-                                        <strong>Prices:</strong>
-                                    </p>
-                                    {flight.available_seats.map((seat) => (
-                                        <div
-                                            key={seat._id.$oid}
-                                            style={{
-                                                display: "flex",
-                                                justifyContent: "space-between",
-                                                alignItems: "center",
-                                                margin: "10px 0",
-                                            }}
-                                        >
-                                            <span>
-                                                {seat.class_type}:{" "}
-                                                {new Intl.NumberFormat("en-US", {
-                                                    style: "currency",
-                                                    currency: "VND",
-                                                }).format(seat.price)}
-                                            </span>
-                                            <button
-                                                onClick={() =>
-                                                    handleSelect(
-                                                        flight,
-                                                        seat.class_type
-                                                    )
-                                                }
-                                                style={{
-                                                    padding: "5px 10px",
-                                                    backgroundColor: "#28a745",
-                                                    color: "#fff",
-                                                    border: "none",
-                                                    borderRadius: "5px",
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                Select
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            ))}
-                        </>
-                    ) : (
-                        <p style={{ textAlign: "center", color: "#555" }}>
-                            Không có máy bay nào phù hợp yêu cầu của bạn
-                        </p>
-                    )}
-                    <button
-                        onClick={() => setShowOutbound(true)}
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px 20px",
-                            backgroundColor: "#28a745",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                        }}
-                    >
-                        Back
-                    </button>
-                </>
-            )}
+                    </div>
+                    <div className="flex items-center justify-center">
+                        <div className="text-center mx-8">
+                            <p className="font-bold text-2xl"
+                               style={{fontFamily: "Barlow Condensed"}}>Tổng chi phí</p>
+                            <p className="font-bold text-red-700 text-lg">{new Intl.NumberFormat("en-US", {
+                                style: "currency",
+                                currency: "VND"
+                            }).format(totalCost)}</p>
+                        </div>
+                        <div className="text-right mx-8">
+                            <button
+                                type="button"
+                                className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
+                                onClick={() => handleNext()}
+                            >
+                                Tiếp theo
+                                <span className="ml-2 font-bold text-lg">→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
+}
+
+function FlightCard({flight, onSelect}) {
+    return (
+        <div>
+            <div className="bg-white rounded-lg shadow flex justify-between">
+                <div className="p-6">
+                    <p className="text-center">{flight.flight_number}</p>
+                    <p className="px-4 text-2xl font-bold">{new Date(flight.departure_time).toLocaleTimeString("en-GB", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })} ---------------╰┈➤--------------- {new Date(flight.arrival_time).toLocaleTimeString("en-GB", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })}</p>
+                    <div className="flex w-full justify-between">
+                        <div className="text-sm font-semibold text-left text-gray-500">
+                            <p>Sân bay {flight?.departure_airport?.name}</p>
+                            <p className="pl-8">{flight.departure_airport_id}</p>
+                        </div>
+                        <div className="text-sm font-semibold text-right text-gray-500">
+                            <p>Sân bay {flight?.arrival_airport?.name}</p>
+                            <p className="pr-8">{flight.arrival_airport_id}</p>
+                        </div>
+                    </div>
+                    <p className="text-md text-center text-gray-500">⏱ Thời gian
+                        bay {flightDuration(flight.departure_time, flight.arrival_time)}</p>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                <div
+                        className="text-center p-5 flex flex-col space-y-2 rounded w-full h-full bg-blue-400 relative">
+                        <p className="font-bold text-white text-lg">Phổ thông</p>
+                        <hr className="w-32"/>
+                        <p className="font-bold whitespace-nowrap">{new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: "VND"
+                        }).format(flight.available_seats[0]?.price)}</p>
+                        <i className="text-sm text-white">Còn {flight.available_seats[0]?.seat_count} ghế</i>
+                        <button
+                            className="absolute bottom-4 right-11 lg:hover:scale-110 text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-md"
+                            onClick={() => onSelect(flight, "Economy")}>
+                            LỰA CHỌN
+                        </button>
+                    </div>
+                    <div
+                        className="relative space-y-2 text-center flex flex-col p-5 rounded w-full h-full bg-yellow-300">
+                        <p className="font-bold text-red-700 text-lg">Thương gia</p>
+                        <hr className="border-red-500 w-32"/>
+                        <p className="font-bold whitespace-nowrap">{new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: "VND"
+                        }).format(flight.available_seats[1]?.price)}</p>
+                        <i className="text-sm text-red-500">Còn {flight.available_seats[1]?.seat_count} ghế</i>
+                        <button
+                            className="absolute bottom-4 right-11 text-xs lg:hover:scale-110 font-bold text-white bg-green-600 px-2 py-1 rounded-md"
+                            onClick={() => onSelect(flight, "Business")}>
+                            LỰA CHỌN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function convertDateFormat(timeInput) {
+    const date = new Date(timeInput);
+
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+}
+
+function flightDuration(departure_time, arrival_time) {
+    const arrival = new Date(arrival_time);
+    const departure = new Date(departure_time);
+    const durationMs = arrival - departure;
+    const hours = Math.floor(durationMs / (1000 * 60 * 60));
+    const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h${minutes}'`;
 }
 
 export default FlightSelection;

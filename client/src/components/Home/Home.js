@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
     const [activeForm, setActiveForm] = useState("booking_form");
-    const [roundTrip, setRoundTrip] = useState(false);
+    const [roundTrip, setRoundTrip] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [passengers, setPassengers] = useState({
         adults: 1,
@@ -93,7 +93,8 @@ function Home() {
                 navigate("/booking/flight-selection", {
                     state: {
                         flights: response.data,
-                        tripType: roundTrip ? "round-trip" : "one-way"
+                        tripType: roundTrip ? "round-trip" : "one-way",
+                        passengers: passengers,
                     }
                 });
             } else {
@@ -357,12 +358,12 @@ function Home() {
                                 </div>
 
                                 <button
+                                    type="submit"
                                     className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg p-3"
-                                    type="submit">
+                                >
                                     Tìm chuyến bay
                                 </button>
                             </form>
-                            
                         )}
 
                         {activeForm === "myBooking_form" && (
