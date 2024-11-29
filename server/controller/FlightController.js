@@ -1,6 +1,20 @@
 const Flight = require('../models/Flight');
 const Aircraft = require('../models/Aircraft');
+const Airport = require('../models/Airport');
 const moment = require('moment-timezone');
+
+const updateFlightStatus = async () => {
+    try {
+        const now = new Date();
+        const result = await Flight.updateMany(
+            { status: 'Scheduled', departure_time: { $lte: now } },
+            { $set: { status: 'HasFlied' } }
+        );
+        console.log(`[${new Date().toISOString()}] Updated ${result.nModified} flights to 'HasFlied'.`);
+    } catch (error) {
+        console.error('Error updating flight statuses:', error);
+    }
+};
 
 const getAllFlights = async (req, res) => {
     try {
@@ -122,7 +136,7 @@ const getFlightsRoundTrip = async (req, res) => {
         const returnFlights = await getFlights(arriveCity, departCity, arriveDate);
 
         if (outboundFlights.length === 0) {
-            return res.status(404).json({ status: false, message: "No outbound flights found" });
+            return res.status(403).json({ status: false, message: "No outbound flights found" });
         }
 
         if (returnFlights.length === 0) {
@@ -140,32 +154,15 @@ const getFlightsRoundTrip = async (req, res) => {
 };
 
 /**
- * Support function to show can or not make new flight.
+ * Support function to show can or not make new flight because of overlap time.
  * @param flightID
  * @param aircraftID
  * @param departureTime
  * @param arrivalTime
  * @returns {Promise<boolean>}
  */
-async function canMakeNewFlight(flightID, aircraftID, departureTime, arrivalTime) {
+async function canScheduleNewFlight(flightID, aircraftID, departureTime, arrivalTime) {
 
-    // Handle for case aircraft not exist
-    const aircraft = await Aircraft.findOne({
-        aircraft_number: aircraftID
-    });
-    if (!aircraft) {
-        return false;
-    }
-
-    // Handle for case overlap ID
-    const conflictIDFlights = await Flight.findOne({
-        flight_number: flightID
-    });
-    if (conflictIDFlights) {
-        return false;
-    }
-
-    // Handle for case overlap time
     const twelveHoursBefore = new Date(departureTime);
     twelveHoursBefore.setHours(twelveHoursBefore.getHours() - 12);
 
@@ -204,14 +201,44 @@ const addFlight = async (req, res) => {
     } = req.body;
 
     try {
-        const canMake = await canMakeNewFlight(flightID, aircraftID, departureTime, arrivalTime);
-        if (!canMake) {
-            return res.status(400).json({ error: 'Cant make new flight.' });
-        }
-
+        // Handle for case aircraft not exist
         const aircraft = await Aircraft.findOne({
             aircraft_number: aircraftID
         });
+        if (!aircraft) {
+            return res.status(400).json({ error: 'This aircraft ID is not existed'});
+        }
+
+        // Handle for case overlap ID
+        const conflictIDFlights = await Flight.findOne({
+            flight_number: flightID
+        });
+        if (conflictIDFlights) {
+            return res.status(401).json({ error: 'This flight ID is existed'});
+        }
+
+        const canSchedule = await canScheduleNewFlight(flightID, aircraftID, departureTime, arrivalTime);
+        if (!canSchedule) {
+            return res.status(402).json({ error: 'The time of this aircraft is overlapped' });
+        }
+
+        // Handle for case international flight but airport not
+        const departureAirport = await Airport.findOne({
+            airport_code: departureAirportID
+        });
+        const arrivalAirport = await Airport.findOne({
+            airport_code: arrivalAirportID
+        });
+        let isInternational = false;
+        if (departureAirport.country !== 'Vietnam' || arrivalAirport.country !== 'Vietnam') {
+            isInternational = true;
+        }
+        if (isInternational && !departureAirport.is_international) {
+            return res.status(403).json({ error: 'Departure airport does not support for international flight'});
+        }
+        if (isInternational && !arrivalAirport.is_international) {
+            return res.status(404).json({ error: 'Arrival airport does not support for international flight'});
+        }
 
         const availableSeats = aircraft.seat_classes.map(seatClass => {
             let price = 0;
@@ -236,7 +263,8 @@ const addFlight = async (req, res) => {
             departure_time: departureTime,
             arrival_time: arrivalTime,
             available_seats: availableSeats,
-            status: "Scheduled"
+            status: "Scheduled",
+            is_international: isInternational
         });
         await newFlight.save();
         res.status(200).json("Flight added successfully");
@@ -247,4 +275,4 @@ const addFlight = async (req, res) => {
     }
 };
 
-module.exports = {getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight};
+module.exports = {getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus};
