@@ -158,11 +158,12 @@ function BookingInfo({ outboundFlight, returnFlight, tripType, passengers }) {
                     )}
                 </div>
             )}
-            <div className="bg-blue-800 text-white font-bold py-2 px-4 text-right rounded-b-lg">
-                Tổng tiền <span className="text-lg">{new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "VND"
-            }).format(totalCost)}</span>
+            <div className="flex justify-between bg-blue-800 text-white px-5 font-bold py-2 text-lg rounded-b-lg">
+                <p className="text-left">Tổng tiền</p>
+                <span className="text-right">{new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "VND"
+                }).format(totalCost)}</span>
             </div>
         </div>
     )
