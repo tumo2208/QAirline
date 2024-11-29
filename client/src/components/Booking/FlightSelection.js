@@ -81,10 +81,6 @@ function FlightSelection() {
         }
     };
 
-    const totalCost =
-        (selectedOutbound?.flight?.available_seats.find((seat) => seat.class_type === selectedOutbound.classType)?.price || 0) +
-        (selectedReturn?.flight?.available_seats.find((seat) => seat.class_type === selectedReturn.classType)?.price || 0);
-
     return (
         <div>
             <div className="bg-gray-100 flex">
