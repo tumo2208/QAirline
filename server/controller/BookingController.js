@@ -3,30 +3,45 @@ const Flight = require('../models/Flight');
 const Ticket = require('../models/Ticket');
 const Aircraft = require('../models/Aircraft');
 const {Adult, Children, Infant} = require('../../client/src/shared/SharedData');
+const {ObjectId} = require("mongodb");
 
-function determineNextChair(flight, aircraft, class_type) {
-    let seatMax = 0;
-    aircraft.seat_classes.forEach(seatClass => {
-        if (seatClass.class_type === class_type) {
-            seatMax = seatClass.seat_count;
+/**
+ * Function to compute seat no next.
+ * @param flight flight that booking
+ * @param aircraft aircraft of this flight
+ * @param class_type seat class customer want
+ * @returns {string} seat no
+ */
+const determineNextChair = (flight, aircraft, class_type) => {
+    const seatClassInfo = aircraft.seat_classes.findOne(seatClass => seatClass.class_type === class_type);
+    const seatMax = seatClassInfo.seat_count;
+
+    const allSeats = [];
+    if (class_type === 'Economy') {
+        for (let i = 0; i < seatMax; ++i) {
+            const rowNumber = (i % 6) + 1; // Số hàng (1-6)
+            const columnChar = String.fromCharCode(Math.floor(i / 6) + 65); // Ký tự cột (A, B, C,...)
+            allSeats.push(`${rowNumber}${columnChar}`);
         }
-    });
-    let numUsed = 0;
-    flight.available_seats.forEach(seatClass => {
-        if (seatClass.class_type === class_type) {
-            numUsed = seatClass.seat_count;
+    } else {
+        for (let i = 0; i < seatMax; ++i) {
+            const vipNo = i.toString().padStart(2, '0');
+            allSeats.push(`VIP${vipNo}`);
         }
-    })
-    numUsed = seatMax - numUsed;
-    const nextSeatNumber = numUsed + 1;
-    const rowNumber = (nextSeatNumber - 1) % 6 + 1;
-    const columnChar = String.fromCharCode(Math.floor((nextSeatNumber - 1) / 6) + 65);
-    return `${rowNumber}${columnChar}`;
-}
+    }
+
+    const usedSeats = flight.occupied_seats?.get(class_type) || [];
+
+    const availableSeats = allSeats.filter(seat => !usedSeats.includes(seat));
+    return availableSeats[0];
+};
 
 const getMyBookings = async (req, res) => {
     try {
         const user = req.user;
+        if (!user) {
+            return res.status(403).json({ error: 'You need to login to view booking history'});
+        }
         const allMyBookings = await Booking.find({
             passenger_id: user._id
         });
@@ -45,8 +60,12 @@ const getMyBookings = async (req, res) => {
 const makeBooking = async (req, res) => {
     try {
         const user = req.user;
+        let uid = new ObjectId();
+        if (user) {
+            uid = user._id;
+        }
         const {flightID, numAdult, numChildren, numInfant} = req.body;
-        const neededSeats = numChildren + numInfant + numAdult;
+        const neededSeats = numChildren + numAdult;
         const flight = await Flight.findOne({
             flight_number: flightID
         });
@@ -59,7 +78,7 @@ const makeBooking = async (req, res) => {
             return res.status(400).json({ error: 'No seats available.' });
         }
         const newBooking = new Booking({
-            passenger_id: user._id,
+            passenger_id: uid,
             flight_id: flightID,
             num_adult: numAdult,
             num_child: numChildren,
@@ -88,11 +107,17 @@ const makeTicket = async (req, res) => {
         const tickets = [];
         let totalPrice = 0;
 
-        const updateSeatCount = async (flightId, classType) => {
+        const updateOccupiedSeats = async (flightId, classType, seatNumber) => {
+            await Flight.updateOne(
+                { flight_number: flightId },
+                { $push: { [`occupied_seats.${classType}`]: seatNumber } }
+            );
+
             await Flight.updateOne(
                 { flight_number: flightId, "available_seats.class_type": classType },
                 { $inc: { "available_seats.$.seat_count": -1 } }
             );
+
             flight = await Flight.findOne({ flight_number: booking.flight_id });
         };
 
@@ -107,18 +132,22 @@ const makeTicket = async (req, res) => {
                 throw new Error(`No available seats in ${adult.class_type} class`);
             }
 
+            const seatNumber = determineNextChair(flight, aircraft, adult.class_type);
+
             const ticket = new Ticket({
                 booking_id: booking._id,
                 customer_type: "Adult",
                 customer_details: adultInfo,
                 class_type: adult.class_type,
-                seat_number: determineNextChair(flight, aircraft, adult.class_type),
+                seat_number: seatNumber,
                 price: seatClass.price,
             });
+
             await ticket.save();
             tickets.push(ticket);
             totalPrice += seatClass.price;
-            await updateSeatCount(booking.flight_id, adult.class_type);
+
+            await updateOccupiedSeats(booking.flight_id, adult.class_type, seatNumber);
         }
 
         // Create tickets for children
@@ -129,41 +158,38 @@ const makeTicket = async (req, res) => {
                 throw new Error(`No available seats in ${child.class_type} class`);
             }
 
+            const seatNumber = determineNextChair(flight, aircraft, child.class_type);
+
             const ticket = new Ticket({
                 booking_id: booking._id,
                 customer_type: "Child",
                 customer_details: childInfo,
                 class_type: child.class_type,
-                seat_number: determineNextChair(flight, aircraft, child.class_type),
+                seat_number: seatNumber,
                 price: seatClass.price,
             });
+
             await ticket.save();
             tickets.push(ticket);
             totalPrice += seatClass.price;
-            await updateSeatCount(booking.flight_id, child.class_type);
+
+            await updateOccupiedSeats(booking.flight_id, child.class_type, seatNumber);
         }
 
         // Create tickets for infants
         for (const infant of infantList) {
             const infantInfo = new Infant(infant.customer_name, infant.dob,
                 infant.gender, infant.fly_with);
-            const seatClass = flight.available_seats.find(sc => sc.class_type === infant.class_type);
-            if (!seatClass || seatClass.seat_count <= 0) {
-                throw new Error(`No available seats in ${infant.class_type} class`);
-            }
-
             const ticket = new Ticket({
                 booking_id: booking._id,
                 customer_type: "Infant",
                 customer_details: infantInfo,
-                class_type: infant.class_type,
-                seat_number: determineNextChair(flight, aircraft, infant.class_type),
-                price: seatClass.price,
+                price: 100000,
             });
+
             await ticket.save();
             tickets.push(ticket);
-            totalPrice += seatClass.price;
-            await updateSeatCount(booking.flight_id, infant.class_type);
+            totalPrice += 100000;
         }
 
         await Booking.findByIdAndUpdate(
@@ -181,27 +207,32 @@ const makeTicket = async (req, res) => {
     }
 };
 
-
-
 const cancelBooking = async (req, res) => {
     try {
-        const user = req.user;
+        // const user = req.user;
         const { bookingID } = req.body;
 
         const booking = await Booking.findById(bookingID);
-
         if (!booking) {
             return res.status(404).json({ status: false, message: "Booking not found" });
         }
 
-        const tickets = booking.tickets;
+        const flight = await Flight.findOne({ flight_number: booking.flight_id });
+        if (!flight) {
+            return res.status(404).json({ status: false, message: "Flight not found" });
+        }
+
+        const tickets = await Ticket.find({ booking_id: bookingID });
 
         for (const ticket of tickets) {
             await Ticket.findByIdAndDelete(ticket._id);
 
-            const flight = await Flight.findOne({ flight_number: booking.flight_id });
-            const seatClass = flight.available_seats.find(sc => sc.class_type === ticket.class_type);
-            if (seatClass) {
+            if (ticket.customer_type !== 'Infant') {
+                await Flight.updateOne(
+                    { flight_number: booking.flight_id },
+                    { $pull: { [`occupied_seats.${ticket.class_type}`]: ticket.seat_number } }
+                );
+
                 await Flight.updateOne(
                     { flight_number: booking.flight_id, "available_seats.class_type": ticket.class_type },
                     { $inc: { "available_seats.$.seat_count": 1 } }
