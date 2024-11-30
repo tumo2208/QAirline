@@ -57,6 +57,17 @@ const getMyBookings = async (req, res) => {
     }
 };
 
+const getBookingByID = async (req, res) => {
+    try {
+        const {bookingID} = req.body;
+        const booking = await Booking.findById(bookingID);
+        return res.status(200).json(booking);
+    }  catch (err) {
+        console.error("Error view booking details", error);
+        return res.status(500).json({ status: false, message: error.message });
+    }
+};
+
 const makeBooking = async (req, res) => {
     try {
         const user = req.user;
@@ -302,19 +313,32 @@ const makeBooking = async (req, res) => {
 //     }
 // };
 
+/**
+ * Function to check time customer cancel ticket or booking is 7 days before flight time or not
+ * @param flight flight
+ * @returns {boolean}
+ */
+function checkTimeToCancel (flight) {
+    const departTime = new Date(flight.departure_time);
+    const currentTime = new Date();
+    const cancellationDeadline = new Date(departTime);
+    cancellationDeadline.setDate(cancellationDeadline.getDate() - 7);
+
+    return cancellationDeadline > currentTime;
+}
+
 const cancelBooking = async (req, res) => {
     try {
-        // const user = req.user;
         const { bookingID } = req.body;
 
         const booking = await Booking.findById(bookingID);
-        if (!booking) {
-            return res.status(404).json({ status: false, message: "Booking not found" });
-        }
 
-        const flight = await Flight.findOne({ flight_number: booking.flight_id });
-        if (!flight) {
-            return res.status(404).json({ status: false, message: "Flight not found" });
+        const flight = await Flight.findOne({
+            flight_number: booking.flight_id
+        });
+
+        if (!checkTimeToCancel(flight)) {
+            return res.status(404).json("Ticket can only be canceled at least 7 days before the departure time.");
         }
 
         const tickets = await Ticket.find({ booking_id: bookingID });
@@ -345,5 +369,53 @@ const cancelBooking = async (req, res) => {
     }
 };
 
+const cancelTicket = async (req, res) => {
+    try {
+        const { ticketID } = req.body;
 
-module.exports = {getMyBookings, makeBooking, cancelBooking};
+        const ticket = await Ticket.findById(ticketID);
+        const bookingID = ticket.booking_id;
+        const booking = await Booking.findById(bookingID);
+        const customerType = ticket.customer_type;
+        const ticketPrice = ticket.price;
+
+        const flight = await Flight.findOne({
+            flight_number: booking.flight_id
+        });
+
+        if (!checkTimeToCancel(flight)) {
+            return res.status(404).json("Ticket can only be canceled at least 7 days before the departure time.");
+        }
+
+        booking.total_price = booking.total_price - ticketPrice;
+        switch (customerType) {
+            case 'Adult':
+                booking.num_adult = booking.num_adult - 1;
+                break;
+            case 'Child':
+                booking.num_child = booking.num_child - 1;
+                break;
+            default:
+                booking.num_infant = booking.num_infant - 1;
+                break;
+        }
+        booking.tickets = booking.tickets.filter(t => t._id.toString() !== ticketID);
+
+        if (booking.tickets.length === 0) {
+            await Booking.findByIdAndDelete(bookingID);
+        } else {
+            await booking.save();
+        }
+
+        await Ticket.findByIdAndDelete(ticketID);
+
+        res.status(200).json("Ticket deleted successfully!");
+
+    } catch (err) {
+        console.error("Error canceling ticket", error);
+        res.status(500).json({ status: false, message: error.message });
+    }
+};
+
+
+module.exports = {getMyBookings, getBookingByID, makeBooking, cancelBooking, cancelTicket};

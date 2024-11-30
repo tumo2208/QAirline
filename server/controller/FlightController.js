@@ -201,6 +201,11 @@ const addFlight = async (req, res) => {
     } = req.body;
 
     try {
+        const user = req.user;
+        if (user.user_type !== 'Admin') {
+            return res.status(405).json({error: 'You do not have access to this function'});
+        }
+
         // Handle for case aircraft not exist
         const aircraft = await Aircraft.findOne({
             aircraft_number: aircraftID

@@ -14,6 +14,11 @@ const allAirports = async (req, res) => {
 
 const addAircraft = async (req, res) => {
       try {
+          const user = req.user;
+          if (user.user_type !== 'Admin') {
+              return res.status(404).json({error: 'You do not have access to this function'});
+          }
+
           const {aircraftNumber, manufacturer, seatNumber} = req.body;
           const newAircraft = new Aircraft({
               aircraft_number: aircraftNumber,
@@ -30,6 +35,11 @@ const addAircraft = async (req, res) => {
 
 const removeAircraft = async (req, res) => {
     try {
+        const user = req.user;
+        if (user.user_type !== 'Admin') {
+            return res.status(404).json({error: 'You do not have access to this function'});
+        }
+
         const {aircraftID} = req.body;
         const flights = await Flight.find({
             aircraft_id: aircraftID,
