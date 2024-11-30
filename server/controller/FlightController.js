@@ -246,7 +246,7 @@ const addFlight = async (req, res) => {
         }
 
         const availableSeats = aircraft.seat_classes.map(seatClass => {
-            let price = 0;
+            let price;
             if (seatClass.class_type === 'Economy') {
                 price = priceEconomy;
             } else {
@@ -295,7 +295,7 @@ const setDelayTime = async (req, res) => {
         const oldArrivalDate = new Date(flight.arrival_time);
         const timeDif = oldArrivalDate - oldDepartDate;
 
-        const newDepartDate = new Date(newDate);
+        const newDepartDate = new Date(newTime);
         const newArrivalDate = new Date(newDepartDate.getTime() + timeDif);
 
         flight.departure_date = newDepartDate;
