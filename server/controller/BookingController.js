@@ -195,6 +195,10 @@ const makeBooking = async (req, res) => {
         const {returnFlightID} = req.body;
         const returnTickets = [];
         if (returnFlightID) {
+            await Booking.findByIdAndUpdate(newBooking._id, {
+                $set: { return_flight_id: returnFlightID }
+            });
+
             let returnFlight = await Flight.findOne({
                 flight_number: returnFlightID
             });

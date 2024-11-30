@@ -5,6 +5,7 @@ const Ticket = require('./Ticket');
 
 const bookingSchema = new Schema({
     flight_id: { type: String, ref: 'Flight', required: true },
+    return_flight_id: { type: String, ref: 'Flight' },
     passenger_id: { type: Schema.Types.ObjectId, ref: 'User'},
     class_type: { type: String, enum: ['Economy', 'Business']},
     booking_date: { type: Date, default: Date.now },
