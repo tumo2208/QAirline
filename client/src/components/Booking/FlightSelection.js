@@ -11,6 +11,16 @@ function FlightSelection() {
     const [selectedOutbound, setSelectedOutbound] = useState([]);
     const [selectedReturn, setSelectedReturn] = useState([]);
 
+    // Nếu không có chuyến bay phù hợp
+    if (!flights) {
+        return (
+            <div style={{ textAlign: "center", marginTop: "20px" }}>
+                <h2>No Flights Available</h2>
+                <button onClick={() => navigate("/")}>Back to Search</button>
+            </div>
+        );
+    }
+
     const outboundCost = selectedOutbound?.flight?.available_seats.find(seat => seat.class_type === selectedOutbound.classType)?.price || 0;
     const returnCost = selectedReturn?.flight?.available_seats.find(seat => seat.class_type === selectedReturn.classType)?.price || 0;
 
