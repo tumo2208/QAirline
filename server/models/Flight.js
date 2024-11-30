@@ -15,7 +15,13 @@ const flightSchema = new Schema({
     departure_time: { type: Date, required: true },
     arrival_time: { type: Date, required: true },
     available_seats: [seatFlightSchema],
-    status: { type: String, enum: ['Scheduled', 'Delayed', 'Cancelled'], required: true },
+    status: { type: String, enum: ['Scheduled', 'Delayed', 'HasFlied'], required: true },
+    is_international: {type: Boolean, required: true, default: false},
+    occupied_seats: {
+        type: Map,
+        of: [String],
+        default: {}
+    }
 });
 
 module.exports = mongoose.model('Flight', flightSchema);
