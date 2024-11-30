@@ -280,4 +280,35 @@ const addFlight = async (req, res) => {
     }
 };
 
-module.exports = {getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus};
+const setDelayTime = async (req, res) => {
+    try {
+        const {flightID, newTime} = req.body;
+        const flight = await Flight.findOne({
+            flight_number: flightID
+        });
+
+        if (!flight) {
+            return res.status(404).json({ error: "Flight not found." });
+        }
+
+        const oldDepartDate = new Date(flight.departure_time);
+        const oldArrivalDate = new Date(flight.arrival_time);
+        const timeDif = oldArrivalDate - oldDepartDate;
+
+        const newDepartDate = new Date(newDate);
+        const newArrivalDate = new Date(newDepartDate.getTime() + timeDif);
+
+        flight.departure_date = newDepartDate;
+        flight.arrival_date = newArrivalDate;
+
+        await flight.save();
+
+        res.status(200).json("Flight dates updated successfully!");
+
+    }  catch (error) {
+        console.error("Error set delay for flight", error);
+        res.status(500).json({ status: false, message: error.message });
+    }
+};
+
+module.exports = {getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus, setDelayTime};
