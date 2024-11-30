@@ -32,6 +32,12 @@ const userSchema = new Schema({
     },
     id_type: { type: String, enum: ['Citizen ID', 'Passport'] },
     identification_id: { type: String, required: true, unique: true },
+    user_type: {
+        type: String,
+        enum: ['Customer', 'Admin'],
+        required: true,
+        default: 'Customer'
+    },
     created_at: { type: Date, default: Date.now }
 });
 
