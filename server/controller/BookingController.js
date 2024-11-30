@@ -13,7 +13,7 @@ const {ObjectId} = require("mongodb");
  * @returns {string} seat no
  */
 const determineNextChair = (flight, aircraft, class_type) => {
-    const seatClassInfo = aircraft.seat_classes.findOne(seatClass => seatClass.class_type === class_type);
+    const seatClassInfo = aircraft.seat_classes.find(seatClass => seatClass.class_type === class_type);
     const seatMax = seatClassInfo.seat_count;
 
     const allSeats = [];
@@ -24,7 +24,7 @@ const determineNextChair = (flight, aircraft, class_type) => {
             allSeats.push(`${rowNumber}${columnChar}`);
         }
     } else {
-        for (let i = 0; i < seatMax; ++i) {
+        for (let i = 1; i <= seatMax; ++i) {
             const vipNo = i.toString().padStart(2, '0');
             allSeats.push(`VIP${vipNo}`);
         }
@@ -142,54 +142,167 @@ const makeBooking = async (req, res) => {
         };
 
         // Create tickets for adults
-        for (const adult of adultList) {
-            const adultInfo = new Adult(
-                adult.customer_name,
-                adult.dob,
-                adult.gender,
-                adult.nationality,
-                adult.phone_number,
-                adult.email,
-                adult.id_type,
-                adult.id_number,
-                adult.country_issuing,
-                adult.date_expiration,
-                // adult.address,
-                // adult.receive_flight_info
-            );
-            await createTicket(adultInfo, "Adult");
+        if (Array.isArray(adultList)) {
+            for (const adult of adultList) {
+                const adultInfo = new Adult(
+                    adult.customer_name,
+                    adult.dob,
+                    adult.gender,
+                    adult.nationality,
+                    adult.phone_number,
+                    adult.email,
+                    adult.id_type,
+                    adult.id_number,
+                    adult.country_issuing,
+                    adult.date_expiration,
+                    // adult.address,
+                    // adult.receive_flight_info
+                );
+                await createTicket(adultInfo, "Adult");
+            }
         }
 
         // Create tickets for children
-        for (const child of childrenList) {
-            const childInfo = new Children(child.customer_name, child.dob, child.gender);
-            await createTicket(childInfo, "Child");
+        if (Array.isArray(childrenList)) {
+            for (const child of childrenList) {
+                const childInfo = new Children(child.customer_name, child.dob, child.gender);
+                await createTicket(childInfo, "Child");
+            }
         }
 
         // Create tickets for infants
-        for (const infant of infantList) {
-            const infantInfo = new Infant(
-                infant.customer_name,
-                infant.dob,
-                infant.gender,
-                infant.fly_with
-            );
-            const ticket = new Ticket({
-                booking_id: newBooking._id,
-                customer_type: "Infant",
-                customer_details: infantInfo,
-                price: 100000,
+        if (Array.isArray(infantList)) {
+            for (const infant of infantList) {
+                const infantInfo = new Infant(
+                    infant.customer_name,
+                    infant.dob,
+                    infant.gender,
+                    infant.fly_with
+                );
+                const ticket = new Ticket({
+                    booking_id: newBooking._id,
+                    customer_type: "Infant",
+                    customer_details: infantInfo,
+                    price: 100000,
+                });
+
+                await ticket.save();
+                tickets.push(ticket);
+                totalPrice += 100000;
+            }
+        }
+
+        const {returnFlightID} = req.body;
+        const returnTickets = [];
+        if (returnFlightID) {
+            let returnFlight = await Flight.findOne({
+                flight_number: returnFlightID
+            });
+            const returnAircraft = await Aircraft.findOne({
+                aircraft_number: returnFlight.aircraft_id
             });
 
-            await ticket.save();
-            tickets.push(ticket);
-            totalPrice += 100000;
+            // Handle log error when out of seats
+            const neededSeats = numChildren + numAdult;
+            const returnSeatClass = returnFlight.available_seats.find(sc => sc.class_type === classType);
+            const returnPrice = returnSeatClass.price;
+            if (seatClass.seat_count < neededSeats) {
+                return res.status(404).json({ error: 'Out of seats'});
+            }
+
+            // Function to update list occupiedSeats and availableSeats
+            const updateOccupiedSeatsReturn = async (flightId, classType, seatNumber) => {
+                await Flight.updateOne(
+                    { flight_number: flightId },
+                    { $push: { [`occupied_seats.${classType}`]: seatNumber } }
+                );
+
+                await Flight.updateOne(
+                    { flight_number: flightId, "available_seats.class_type": classType },
+                    { $inc: { "available_seats.$.seat_count": -1 } }
+                );
+
+                returnFlight = await Flight.findOne({ flight_number: flightId });
+            };
+
+            // Function to handle ticket creation
+            const createTicketReturn = async (customer, type) => {
+                const seatNumber = determineNextChair(returnFlight, returnAircraft, classType);
+                const ticket = new Ticket({
+                    booking_id: newBooking._id,
+                    customer_type: type,
+                    customer_details: customer,
+                    class_type: classType,
+                    seat_number: seatNumber,
+                    price: returnPrice
+                });
+
+                await ticket.save();
+                returnTickets.push(ticket);
+                totalPrice += returnPrice;
+
+                await updateOccupiedSeatsReturn(returnFlightID, classType, seatNumber);
+            };
+
+            // Create tickets for adults
+            if (Array.isArray(adultList)) {
+                for (const adult of adultList) {
+                    const adultInfo = new Adult(
+                        adult.customer_name,
+                        adult.dob,
+                        adult.gender,
+                        adult.nationality,
+                        adult.phone_number,
+                        adult.email,
+                        adult.id_type,
+                        adult.id_number,
+                        adult.country_issuing,
+                        adult.date_expiration,
+                        // adult.address,
+                        // adult.receive_flight_info
+                    );
+                    await createTicketReturn(adultInfo, "Adult");
+                }
+            }
+
+            // Create tickets for children
+            if (Array.isArray(childrenList)) {
+                for (const child of childrenList) {
+                    const childInfo = new Children(child.customer_name, child.dob, child.gender);
+                    await createTicketReturn(childInfo, "Child");
+                }
+            }
+
+            // Create tickets for infants
+            if (Array.isArray(infantList)) {
+                for (const infant of infantList) {
+                    const infantInfo = new Infant(
+                        infant.customer_name,
+                        infant.dob,
+                        infant.gender,
+                        infant.fly_with
+                    );
+                    const ticket = new Ticket({
+                        booking_id: newBooking._id,
+                        customer_type: "Infant",
+                        customer_details: infantInfo,
+                        price: 100000,
+                    });
+
+                    await ticket.save();
+                    returnTickets.push(ticket);
+                    totalPrice += 100000;
+                }
+            }
         }
 
         // Update booking with tickets and total price
         await Booking.findByIdAndUpdate(newBooking._id, {
-            $push: { tickets: { $each: tickets } },
-            $set: { total_price: totalPrice },
+            $push: {
+                outbound_tickets: { $each: tickets },
+                return_tickets: { $each: returnTickets }
+            },
+            $set: { total_price: totalPrice }
         });
 
         res.status(200).json("Booking was creating");
@@ -412,8 +525,8 @@ const cancelTicket = async (req, res) => {
         res.status(200).json("Ticket deleted successfully!");
 
     } catch (err) {
-        console.error("Error canceling ticket", error);
-        res.status(500).json({ status: false, message: error.message });
+        console.error("Error canceling ticket", err);
+        res.status(500).json({ status: false, message: err.message });
     }
 };
 

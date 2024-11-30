@@ -11,7 +11,8 @@ const bookingSchema = new Schema({
     num_adult: { type: Number, required: true },
     num_child: { type: Number, required: true },
     num_infant: { type: Number, required: true },
-    tickets: [Ticket.schema],
+    outbound_tickets: [Ticket.schema],
+    return_tickets: [Ticket.schema],
     total_price: { type: Number, required: true },
 });
 
