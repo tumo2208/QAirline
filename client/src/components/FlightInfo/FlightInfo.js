@@ -1,7 +1,7 @@
-function Travelinfo() {
+function FlightInfo() {
     return (
         <h1>Travel Info Page</h1>
     )
 }
 
-export default Travelinfo;
+export default FlightInfo;
