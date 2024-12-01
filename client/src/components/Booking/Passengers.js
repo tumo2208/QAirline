@@ -10,7 +10,7 @@ function Passengers() {
     const navigate = useNavigate();
 
     const outboundFlightID = outboundFlight.flight.flight_number;
-    const return_flightID = returnFlight ? returnFlight.flight_number : null;
+    const returnFlightID = returnFlight ? returnFlight.flight_number : null;
 
     const [formData, setFormData] = useState({
         adults: Array.from({ length: passengers.adults }, () => ({
@@ -20,7 +20,7 @@ function Passengers() {
             nationality: nationalities[0],
             phone_number: "",
             email: "",
-            id_type: "CitizenID",
+            id_type: "Citizen ID",
             id_number: "",
             country_issuing: nationalities[0],
             date_expiration: "",
@@ -51,23 +51,29 @@ function Passengers() {
             return;
         }
 
-        const outboundBookingData = {
-            flightID: outboundFlightID,
-
-            numAdult: passengers.adults,
-            numChildren: passengers.children,
-            numInfant: passengers.infants,
-            classType: outboundFlight.classType,
-
-            adultList: formData.adults,
-            childrenList: formData.children,
-            infantList: formData.infants,
-        }
-
-        console.log("Booking data:", outboundBookingData);
-    
         try {
-            const response = await axios.post("/api/bookings/newBooking", outboundBookingData);
+            const BookingData = {
+                outboundFlightID: outboundFlightID,
+                returnFlightID: returnFlightID,
+
+                numAdult: passengers.adults,
+                numChildren: passengers.children,
+                numInfant: passengers.infants,
+                classType: outboundFlight.classType,
+
+                adultList: formData.adults,
+                childrenList: formData.children,
+                infantList: formData.infants
+            };
+
+            console.log("Booking Data:", JSON.stringify(BookingData, null, 2));
+            const response = await axios.post(
+                "http://localhost:3001/api/bookings/newBooking", 
+                BookingData,
+                {
+                    withCredentials: true
+                }
+            );
 
             if (response.status === 200) {
                 const result = await response.data;
@@ -78,8 +84,8 @@ function Passengers() {
                 alert("Booking failed: " + response.data.message);
             }
         } catch (error) {
-            console.error("Error:", error);
-            alert("Booking failed: " + error.message);
+            console.error("Error details:", error.response ? error.response.data : error.message);
+            alert(`Booking indeed failed: ${error.message}`);
         }
     };
 
@@ -273,7 +279,7 @@ function AdultCard({ index, formData, handleInputChange }) {
                                 value={passenger.id_type}
                                 onChange={(e) => handleInputChange(e, "adults", index, "id_type")}
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
-                                <option value="CitizenID">Căn cước công dân</option>
+                                <option value="Citizen ID">Căn cước công dân</option>
                                 <option value="Passport">Hộ chiếu</option>
                             </select>
                         </div>

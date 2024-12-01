@@ -62,7 +62,7 @@ const getBookingByID = async (req, res) => {
         const {bookingID} = req.body;
         const booking = await Booking.findById(bookingID);
         return res.status(200).json(booking);
-    }  catch (err) {
+    }  catch (error) {
         console.error("Error view booking details", error);
         return res.status(500).json({ status: false, message: error.message });
     }
@@ -75,9 +75,9 @@ const makeBooking = async (req, res) => {
         if (user) {
             uid = user._id;
         }
-        const {flightID, numAdult, numChildren, numInfant, classType, adultList, childrenList, infantList} = req.body;
+        const {outboundFlightID, numAdult, numChildren, numInfant, classType, adultList, childrenList, infantList} = req.body;
         let flight = await Flight.findOne({
-            flight_number: flightID
+            flight_number: outboundFlightID
         });
         const aircraft = await Aircraft.findOne({
             aircraft_number: flight.aircraft_id
@@ -94,7 +94,7 @@ const makeBooking = async (req, res) => {
         // Create Booking
         const newBooking = new Booking({
             passenger_id: uid,
-            flight_id: flightID,
+            flight_id: outboundFlightID,
             class_type: classType,
             num_adult: numAdult,
             num_child: numChildren,
@@ -108,18 +108,18 @@ const makeBooking = async (req, res) => {
         let totalPrice = 0;
 
         // Function to update list occupiedSeats and availableSeats
-        const updateOccupiedSeats = async (flightId, classType, seatNumber) => {
+        const updateOccupiedSeats = async (outboundFlightID, classType, seatNumber) => {
             await Flight.updateOne(
-                { flight_number: flightId },
+                { flight_number: outboundFlightID },
                 { $push: { [`occupied_seats.${classType}`]: seatNumber } }
             );
 
             await Flight.updateOne(
-                { flight_number: flightId, "available_seats.class_type": classType },
+                { flight_number: outboundFlightID, "available_seats.class_type": classType },
                 { $inc: { "available_seats.$.seat_count": -1 } }
             );
 
-            flight = await Flight.findOne({ flight_number: flightId });
+            flight = await Flight.findOne({ flight_number: outboundFlightID });
         };
 
         // Function to handle ticket creation
@@ -138,7 +138,7 @@ const makeBooking = async (req, res) => {
             tickets.push(ticket);
             totalPrice += price;
 
-            await updateOccupiedSeats(flightID, classType, seatNumber);
+            await updateOccupiedSeats(outboundFlightID, classType, seatNumber);
         };
 
         // Create tickets for adults
@@ -192,7 +192,7 @@ const makeBooking = async (req, res) => {
             }
         }
 
-        const {returnFlightID} = req.body;
+        const { returnFlightID } = req.body;
         const returnTickets = [];
         if (returnFlightID) {
             await Booking.findByIdAndUpdate(newBooking._id, {
