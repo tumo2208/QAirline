@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import BookingInfo, {totalPrice} from "./BookingInfo";
+import BookingInfo from "./BookingInfo";
 
 function FlightSelection() {
     const { state } = useLocation();
@@ -10,6 +10,16 @@ function FlightSelection() {
     const [showOutbound, setShowOutbound] = useState(true);
     const [selectedOutbound, setSelectedOutbound] = useState([]);
     const [selectedReturn, setSelectedReturn] = useState([]);
+
+    // Nếu không có chuyến bay phù hợp
+    if (!flights) {
+        return (
+            <div style={{ textAlign: "center", marginTop: "20px" }}>
+                <h2>No Flights Available</h2>
+                <button onClick={() => navigate("/")}>Back to Search</button>
+            </div>
+        );
+    }
 
     const outboundCost = selectedOutbound?.flight?.available_seats.find(seat => seat.class_type === selectedOutbound.classType)?.price || 0;
     const returnCost = selectedReturn?.flight?.available_seats.find(seat => seat.class_type === selectedReturn.classType)?.price || 0;
@@ -41,8 +51,15 @@ function FlightSelection() {
         alert("Chọn chuyến bay thành công");
     };
 
-    const navigateToPassengers = (selectedFlights) => {
-        navigate("/booking/passengers", { state: { flights: selectedFlights } });
+    const navigateToPassengers = () => {
+        navigate("/booking/passengers", {
+            state: {
+                outboundFlight: selectedOutbound,
+                returnFlight: selectedReturn,
+                tripType: tripType,
+                passengers: passengers,
+            }
+        });
     }
 
     const handleNext = () => {
@@ -51,7 +68,7 @@ function FlightSelection() {
                 alert("Please select your flight.");
                 return;
             }
-            navigateToPassengers({ outbound: selectedOutbound });
+            navigateToPassengers();
         } else if (tripType === "round-trip") {
             if (showOutbound) {
                 if (!selectedOutbound) {
@@ -64,7 +81,7 @@ function FlightSelection() {
                     alert("Please select your return flight.");
                     return;
                 }
-                navigateToPassengers({ outbound: selectedOutbound, return: selectedReturn });
+                navigateToPassengers();
             }
         }
     }

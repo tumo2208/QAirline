@@ -201,6 +201,11 @@ const addFlight = async (req, res) => {
     } = req.body;
 
     try {
+        const user = req.user;
+        if (user.user_type !== 'Admin') {
+            return res.status(405).json({error: 'You do not have access to this function'});
+        }
+
         // Handle for case aircraft not exist
         const aircraft = await Aircraft.findOne({
             aircraft_number: aircraftID
@@ -241,7 +246,7 @@ const addFlight = async (req, res) => {
         }
 
         const availableSeats = aircraft.seat_classes.map(seatClass => {
-            let price = 0;
+            let price;
             if (seatClass.class_type === 'Economy') {
                 price = priceEconomy;
             } else {
@@ -275,4 +280,35 @@ const addFlight = async (req, res) => {
     }
 };
 
-module.exports = {getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus};
+const setDelayTime = async (req, res) => {
+    try {
+        const {flightID, newTime} = req.body;
+        const flight = await Flight.findOne({
+            flight_number: flightID
+        });
+
+        if (!flight) {
+            return res.status(404).json({ error: "Flight not found." });
+        }
+
+        const oldDepartDate = new Date(flight.departure_time);
+        const oldArrivalDate = new Date(flight.arrival_time);
+        const timeDif = oldArrivalDate - oldDepartDate;
+
+        const newDepartDate = new Date(newTime);
+        const newArrivalDate = new Date(newDepartDate.getTime() + timeDif);
+
+        flight.departure_date = newDepartDate;
+        flight.arrival_date = newArrivalDate;
+
+        await flight.save();
+
+        res.status(200).json("Flight dates updated successfully!");
+
+    }  catch (error) {
+        console.error("Error set delay for flight", error);
+        res.status(500).json({ status: false, message: error.message });
+    }
+};
+
+module.exports = {getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus, setDelayTime};

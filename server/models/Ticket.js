@@ -36,7 +36,7 @@ const ticketSchema = new Schema({
         type: Schema.Types.Mixed,
         required: true
     },
-    class_type: { type: String, enum: ['Economy', 'Business']},
+    // class_type: { type: String, enum: ['Economy', 'Business']},
     seat_number: { type: String},
     price: { type: Number, required: true },
 });
