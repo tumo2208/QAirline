@@ -62,7 +62,7 @@ const getBookingByID = async (req, res) => {
         const {bookingID} = req.body;
         const booking = await Booking.findById(bookingID);
         return res.status(200).json(booking);
-    }  catch (err) {
+    }  catch (error) {
         console.error("Error view booking details", error);
         return res.status(500).json({ status: false, message: error.message });
     }
@@ -76,9 +76,11 @@ const makeBooking = async (req, res) => {
             uid = user._id;
         }
         const {flightID, numAdult, numChildren, numInfant, classType, adultList, childrenList, infantList} = req.body;
+
         let flight = await Flight.findOne({
             flight_number: flightID
         });
+        console.log(flight);
         const aircraft = await Aircraft.findOne({
             aircraft_number: flight.aircraft_id
         });
@@ -411,7 +413,7 @@ const cancelTicket = async (req, res) => {
 
         res.status(200).json("Ticket deleted successfully!");
 
-    } catch (err) {
+    } catch (error) {
         console.error("Error canceling ticket", error);
         res.status(500).json({ status: false, message: error.message });
     }

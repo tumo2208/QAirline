@@ -1,16 +1,101 @@
 import BookingInfo from "./BookingInfo";
-import React from "react";
+import React, { useState } from "react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {nationalities} from "../../shared/SharedData";
+import axios from "axios";
 
 function Passengers() {
     const { state } = useLocation();
     const { outboundFlight, returnFlight , tripType, passengers } = state;
     const navigate = useNavigate();
 
-    const handleNext = () => {
+    const outboundFlightID = outboundFlight.flight.flight_number;
+    const return_flightID = returnFlight ? returnFlight.flight_number : null;
 
-    }
+    const [formData, setFormData] = useState({
+        adults: Array.from({ length: passengers.adults }, () => ({
+            customer_name: "",
+            dob: "",
+            gender: "Male",
+            nationality: nationalities[0],
+            phone_number: "",
+            email: "",
+            id_type: "CitizenID",
+            id_number: "",
+            country_issuing: nationalities[0],
+            date_expiration: "",
+        })),
+        children: Array.from({ length: passengers.children }, () => ({
+            customer_name: "",
+            dob: "",
+            gender: "Male",
+        })),
+        infants: Array.from({ length: passengers.infants }, () => ({
+            customer_name: "",
+            dob: "",
+            gender: "Male",
+            fly_with: "",
+        })),
+    });
+
+    const handleInputChange = (e, category, index, field) => {
+        const updatedData = { ...formData };
+        updatedData[category][index][field] = e.target.value;
+        setFormData(updatedData);
+    };
+
+    const handleNext = async () => {
+        const isValid = validateForm();
+        if (!isValid) {
+            alert("Please fill out all required fields.");
+            return;
+        }
+
+        const outboundBookingData = {
+            flightID: outboundFlightID,
+
+            numAdult: passengers.adults,
+            numChildren: passengers.children,
+            numInfant: passengers.infants,
+            classType: outboundFlight.classType,
+
+            adultList: formData.adults,
+            childrenList: formData.children,
+            infantList: formData.infants,
+        }
+
+        console.log("Booking data:", outboundBookingData);
+    
+        try {
+            const response = await axios.post("/api/bookings/newBooking", outboundBookingData);
+
+            if (response.status === 200) {
+                const result = await response.data;
+                alert("Booking successful, returning to Homepage...");
+                console.log("Booking successful", result);
+                navigate("/");
+            } else {
+                alert("Booking failed: " + response.data.message);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Booking failed: " + error.message);
+        }
+    };
+
+    const validateForm = () => {
+        return (
+            validatePassengers(formData.adults) &&
+            validatePassengers(formData.children) &&
+            validatePassengers(formData.infants)
+        );
+    };
+
+    const validatePassengers = (passengersArray) => {
+        return passengersArray.every((passenger) => {
+            return Object.values(passenger).every((value) => value !== "" && value !== undefined);
+        });
+    };
 
     const handleBack = () => {
         window.history.back()
@@ -33,19 +118,38 @@ function Passengers() {
                     </div>
                     <div className="flex flex-col space-y-5 my-5">
                         {Array.from({length: passengers.adults}).map((_, index) => (
-                            <AdultCard index={index}/>
+                            <AdultCard 
+                                key={`adult-${index}`}
+                                index={index}
+                                formData={formData}
+                                handleInputChange={handleInputChange}
+                            />
                         ))}
                         {Array.from({length: passengers.children}).map((_, index) => (
-                            <ChildrenCard index={index}/>
+                            <ChildrenCard
+                                key={`child-${index}`}
+                                index={index}
+                                formData={formData}
+                                handleInputChange={handleInputChange}
+                            />
                         ))}
                         {Array.from({length: passengers.infants}).map((_, index) => (
-                            <InfantCard index={index}/>
+                            <InfantCard 
+                                key={`infant-${index}`}
+                                index={index}
+                                formData={formData}
+                                handleInputChange={handleInputChange}
+                            />
                         ))}
                     </div>
                 </div>
                 <div style={{flex: 3}}>
-                    <BookingInfo outboundFlight={outboundFlight} returnFlight={returnFlight} tripType={tripType}
-                                 passengers={passengers}/>
+                    <BookingInfo 
+                        outboundFlight={outboundFlight} 
+                        returnFlight={returnFlight} 
+                        tripType={tripType}
+                        passengers={passengers}
+                    />
                 </div>
             </div>
             <div className="sticky bottom-0 z-20 bg-blue-200 p-5 rounded-lg shadow-lg">
@@ -77,7 +181,8 @@ function Passengers() {
     )
 }
 
-function AdultCard({index}) {
+function AdultCard({ index, formData, handleInputChange }) {
+    const passenger = formData.adults[index];
     return (
         <div className="bg-white border-4 p-10 mx-20 flex rounded-2xl shadow-lg">
             <div className="px-5">
@@ -88,8 +193,8 @@ function AdultCard({index}) {
                             <label className="font-semibold block text-gray-700">Họ và tên (<span className="text-xs">Theo giấy tờ thùy thân</span>)</label>
                             <input
                                 type="text"
-                                name=""
-                                id=""
+                                value={passenger.customer_name}
+                                onChange={(e) => handleInputChange(e, "adults", index, "customer_name")}
                                 placeholder="VD: NGUYEN VAN A"
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                                 required
@@ -99,6 +204,8 @@ function AdultCard({index}) {
                         <div className="flex-1">
                             <label className="font-semibold block text-gray-700">Giới tính</label>
                             <select required
+                                    value={passenger.gender}
+                                    onChange={(e) => handleInputChange(e, "adults", index, "gender")}
                                     className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
                                 <option value="Male">Nam</option>
                                 <option value="Female">Nữ</option>
@@ -110,6 +217,8 @@ function AdultCard({index}) {
                             <label className="font-semibold block text-gray-700">Ngày sinh</label>
                             <input
                                 type="date"
+                                value={passenger.dob}
+                                onChange={(e) => handleInputChange(e, "adults", index, "dob")}
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                                 required
                             />
@@ -118,6 +227,8 @@ function AdultCard({index}) {
                         <div className="flex-1">
                             <label className="font-semibold block text-gray-700">Quốc tịch</label>
                             <select
+                                value={passenger.nationality}
+                                onChange={(e) => handleInputChange(e, "adults", index, "nationality")}
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                                 required
                             >
@@ -133,8 +244,8 @@ function AdultCard({index}) {
                             <label className="font-semibold block text-gray-700">Số điện thoại</label>
                             <input
                                 type="text"
-                                name=""
-                                id=""
+                                value={passenger.phone_number}
+                                onChange={(e) => handleInputChange(e, "adults", index, "phone_number")}
                                 placeholder='Nhập số điện thoại'
                                 minLength="10"
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
@@ -145,8 +256,8 @@ function AdultCard({index}) {
                             <label className="font-semibold block text-gray-700">Email</label>
                             <input
                                 type="email"
-                                name=""
-                                id=""
+                                value={passenger.email}
+                                onChange={(e) => handleInputChange(e, "adults", index, "email")}
                                 placeholder="VD: example@abc.com"
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                                 required
@@ -157,8 +268,11 @@ function AdultCard({index}) {
                     <div className="flex flex-row space-x-4">
                         <div className="flex-1">
                             <label className="font-semibold block text-gray-700">Loại giấy tờ tùy thân</label>
-                            <select required
-                                    className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
+                            <select 
+                                required
+                                value={passenger.id_type}
+                                onChange={(e) => handleInputChange(e, "adults", index, "id_type")}
+                                className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
                                 <option value="CitizenID">Căn cước công dân</option>
                                 <option value="Passport">Hộ chiếu</option>
                             </select>
@@ -168,6 +282,8 @@ function AdultCard({index}) {
                             <input
                                 type="text"
                                 placeholder="Nhập theo giấy tờ tùy thân"
+                                value={passenger.id_number}
+                                onChange={(e) => handleInputChange(e, "adults", index, "id_number")}
                                 minLength="8"
                                 maxLength="15"
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
@@ -180,6 +296,8 @@ function AdultCard({index}) {
                         <div className="flex-1">
                             <label className="font-semibold block text-gray-700">Quốc gia cấp</label>
                             <select
+                                value={passenger.country_issuing}
+                                onChange={(e) => handleInputChange(e, "adults", index, "country_issuing")}
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                                 required
                             >
@@ -192,6 +310,8 @@ function AdultCard({index}) {
                             <label className="font-semibold block text-gray-700">Ngày hết hạn</label>
                             <input
                                 type="date"
+                                value={passenger.date_expiration}
+                                onChange={(e) => handleInputChange(e, "adults", index, "date_expiration")}
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                                 required
                             />
@@ -203,7 +323,8 @@ function AdultCard({index}) {
     )
 }
 
-function ChildrenCard({index}) {
+function ChildrenCard({index, formData, handleInputChange}) {
+    const children = formData.children[index];
     return (
         <div className="bg-white border-4 p-10 mx-20 flex rounded-2xl shadow-lg">
             <div className="px-5">
@@ -213,8 +334,8 @@ function ChildrenCard({index}) {
                         <label className="font-semibold block text-gray-700">Họ và tên</label>
                         <input
                             type="text"
-                            name=""
-                            id=""
+                            value={children.customer_name}
+                            onChange={(e) => handleInputChange(e, "children", index, "customer_name")}
                             placeholder="VD: NGUYEN VAN A"
                             className="w-72 px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                             required
@@ -223,8 +344,11 @@ function ChildrenCard({index}) {
 
                     <div className="flex-1">
                         <label className="font-semibold block text-gray-700">Giới tính</label>
-                        <select required
-                                className="w-32 px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
+                        <select 
+                            required
+                            value={children.gender}
+                            onChange={(e) => handleInputChange(e, "children", index, "gender")}
+                            className="w-32 px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
                             <option value="Male">Nam</option>
                             <option value="Female">Nữ</option>
                             <option value="Others">Khác</option>
@@ -235,6 +359,8 @@ function ChildrenCard({index}) {
                         <label className="font-semibold block text-gray-700">Ngày sinh</label>
                         <input
                             type="date"
+                            value={children.dob}
+                            onChange={(e) => handleInputChange(e, "children", index, "dob")}
                             className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                             required
                         />
@@ -245,7 +371,8 @@ function ChildrenCard({index}) {
     )
 }
 
-function InfantCard({index}) {
+function InfantCard({index, formData, handleInputChange}) {
+    const infant = formData.infants[index];
     return (
         <div className="bg-white border-4 p-10 mx-20 flex rounded-2xl shadow-lg">
             <div className="px-5">
@@ -256,7 +383,8 @@ function InfantCard({index}) {
                             <label className="font-semibold block text-gray-700">Họ và tên</label>
                             <input
                                 type="text"
-                                name=""
+                                value={infant.customer_name}
+                                onChange={(e) => handleInputChange(e, "infants", index, "customer_name")}
                                 id=""
                                 placeholder="VD: NGUYEN VAN A"
                                 className="w-72 px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
@@ -266,8 +394,11 @@ function InfantCard({index}) {
 
                         <div className="flex-1">
                             <label className="font-semibold block text-gray-700">Giới tính</label>
-                            <select required
-                                    className="w-32 px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
+                            <select 
+                                value={infant.gender}
+                                onChange={(e) => handleInputChange(e, "infants", index, "gender")}
+                                required
+                                className="w-32 px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
                                 <option value="Male">Nam</option>
                                 <option value="Female">Nữ</option>
                                 <option value="Others">Khác</option>
@@ -278,6 +409,8 @@ function InfantCard({index}) {
                             <label className="font-semibold block text-gray-700">Ngày sinh</label>
                             <input
                                 type="date"
+                                value={infant.dob}
+                                onChange={(e) => handleInputChange(e, "infants", index, "dob")}
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
                                 required
                             />
@@ -290,6 +423,8 @@ function InfantCard({index}) {
                             <input
                                 type="text"
                                 placeholder="Nhập số định danh của người đi cùng"
+                                value={infant.fly_with}
+                                onChange={(e) => handleInputChange(e, "infants", index, "fly_with")}
                                 minLength="8"
                                 maxLength="15"
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
