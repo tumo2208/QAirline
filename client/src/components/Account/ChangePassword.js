@@ -1,6 +1,46 @@
-import {Link} from "react-router-dom";
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function ChangePassword() {
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (newPassword !== confirmNewPassword) {
+            setError("New passwords do not match!");
+            return;
+        }
+
+        try {
+            const response = await axios.post("http://localhost:3001/change-password", {
+                currentPassword: oldPassword,
+                newPassword,
+                confirmPassword: confirmNewPassword,
+            }, {
+                withCredentials: true,
+            });
+
+            if (response.status === 200) {
+                alert("Password changed successfully, please login again");
+                setTimeout(() => {
+                    navigate("/login");
+                }, 1000);
+            }
+        } catch (error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message);
+            } else {
+                setError("Something went wrong. Please try again.");
+            }
+        }
+    };
+
     return (
         <section>
             <main id="content" role="main" className="w-full h-screen max-w-md p-6 mx-auto bg-center bg-cover"
@@ -11,17 +51,23 @@ function ChangePassword() {
                             <h1 className="font-bold text-3xl p-10 text-[#002D74]">Đổi mật khẩu</h1>
                         </div>
 
+                        {error && <div className="text-red-500">{error}</div>}
+
                         <div className="mt-5">
-                            <form>
+                            <form onSubmit={handleSubmit}>
                                 <div className="grid gap-y-4">
                                     <div>
                                         <label htmlFor="old_password"
                                                className="block mb-2 ml-1 text-xs font-semibold ">Mật khẩu cũ</label>
                                         <div className="relative">
-                                            <input type="password" id="old_password" name="old_password"
-                                                   className="block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                   required aria-describedby="old-password-error"
-                                                   />
+                                            <input 
+                                                type="password" 
+                                                id="old_password" 
+                                                value={oldPassword}
+                                                onChange={(e) => setOldPassword(e.target.value)}
+                                                className="block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                required aria-describedby="old-password-error"
+                                            />
                                         </div>
                                         <p className="hidden mt-2 text-xs text-red-600" id="old-password-error"></p>
                                     </div>
@@ -29,10 +75,15 @@ function ChangePassword() {
                                         <label htmlFor="new_password"
                                                className="block mb-2 ml-1 text-xs font-semibold ">Mật khẩu mới</label>
                                         <div className="relative">
-                                            <input type="password" id="new_password" name="new_password" minLength={8}
-                                                   className="block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                   required aria-describedby="new-password-error"
-                                                   />
+                                            <input
+                                                type="password" 
+                                                id="new_password" 
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                                minLength={8}
+                                                className="block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                required aria-describedby="new-password-error"
+                                            />
                                         </div>
                                         <p className="hidden mt-2 text-xs text-red-600" id="new-password-error">Please
                                             include a
@@ -43,11 +94,14 @@ function ChangePassword() {
                                         <label htmlFor="confirmn_new_password"
                                                className="block mb-2 ml-1 text-xs font-semibold ">Nhập lại mật khẩu mới</label>
                                         <div className="relative">
-                                            <input type="password" id="confirmn_new_password"
-                                                   name="confirmn_new_password"
-                                                   className="block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                                   required aria-describedby="confirmn_new-password-error"
-                                                   />
+                                            <input
+                                                type="password" 
+                                                id="confirmn_new_password"
+                                                value={confirmNewPassword}
+                                                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                                className="block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                required aria-describedby="confirmn_new-password-error"
+                                            />
                                         </div>
                                         <p className="hidden mt-2 text-xs text-red-600"
                                            id="confirmn_new-password-error"></p>

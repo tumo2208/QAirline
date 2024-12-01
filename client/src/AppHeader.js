@@ -124,7 +124,7 @@ function AppHeader() {
                                     <li
                                         role="menuitem"
                                     >
-                                        <Link to="/changepassword"
+                                        <Link to="/change-password"
                                               onClick={closeMenu}
                                               className="menu-item profileMenuItem">
                                             <svg
