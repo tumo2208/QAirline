@@ -36,6 +36,22 @@ const determineNextChair = (flight, aircraft, class_type) => {
     return availableSeats[0];
 };
 
+/**
+ * Function to generate Booking ID randomly.
+ * @returns {string}
+ */
+function generateBookingID() {
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let bookingID = '';
+
+    for (let i = 0; i < 6; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        bookingID += characters.charAt(randomIndex);
+    }
+
+    return bookingID;
+}
+
 const getMyBookings = async (req, res) => {
     try {
         const user = req.user;
@@ -60,7 +76,9 @@ const getMyBookings = async (req, res) => {
 const getBookingByID = async (req, res) => {
     try {
         const {bookingID} = req.body;
-        const booking = await Booking.findById(bookingID);
+        const booking = await Booking.findOne({
+            booking_id: bookingID
+        });
         return res.status(200).json(booking);
     }  catch (error) {
         console.error("Error view booking details", error);
@@ -101,6 +119,21 @@ const makeBooking = async (req, res) => {
             num_infant: numInfant,
             total_price: 0
         });
+
+        // Gen Booking ID
+        const objectIDString = newBooking._id.toString();
+        let bookingID = objectIDString.slice(-6);
+        let duplicateBookingID = await Booking.findOne({
+            booking_id: bookingID
+        });
+        while (duplicateBookingID) {
+            bookingID = generateBookingID();
+            duplicateBookingID = await Booking.findOne({
+                booking_id: bookingID
+            });
+        }
+        newBooking.booking_id = bookingID;
+
         await newBooking.save();
 
         // Initial data
@@ -126,7 +159,7 @@ const makeBooking = async (req, res) => {
         const createTicket = async (customer, type) => {
             const seatNumber = determineNextChair(flight, aircraft, classType);
             const ticket = new Ticket({
-                booking_id: newBooking._id,
+                booking_id: bookingID,
                 customer_type: type,
                 customer_details: customer,
                 class_type: classType,
@@ -180,23 +213,24 @@ const makeBooking = async (req, res) => {
                     infant.fly_with
                 );
                 const ticket = new Ticket({
-                    booking_id: newBooking._id,
+                    booking_id: bookingID,
                     customer_type: "Infant",
                     customer_details: infantInfo,
-                    price: 100000,
+                    price: price * 0.1,
                 });
 
                 await ticket.save();
                 tickets.push(ticket);
-                totalPrice += 100000;
+                totalPrice += (price * 0.1);
             }
         }
 
         const { returnFlightID } = req.body;
         const returnTickets = [];
         if (returnFlightID) {
-            await Booking.findByIdAndUpdate(newBooking._id, {
-                $set: { return_flight_id: returnFlightID }
+            await Booking.findOneAndUpdate(
+                { booking_id: bookingID },
+                { $set: { return_flight_id: returnFlightID }
             });
 
             let returnFlight = await Flight.findOne({
@@ -233,7 +267,7 @@ const makeBooking = async (req, res) => {
             const createTicketReturn = async (customer, type) => {
                 const seatNumber = determineNextChair(returnFlight, returnAircraft, classType);
                 const ticket = new Ticket({
-                    booking_id: newBooking._id,
+                    booking_id: bookingID,
                     customer_type: type,
                     customer_details: customer,
                     class_type: classType,
@@ -287,27 +321,30 @@ const makeBooking = async (req, res) => {
                         infant.fly_with
                     );
                     const ticket = new Ticket({
-                        booking_id: newBooking._id,
+                        booking_id: bookingID,
                         customer_type: "Infant",
                         customer_details: infantInfo,
-                        price: 100000,
+                        price: returnPrice * 0.1,
                     });
 
                     await ticket.save();
                     returnTickets.push(ticket);
-                    totalPrice += 100000;
+                    totalPrice += (returnPrice * 0.1);
                 }
             }
         }
 
         // Update booking with tickets and total price
-        await Booking.findByIdAndUpdate(newBooking._id, {
-            $push: {
-                outbound_tickets: { $each: tickets },
-                return_tickets: { $each: returnTickets }
-            },
-            $set: { total_price: totalPrice }
-        });
+        await Booking.findOneAndUpdate(
+            { booking_id: bookingID },
+            {
+                $push: {
+                    outbound_tickets: { $each: tickets },
+                    return_tickets: { $each: returnTickets }
+                },
+                $set: { total_price: totalPrice }
+            }
+        );
 
         res.status(200).json("Booking was creating");
     } catch (error) {
@@ -448,7 +485,9 @@ const cancelBooking = async (req, res) => {
     try {
         const { bookingID } = req.body;
 
-        const booking = await Booking.findById(bookingID);
+        const booking = await Booking.findOne({
+            booking_id: bookingID
+        });
 
         const flight = await Flight.findOne({
             flight_number: booking.flight_id
@@ -466,17 +505,19 @@ const cancelBooking = async (req, res) => {
             if (ticket.customer_type !== 'Infant') {
                 await Flight.updateOne(
                     { flight_number: booking.flight_id },
-                    { $pull: { [`occupied_seats.${ticket.class_type}`]: ticket.seat_number } }
+                    { $pull: { [`occupied_seats.${booking.class_type}`]: ticket.seat_number } }
                 );
 
                 await Flight.updateOne(
-                    { flight_number: booking.flight_id, "available_seats.class_type": ticket.class_type },
+                    { flight_number: booking.flight_id, "available_seats.class_type": booking.class_type },
                     { $inc: { "available_seats.$.seat_count": 1 } }
                 );
             }
         }
 
-        await Booking.findByIdAndDelete(bookingID);
+        await Booking.findOneAndDelete({
+            booking_id: bookingID
+        });
 
         res.status(200).json("Booking and tickets cancelled successfully");
 
@@ -492,7 +533,9 @@ const cancelTicket = async (req, res) => {
 
         const ticket = await Ticket.findById(ticketID);
         const bookingID = ticket.booking_id;
-        const booking = await Booking.findById(bookingID);
+        const booking = await Booking.findOne({
+            booking_id: bookingID
+        });
         const customerType = ticket.customer_type;
         const ticketPrice = ticket.price;
 
@@ -502,6 +545,18 @@ const cancelTicket = async (req, res) => {
 
         if (!checkTimeToCancel(flight)) {
             return res.status(404).json("Ticket can only be canceled at least 7 days before the departure time.");
+        }
+
+        if (ticket.customer_type !== 'Infant') {
+            await Flight.updateOne(
+                { flight_number: booking.flight_id },
+                { $pull: { [`occupied_seats.${booking.class_type}`]: ticket.seat_number } }
+            );
+
+            await Flight.updateOne(
+                { flight_number: booking.flight_id, "available_seats.class_type": booking.class_type },
+                { $inc: { "available_seats.$.seat_count": 1 } }
+            );
         }
 
         booking.total_price = booking.total_price - ticketPrice;
@@ -519,7 +574,9 @@ const cancelTicket = async (req, res) => {
         booking.tickets = booking.tickets.filter(t => t._id.toString() !== ticketID);
 
         if (booking.tickets.length === 0) {
-            await Booking.findByIdAndDelete(bookingID);
+            await Booking.findOneAndDelete({
+                booking_id: bookingID
+            });
         } else {
             await booking.save();
         }
