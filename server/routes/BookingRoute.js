@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get('/myBookings', userVerification, getMyBookings);
 router.post('/getBookingByID', userVerification, getBookingByID);
-router.post('/newBooking', userVerification, makeBooking);
+router.post('/newBooking', makeBooking);
 router.post('/cancelBooking', userVerification, cancelBooking);
 router.post('/cancelTicket', userVerification, cancelTicket);
 

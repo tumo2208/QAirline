@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const Ticket = require('./Ticket');
 
 const bookingSchema = new Schema({
+    booking_id: { type: String, required: true, unique: true },
     flight_id: { type: String, ref: 'Flight', required: true },
     return_flight_id: { type: String, ref: 'Flight' },
     passenger_id: { type: Schema.Types.ObjectId, ref: 'User'},
