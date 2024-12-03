@@ -8,17 +8,26 @@ function FlightSelection() {
     const navigate = useNavigate();
 
     const [showOutbound, setShowOutbound] = useState(true);
-    const [selectedOutbound, setSelectedOutbound] = useState([]);
-    const [selectedReturn, setSelectedReturn] = useState([]);
+    const [selectedOutbound, setSelectedOutbound] = useState(null);
+    const [selectedReturn, setSelectedReturn] = useState(null);
 
     // Nếu không có chuyến bay phù hợp
     if (!flights) {
         return (
-            <div style={{ textAlign: "center", marginTop: "20px" }}>
-                <h2>No Flights Available</h2>
-                <button onClick={() => navigate("/")}>Back to Search</button>
+            <div className="bg-white p-60 flex flex-col items-center justify-center space-y-10">
+                <h2 className="text-5xl font-bold text-center text-[#002D74]">Rất tiếc, không có chuyến bay phù hợp với tìm kiếm của bạn</h2>
+                <div className="text-left mx-8">
+                        <button
+                            type="button"
+                            className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
+                            onClick={() => window.history.back()}
+                        >
+                            <span className="mr-2 font-bold text-lg">←</span>
+                            Quay lại trang trước
+                        </button>
+                    </div>
             </div>
-        );
+        )
     }
 
     const outboundCost = selectedOutbound?.flight?.available_seats.find(seat => seat.class_type === selectedOutbound.classType)?.price || 0;

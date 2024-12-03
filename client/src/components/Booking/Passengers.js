@@ -60,7 +60,7 @@ function Passengers() {
                 numChildren: passengers.children,
                 numInfant: passengers.infants,
                 classType: outboundFlight.classType,
-                returnClassType: returnFlight.classType,
+                returnClassType: returnFlight ? returnFlight.classType : null,
 
                 adultList: formData.adults,
                 childrenList: formData.children,

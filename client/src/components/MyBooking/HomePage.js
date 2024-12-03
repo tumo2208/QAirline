@@ -5,7 +5,7 @@ import axios from "axios";
 function HomePage(){
     const navigate = useNavigate();
     const [bookingID, setBookingID] = useState("");
-    const handleSubmit= async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!bookingID) {
             alert("Please fill in all required fields.");
@@ -51,7 +51,7 @@ function HomePage(){
                     <img
                         className="w-full h-full md:block lg:block hidden rounded-b-2xl object-fit object-center"
                         style={{height: "500px"}}
-                        src="https://i.imgur.com/3mcNLZX.png"
+                        src="https://i.imgur.com/6nhgeK0.png"
                         alt=""
                     />
                     <div className="absolute bottom-32 left-24  px-4 py-5 sm:p-0">
