@@ -10,9 +10,45 @@ const updateFlightStatus = async () => {
             { status: 'Scheduled', departure_time: { $lte: now } },
             { $set: { status: 'HasFlied' } }
         );
-        console.log(`[${new Date().toISOString()}] Updated ${result.nModified} flights to 'HasFlied'.`);
     } catch (error) {
         console.error('Error updating flight statuses:', error);
+    }
+};
+
+const updatePrepareFlight = async () => {
+    try {
+        const now = new Date();
+        const oneDayLater = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+        const flights = await Flight.find({
+            departure_time: { $gte: now, $lt: oneDayLater },
+        });
+
+        for (const flight of flights) {
+            const notificationMessage = `Chuyến bay của bạn chuẩn bị cất cánh vào lúc ${flight.departure_time.toISOString()}, vui lòng chuẩn bị`;
+
+            if (!flight.notification.includes(notificationMessage)) {
+                flight.notification.push(notificationMessage);
+                await flight.save();
+            }
+        }
+    }  catch (error) {
+        console.error('Error updating notification for flight:', error);
+    }
+};
+
+const getFlightByID = async (req, res) => {
+    try {
+        const {flightID} = req.body;
+        const flight = await Flight.findOne({
+            flight_number: flightID
+        });
+        if (!flight) {
+            return res.status(404).json("Flight not found");
+        }
+    }  catch (error) {
+        console.error("Error getting flight by ID", error);
+        return res.status(500).json({ status: false, message: error.message });
     }
 };
 
@@ -301,6 +337,9 @@ const setDelayTime = async (req, res) => {
         flight.departure_date = newDepartDate;
         flight.arrival_date = newArrivalDate;
 
+        const delayMessage = `Chuyến bay của bạn đã bị delay sang ${newDepartDate.toISOString()}`;
+        flight.notification.push(delayMessage);
+
         await flight.save();
 
         res.status(200).json("Flight dates updated successfully!");
@@ -311,4 +350,4 @@ const setDelayTime = async (req, res) => {
     }
 };
 
-module.exports = {getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus, setDelayTime};
+module.exports = {getFlightByID, getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus, updatePrepareFlight, setDelayTime};
