@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {useLocation} from "react-router-dom";
+import axios from "axios";
 import logo from "../../logo.svg";
+import unidecode from 'unidecode';
 
 function SearchBooking() {
     const [activeTab, setActiveTab] = useState("outbound");
     const { state } = useLocation();
     const { booking } = state || null;
     const [roundTrip, setRoundTrip] = useState(true);
+
+    const [outboundFlight, setOutboundFlight] = useState(null);
+    const [returnFlight, setReturnFlight] = useState(null);
+
     const handleBack = () => {
         window.history.back()
     };
@@ -16,6 +22,48 @@ function SearchBooking() {
         if (booking?.return_tickets.length === 0) {
             setRoundTrip(false);
         }
+    }, [booking]);
+
+    //Fetch flight data
+    useEffect( () => {
+        async function FetchData() {
+            if (booking?.flight_id) {
+                try {
+                    const response = await axios.post(
+                        "http://localhost:3001/api/flights/getFlightByID",
+                        { flightID: booking.flight_id },
+                        {
+                            withCredentials: true,
+                        }
+                    );
+                    if (!response || !response.data) {
+                        throw new Error("Invalid response from the server");
+                    }
+                    setOutboundFlight(response.data);
+                } catch (error) {
+                    console.error("Error fetching flight details:", error);
+                }
+            }
+            
+            if (booking?.return_flight_id) {
+                try {
+                    const response = await axios.post(
+                        "http://localhost:3001/api/flights/getFlightByID",
+                        { flightID: booking.return_flight_id },
+                        {
+                            withCredentials: true,
+                        }
+                    );
+                    if (!response || !response.data) {
+                        throw new Error("Invalid response from the server");
+                    }
+                    setReturnFlight(response.data);
+                } catch (error) {
+                    console.error("Error fetching flight details:", error);
+                }
+            }
+        }
+        FetchData();
     }, [booking]);
 
     if (!booking) {
@@ -78,14 +126,14 @@ function SearchBooking() {
                     {activeTab === "outbound" && (
                         <div>
                             {Array.from({length: booking?.outbound_tickets?.length}).map((_, index) => (
-                            <TicketCard ticket={booking?.outbound_tickets[index]} flight_id={booking?.flight_id} class_type={booking?.class_type}/>
+                            <TicketCard ticket={booking?.outbound_tickets[index]} flight={outboundFlight} class_type={booking?.class_type}/>
                         ))}
                         </div>
                     )}
                     {activeTab === "return" && roundTrip && (
                         <div>
                             {Array.from({length: booking?.return_tickets?.length}).map((_, index) => (
-                            <TicketCard ticket={booking?.return_tickets[index]} flight_id={booking?.return_flight_id} class_type={booking?.return_class_type}/>
+                            <TicketCard ticket={booking?.return_tickets[index]} flight={returnFlight} class_type={booking?.return_class_type}/>
                         ))}
                         </div>
                     )}
@@ -95,7 +143,31 @@ function SearchBooking() {
     )
 }
 
-function TicketCard({ticket, flight_id, class_type}) {
+function TicketCard({ticket, flight, class_type}) {
+    const [airportInfo, setAirportInfo] = useState([]);
+
+    useEffect(() => {
+        const fetchAirportInfo = async () => {
+            try {
+                const response = await axios.get("http://localhost:3001/api/airportAircraft/allAirports");
+                setAirportInfo(response.data.map((airport) => ({
+                    name: airport.name,
+                    city: airport.city,
+                    airport_code: airport.airport_code
+                })));
+            } catch (error) {
+                console.error("Error fetching airports info:", error);
+            }
+        };
+
+        fetchAirportInfo();
+    }, []);
+
+    const getCityFromAirportID = (airportCode) => {
+        const airport = airportInfo.find((a) => a.airport_code === airportCode);
+        return airport ? airport.city : "";
+    };
+
     return (
         <div className="bg-white border-4 p-2 mx-52 rounded-2xl shadow-lg">
             <div className="flex flex-row">
@@ -128,11 +200,11 @@ function TicketCard({ticket, flight_id, class_type}) {
                             )}
                             <div className="flex mt-8 w-full justify-between items-center">
                                 <div className="flex flex-col items-center">
-                                    <span className="text-4xl font-bold">HAN</span>
-                                    <span className="text-zinc-500 text-sm">Hanoi</span>
+                                    <span className="text-4xl font-bold">{flight?.departure_airport_id}</span>
+                                    <span className="text-zinc-500 text-sm">{unidecode(getCityFromAirportID(flight?.departure_airport_id))}</span>
                                 </div>
                                 <div className="flex flex-col flex-grow items-center px-10">
-                                    <span className="font-bold text-sm">{flight_id}</span>
+                                    <span className="font-bold text-sm">{flight?.flight_number}</span>
                                     <div className="w-full flex items-center mt-2">
                                         <div className="w-3 h-3 rounded-full border-2 border-zinc-900"></div>
                                         <div
@@ -151,18 +223,21 @@ function TicketCard({ticket, flight_id, class_type}) {
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-center">
-                                    <span className="text-4xl font-bold">SGN</span>
-                                    <span className="text-zinc-500 text-sm">Ho Chi Minh City</span>
+                                    <span className="text-4xl font-bold">{flight?.arrival_airport_id}</span>
+                                    <span className="text-zinc-500 text-sm">{unidecode(getCityFromAirportID(flight?.arrival_airport_id))}</span>
                                 </div>
                             </div>
                             <div className="flex w-full mt-auto justify-between">
                                 <div className="flex flex-col">
                                     <span className="text-xs text-gray-500">Date</span>
-                                    <span className="font-mono">09/06/2023</span>
+                                    <span className="font-mono">{convertDateFormat(flight?.departure_time)}</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-xs text-gray-500">Departure</span>
-                                    <span className="font-mono">17:45</span>
+                                    <span className="font-mono">{new Date(flight?.departure_time).toLocaleTimeString("en-GB", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-xs text-gray-500">Passenger</span>
@@ -190,6 +265,15 @@ function TicketCard({ticket, flight_id, class_type}) {
             </div>
         </div>
     )
+}
+
+function convertDateFormat(timeInput) {
+    const date = new Date(timeInput);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
 }
 
 export default SearchBooking;

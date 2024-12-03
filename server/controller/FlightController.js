@@ -46,6 +46,7 @@ const getFlightByID = async (req, res) => {
         if (!flight) {
             return res.status(404).json("Flight not found");
         }
+        return res.status(200).json(flight);
     }  catch (error) {
         console.error("Error getting flight by ID", error);
         return res.status(500).json({ status: false, message: error.message });
