@@ -55,7 +55,7 @@ function HomePage(){
                         alt=""
                     />
                     <div className="absolute bottom-32 left-24  px-4 py-5 sm:p-0">
-                        <h2 className="text-3xl font-bold text-center text-[#002D74]">Nhập mã đặt chỗ</h2>
+                        <h2 className="text-3xl font-bold text-center text-[#002D74]">NHẬP MÃ ĐẶT CHỖ</h2>
                         <form className="space-y-7 p-12" onSubmit={handleSubmit}>
                             <div>
                                 <label className="text-gray-600 text-left text-sm font-medium"> Mã đặt chỗ</label>

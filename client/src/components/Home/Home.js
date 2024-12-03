@@ -20,6 +20,7 @@ function Home() {
     const [destination, setDestination] = useState("");
     const [departureDate, setDepartureDate] = useState("");
     const [returnDate, setReturnDate] = useState("");
+    const [bookingID, setBookingID] = useState("");
     const [error, setError] = useState("");
 
     // Hàm tăng/giảm số lượng hành khách
@@ -105,29 +106,58 @@ function Home() {
         }
     };
 
+    const handleSubmit_mybooking = async (e) => {
+        e.preventDefault();
+        if (!bookingID) {
+            alert("Please fill in all required fields.");
+        }
+        try {
+            const response = await axios.post(
+                "http://localhost:3001/api/bookings/getBookingByID", 
+                {bookingID : bookingID},
+                {
+                    withCredentials: true
+                }
+            );
+            console.log(`Response data: ${JSON.stringify(response.data)}`);
+
+            if (response.status === 200) {
+                navigate("/mybooking/search-booking", {
+                    state: {
+                        booking: response.data,
+                    }
+                });
+            } else {
+                navigate("/mybooking/search-booking", { state: null });
+            }
+        } catch (error) {
+            navigate("/mybooking/search-booking", { state: null });
+        }
+    }
+
     return (
         <div className="Home">
             <div className="section1 flex flex-wrap justify-center items-center bg-cover bg-center"
                  style={{backgroundImage: "url('/images/background.png')", height: "600px"}}>
                 <div className="pl-6 pr-6 pb-6 flex justify-center items-center" style={{flex:6}}>
-                    <div className="max-w-md mx-auto mt-8 bg-white rounded-xl shadow-lg p-6">
-                        <div className="flex justify-around text-center mb-4">
+                    <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg">
+                        <div className="flex rounded-t-xl border-b-4 shadow-lg p-3 bg-yellow-400 justify-around text-center">
                             <button
-                                className={`text-gray-500 font-bold pb-2 ${
-                                    activeForm === "booking_form" ? "text-blue-700 border-b-4 border-blue-700" : "lg:hover:text-blue-700 lg:hover:border-blue-700"
+                                className={`font-bold pb-2  ${
+                                    activeForm === "booking_form" ? "text-blue-900 border-b-4 border-blue-900" : "lg:hover:text-blue-700 lg:hover:border-blue-700"
                                 }`}
                                 onClick={() => setActiveForm("booking_form")}
-                            >✈️ Đặt vé
+                            >🛫 Đặt vé
                             </button>
                             <button
-                                className={`text-gray-500 font-bold pb-2 ${
-                                    activeForm === "myBooking_form" ? "text-blue-700 border-b-4 border-blue-700" : "lg:hover:text-blue-700 lg:hover:border-blue-700"
+                                className={`font-bold pb-2 ${
+                                    activeForm === "myBooking_form" ? "text-blue-900 border-b-4 border-blue-900" : "lg:hover:text-blue-700 lg:hover:border-blue-700"
                                 }`}
                                 onClick={() => setActiveForm("myBooking_form")}
-                            >🎫 Quản lý đặt chỗ
+                            >🎟️ Quản lý đặt chỗ
                             </button>
                         </div>
-
+                        <div className='p-6'>
                         {activeForm === "booking_form" && (
                             <form className="space-y-3" onSubmit={handleSubmit}>
                                 <div className="space-x-5">
@@ -365,26 +395,31 @@ function Home() {
                                 </button>
                             </form>
                         )}
-
                         {activeForm === "myBooking_form" && (
                             <form className="space-y-6 p-12" onSubmit={(e) => e.preventDefault()}>
                                 <div>
-                                    <label className="text-gray-600 text-sm font-medium">Họ và tên</label>
-                                    <input type="text"
-                                           className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                    <p className='text-center font-bold text-2xl text-blue-800'>NHẬP MÃ ĐẶT CHỖ</p>
                                 </div>
                                 <div>
                                     <label className="text-gray-600 text-sm font-medium"> Mã đặt chỗ</label>
                                     <input type="text"
+                                           required
+                                           value={bookingID}
+                                           onChange={(e) => setBookingID(e.target.value)}
                                            className="w-full border border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
                                 </div>
                                 <button
+                                type='submit'
+                                onClick={(e) => handleSubmit_mybooking(e)}
                                     className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg p-3">
                                 Tra cứu
                                 </button>
                             </form>
                         )}
-                        {error && <p className="error">{error}</p>}
+                        </div>
+                        <div>
+                            {error && <p className="error">{error}</p>}
+                        </div>
                     </div>
                 </div>
                 <div style={{flex: 5}}>
