@@ -228,10 +228,17 @@ const makeBooking = async (req, res) => {
         const { returnFlightID } = req.body;
         const returnTickets = [];
         if (returnFlightID) {
+            const {returnClassType} = req.body;
             await Booking.findOneAndUpdate(
                 { booking_id: bookingID },
-                { $set: { return_flight_id: returnFlightID }
-            });
+                {
+                    $set: {
+                        return_flight_id: returnFlightID,
+                        return_class_type: returnClassType
+                    }
+
+                }
+            );
 
             let returnFlight = await Flight.findOne({
                 flight_number: returnFlightID
@@ -242,7 +249,7 @@ const makeBooking = async (req, res) => {
 
             // Handle log error when out of seats
             const neededSeats = numChildren + numAdult;
-            const returnSeatClass = returnFlight.available_seats.find(sc => sc.class_type === classType);
+            const returnSeatClass = returnFlight.available_seats.find(sc => sc.class_type === returnClassType);
             const returnPrice = returnSeatClass.price;
             if (seatClass.seat_count < neededSeats) {
                 return res.status(404).json({ error: 'Out of seats'});
