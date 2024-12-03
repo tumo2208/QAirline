@@ -10,7 +10,7 @@ function Passengers() {
     const navigate = useNavigate();
 
     const outboundFlightID = outboundFlight.flight.flight_number;
-    const returnFlightID = returnFlight ? returnFlight.flight_number : null;
+    const returnFlightID = returnFlight?.flight?.flight_number || null;
 
     const [formData, setFormData] = useState({
         adults: Array.from({ length: passengers.adults }, () => ({
@@ -60,6 +60,7 @@ function Passengers() {
                 numChildren: passengers.children,
                 numInfant: passengers.infants,
                 classType: outboundFlight.classType,
+                returnClassType: returnFlight ? returnFlight.classType : null,
 
                 adultList: formData.adults,
                 childrenList: formData.children,
@@ -77,9 +78,8 @@ function Passengers() {
 
             if (response.status === 200) {
                 const result = await response.data;
-                alert("Booking successful, returning to Homepage...");
                 console.log("Booking successful", result);
-                navigate("/");
+                navigate("/booking/booking-successfully", { state: { bookingID: result.bookingID }});
             } else {
                 alert("Booking failed: " + response.data.message);
             }

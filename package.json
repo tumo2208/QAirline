@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"npm start --prefix client\" \"npm start --prefix server\""
   },
   "keywords": [],
   "author": "",
@@ -32,6 +33,7 @@
     "react-google-recaptcha": "^3.1.0",
     "react-router-dom": "^6.28.0",
     "react-scripts": "5.0.1",
+    "redis": "^4.7.0",
     "sequelize": "^6.37.5",
     "web-vitals": "^2.1.4"
   },
@@ -54,6 +56,7 @@
     ]
   },
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "tailwindcss": "^3.4.14"
   }
 }

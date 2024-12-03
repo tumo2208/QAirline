@@ -12,7 +12,7 @@ const airportAircraftRoute = require("./routes/AirportAircraftRoute");
 const flightRoute = require("./routes/FlightRoute");
 const bookingRoute = require("./routes/BookingRoute");
 
-const {updateFlightStatus} = require("./controller/FlightController");
+const {updateFlightStatus, updatePrepareFlight} = require("./controller/FlightController");
 
 const app = express();
 
@@ -34,6 +34,11 @@ app.use(cors({
 schedule.scheduleJob('*/30 * * * *', async () => {
     console.log('Running flight status update...');
     await updateFlightStatus();
+});
+
+schedule.scheduleJob('0 0 * * *', async () => {
+    console.log("Checking for flights that are about to depart...");
+    await updatePrepareFlight();
 });
 
 // Routes

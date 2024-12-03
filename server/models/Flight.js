@@ -21,7 +21,8 @@ const flightSchema = new Schema({
         type: Map,
         of: [String],
         default: {}
-    }
+    },
+    notification: { type: [String], default: [] }
 });
 
 module.exports = mongoose.model('Flight', flightSchema);

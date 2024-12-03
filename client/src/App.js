@@ -1,9 +1,9 @@
 import Home from "./components/Home/Home";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import Explore from "./components/Explore";
+import Explore from "./components/Explore/Explore";
 import Booking from "./components/Booking/Booking";
-import Travelinfo from "./components/Travelinfo";
-import Help from "./components/Help";
+import FlightInfo from "./components/FlightInfo/FlightInfo";
+import MyBooking from "./components/MyBooking/MyBooking";
 import Login from "./components/Account/Login";
 import Signup from "./components/Account/Signup";
 import Profile from "./components/Account/Profile";
@@ -23,10 +23,10 @@ function App() {
 
                 <Routes>
                     <Route path="/" element={<Home/>}/>
-                    <Route path="/explore" element={<Explore/>}/>
+                    <Route path="/explore/*" element={<Explore/>}/>
                     <Route path="/booking/*" element={<Booking/>}/>
-                    <Route path="/travel-info" element={<Travelinfo />} />
-                    <Route path="/help" element={<Help/>}/>
+                    <Route path="/flight-info/*" element={<FlightInfo />} />
+                    <Route path="/mybooking/*" element={<MyBooking/>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/signup" element={<Signup/>}/>
                     <Route path="/profile" element={<Profile />} />

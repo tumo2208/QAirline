@@ -228,10 +228,17 @@ const makeBooking = async (req, res) => {
         const { returnFlightID } = req.body;
         const returnTickets = [];
         if (returnFlightID) {
+            const {returnClassType} = req.body;
             await Booking.findOneAndUpdate(
                 { booking_id: bookingID },
-                { $set: { return_flight_id: returnFlightID }
-            });
+                {
+                    $set: {
+                        return_flight_id: returnFlightID,
+                        return_class_type: returnClassType
+                    }
+
+                }
+            );
 
             let returnFlight = await Flight.findOne({
                 flight_number: returnFlightID
@@ -242,7 +249,7 @@ const makeBooking = async (req, res) => {
 
             // Handle log error when out of seats
             const neededSeats = numChildren + numAdult;
-            const returnSeatClass = returnFlight.available_seats.find(sc => sc.class_type === classType);
+            const returnSeatClass = returnFlight.available_seats.find(sc => sc.class_type === returnClassType);
             const returnPrice = returnSeatClass.price;
             if (seatClass.seat_count < neededSeats) {
                 return res.status(404).json({ error: 'Out of seats'});
@@ -265,12 +272,12 @@ const makeBooking = async (req, res) => {
 
             // Function to handle ticket creation
             const createTicketReturn = async (customer, type) => {
-                const seatNumber = determineNextChair(returnFlight, returnAircraft, classType);
+                const seatNumber = determineNextChair(returnFlight, returnAircraft, returnClassType);
                 const ticket = new Ticket({
                     booking_id: bookingID,
                     customer_type: type,
                     customer_details: customer,
-                    class_type: classType,
+                    class_type: returnClassType,
                     seat_number: seatNumber,
                     price: returnPrice
                 });
@@ -279,7 +286,7 @@ const makeBooking = async (req, res) => {
                 returnTickets.push(ticket);
                 totalPrice += returnPrice;
 
-                await updateOccupiedSeatsReturn(returnFlightID, classType, seatNumber);
+                await updateOccupiedSeatsReturn(returnFlightID, returnClassType, seatNumber);
             };
 
             // Create tickets for adults
@@ -346,7 +353,7 @@ const makeBooking = async (req, res) => {
             }
         );
 
-        res.status(200).json("Booking was creating");
+        res.status(200).json({bookingID: bookingID});
     } catch (error) {
         console.error("Error adding booking", error);
         res.status(500).json({ status: false, message: error.message });
