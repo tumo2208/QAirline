@@ -30,8 +30,8 @@ function App() {
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/signup" element={<Signup/>}/>
                     <Route path="/profile" element={<Profile />} />
-                    <Route path="/changepassword" element={<ChangePassword/>} />
-                    <Route path="/forgotpassword" element={<ForgotPassword/>} />
+                    <Route path="/change-password" element={<ChangePassword/>} />
+                    <Route path="/forgot-password" element={<ForgotPassword/>} />
                 </Routes>
 
                 <AppFooter/>
