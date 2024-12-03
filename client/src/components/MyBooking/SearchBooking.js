@@ -233,7 +233,7 @@ function TicketCard({ticket, flight, class_type}) {
                                     <span className="font-mono">{convertDateFormat(flight?.departure_time)}</span>
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-xs text-gray-500">Departure</span>
+                                    <span className="text-xs text-gray-500">Departure time</span>
                                     <span className="font-mono">{new Date(flight?.departure_time).toLocaleTimeString("en-GB", {
                                             hour: "2-digit",
                                             minute: "2-digit",

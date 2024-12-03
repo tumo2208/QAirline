@@ -2,9 +2,15 @@ import './Home.css';
 import {useEffect, useState} from "react";
 import {AutocompleteInput} from "../../shared/AutoComplete";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import Loading from '../../shared/Loading';
 
 function Home() {
+    const location = useLocation();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location]);
+
     const [activeForm, setActiveForm] = useState("booking_form");
     const [roundTrip, setRoundTrip] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +28,7 @@ function Home() {
     const [returnDate, setReturnDate] = useState("");
     const [bookingID, setBookingID] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     // Hàm tăng/giảm số lượng hành khách
     const handlePassengerChange = (type, operation) => {
@@ -71,6 +78,8 @@ function Home() {
             return;
         }
 
+        setLoading(true);
+
         try {
             let response;
 
@@ -110,6 +119,7 @@ function Home() {
         e.preventDefault();
         if (!bookingID) {
             alert("Please fill in all required fields.");
+            return;
         }
         try {
             const response = await axios.post(
@@ -721,6 +731,7 @@ function Home() {
                     </button>
                 </div>
             </div>
+            {loading && (<div><Loading/></div>)}
         </div>
     )
 }
