@@ -276,13 +276,13 @@ function AppHeader() {
                         </li>
                         <li>
                             <Link
-                                to="/travel-info"
+                                to="/flight-info"
                                 className="navItem"
-                            >THÔNG TIN HÀNH TRÌNH</Link>
+                            >THÔNG TIN CHUYẾN BAY</Link>
                         </li>
                         <li>
                             <Link
-                                to="/help"
+                                to="/mybooking"
                                 className="navItem"
                             >VÉ CỦA TÔI</Link>
                         </li>
