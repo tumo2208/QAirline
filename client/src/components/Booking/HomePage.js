@@ -96,10 +96,10 @@ function HomePage() {
                     }
                 });
             } else {
-                navigate("/booking/flight-selection", { state: { flights: [] } });
+                navigate("/booking/flight-selection", { state: { flights: null } });
             }
         } catch (error) {
-            navigate("/booking/flight-selection", { state: { flights: [] } });
+            navigate("/booking/flight-selection", { state: { flights: null } });
         }
     };
     return (

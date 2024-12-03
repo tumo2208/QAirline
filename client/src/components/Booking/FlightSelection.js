@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BookingInfo from "./BookingInfo";
 
 function FlightSelection() {
-    const { state } = useLocation();
+    const location = useLocation();
+    const { state } = location;
+    
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location]);
+
     const { flights, tripType, passengers } = state;
     const navigate = useNavigate();
 
@@ -85,6 +91,7 @@ function FlightSelection() {
                     return;
                 }
                 setShowOutbound(false);
+                window.scrollTo(0, 0);
             } else {
                 if (!selectedReturn) {
                     alert("Please select your return flight.");
@@ -103,6 +110,7 @@ function FlightSelection() {
                 window.history.back()
             } else {
                 setShowOutbound(true);
+                window.scrollTo(0, 0);
             }
         }
     };

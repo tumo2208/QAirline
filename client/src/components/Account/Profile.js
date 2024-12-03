@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Loading from '../../shared/Loading';
 
 function Profile() {
     const [user, setUser] = useState(null);
@@ -25,14 +26,7 @@ function Profile() {
     }
 
     if (!user) return (
-        <div className="w-full bg-purple-50 opacity-75 z-50">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
-                  integrity="sha512-PgQMlq+nqFLV4ylk1gwUOgm6CtIIXkKwaIHp/PAIWHzig/lKZSEGKEysh0TCVbHJXCLN7WetD8TFecIky75ZfQ=="
-                  crossOrigin="anonymous" referrerPolicy="no-referrer"/>
-            <div className="flex justify-center items-center py-[30vh]">
-                <div className="fas fa-circle-notch fa-spin fa-5x text-blue-700"></div>
-            </div>
-        </div>
+        <Loading/>
     );
 
     return (

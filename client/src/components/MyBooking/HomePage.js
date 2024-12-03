@@ -1,15 +1,21 @@
 import React, { useState } from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
+import Loading from '../../shared/Loading';
 
 function HomePage(){
     const navigate = useNavigate();
     const [bookingID, setBookingID] = useState("");
+    const [loading, setLoading] = useState(false);
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!bookingID) {
             alert("Please fill in all required fields.");
+            return;
         }
+
+        setLoading(true);
+
         try {
             const response = await axios.post(
                 "http://localhost:3001/api/bookings/getBookingByID", 
@@ -34,7 +40,8 @@ function HomePage(){
         }
     }
     return (
-        <div className="py-10" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
+        <div>
+            <div className="py-10" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
             <div className="  border-4 mx-60 my-5 rounded-2xl shadow-lg"
                  >
                 <div className="flex select-none cursor-pointer  justify-between text-white text-center w-full font-bold">
@@ -76,6 +83,8 @@ function HomePage(){
                 </div>
 
             </div>
+        </div>
+        {loading && <Loading/>}
         </div>
     )
 }

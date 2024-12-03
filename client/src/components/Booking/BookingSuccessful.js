@@ -1,11 +1,16 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../logo.svg";
 
 function BookingSuccessful() {
-    const { state } = useLocation();
+    const location = useLocation();
+    const { state } = location;
     const { bookingID } = state;
     const navigate = useNavigate();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, [location]);
 
     return (
         <div className="bg-white px-60 pb-40 flex flex-col items-center justify-center space-y-10">
@@ -22,7 +27,7 @@ function BookingSuccessful() {
             </div>
             <div className="text-lg text-center">
                 <i>Nếu bạn muốn xem lại thông tin của các vé đã đặt hoặc hủy vé, hãy tra cứu mã đặt chỗ này ở <Link to="/" className="font-semibold underline text-blue-500 hover:text-blue-700 focus:text-blue-700">Trang chủ</Link> ➡️ Quản lý đặt chỗ
-                 HOẶC <Link to="/mybooking" className="font-semibold underline text-blue-500 hover:text-blue-700 focus:text-blue-700">Vé của tôi</Link> ➡️ Tra cứu mã đặt chỗ</i>
+                 <strong> HOẶC</strong> <Link to="/mybooking" className="font-semibold underline text-blue-500 hover:text-blue-700 focus:text-blue-700">Vé của tôi</Link> ➡️ Tra cứu mã đặt chỗ</i>
             </div>
             <div className="text-left mx-8">
                 <button

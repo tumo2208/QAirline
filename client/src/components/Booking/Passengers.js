@@ -1,13 +1,22 @@
 import BookingInfo from "./BookingInfo";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {nationalities} from "../../shared/SharedData";
+import Loading from '../../shared/Loading';
 import axios from "axios";
 
 function Passengers() {
-    const { state } = useLocation();
+    const location = useLocation();
+    const { state } = location;
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location]);
+
     const { outboundFlight, returnFlight , tripType, passengers } = state;
     const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(false);
 
     const outboundFlightID = outboundFlight.flight.flight_number;
     const returnFlightID = returnFlight?.flight?.flight_number || null;
@@ -50,6 +59,8 @@ function Passengers() {
             alert("Please fill out all required fields.");
             return;
         }
+
+        setLoading(true);
 
         try {
             const BookingData = {
@@ -182,6 +193,7 @@ function Passengers() {
                     </div>
                 </div>
             </div>
+            {loading && <Loading/>}
         </div>
 
     )
