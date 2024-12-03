@@ -1,4 +1,4 @@
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import logo from "./logo.svg";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -7,6 +7,20 @@ function AppHeader() {
     const [loginState, setLoginState] = useState(false);
     const [userName, setUserName] = useState(null);
     const [userGender, setUserGender] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await axios.get(`http://localhost:3001/logout`, {
+                withCredentials: true,
+            });
+            setLoginState(false);
+            window.location.reload();
+        } catch (error) {
+            console.error("Logout unsuccessful:", error);
+        }
+    };
 
     useEffect(() => {
         const checkLogin = async () => {
@@ -17,6 +31,9 @@ function AppHeader() {
                 setUserName(response.data.user.full_name);
                 setUserGender(response.data.user.gender);
                 setLoginState(true);
+                if (response.data.user.user_type === "Admin") {
+                    setIsAdmin(true);
+                }
             } catch (error) {
                 console.error("Login unsuccessful:", error);
             }
@@ -167,6 +184,30 @@ function AppHeader() {
                                             Vé của tôi
                                         </p>
                                     </li>
+                                    {isAdmin && (
+                                        <li
+                                            role="menuitem"
+                                        >
+                                            <Link to="/admin"
+                                                onClick={closeMenu}
+                                                className="menu-item profileMenuItem">
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="currentColor"
+                                                    height="1.5em"
+                                                    width="1.5em"
+                                                >
+                                                    <path fill="none" d="M0 0h24v24H0z"/>
+                                                    <path
+                                                        d="M18 8h2a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1h2V7a6 6 0 1112 0v1zM5 10v10h14V10H5zm6 4h2v2h-2v-2zm-4 0h2v2H7v-2zm8 0h2v2h-2v-2zm1-6V7a4 4 0 10-8 0v1h8z"/>
+                                                </svg>
+
+                                                <p className="text-slate-800 font-medium ml-2">
+                                                    Quản trị viên
+                                                </p>
+                                            </Link>
+                                        </li>
+                                    )}
                                     <li
                                         role="menuitem"
                                         onClick={closeMenu}
@@ -191,6 +232,7 @@ function AppHeader() {
                                     <hr className="my-2 border-slate-200" role="menuitem"/>
                                     <li
                                         role="menuitem"
+                                        onClick={handleLogout}
                                         className="cursor-pointer text-slate-800 flex w-full text-sm items-center rounded-md p-3 transition-all hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-300"
                                     >
                                         <svg
