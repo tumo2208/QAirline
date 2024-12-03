@@ -290,11 +290,13 @@ function FlightCard({flight, onSelect}) {
                             currency: "VND"
                         }).format(flight.available_seats[0]?.price)}</p>
                         <i className="text-sm text-white">Còn {flight.available_seats[0]?.seat_count} ghế</i>
-                        <button
+                        {flight.available_seats[0]?.seat_count > 0 && (
+                            <button
                             className="absolute bottom-4 right-11 lg:hover:scale-110 text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-md"
                             onClick={() => onSelect(flight, "Economy")}>
                             LỰA CHỌN
                         </button>
+                        )}
                     </div>
                     <div
                         className="relative space-y-2 text-center flex flex-col p-5 rounded w-full h-full bg-yellow-300">
@@ -305,11 +307,13 @@ function FlightCard({flight, onSelect}) {
                             currency: "VND"
                         }).format(flight.available_seats[1]?.price)}</p>
                         <i className="text-sm text-red-500">Còn {flight.available_seats[1]?.seat_count} ghế</i>
-                        <button
+                        {flight.available_seats[1]?.seat_count > 0 && (
+                            <button
                             className="absolute bottom-4 right-11 text-xs lg:hover:scale-110 font-bold text-white bg-green-600 px-2 py-1 rounded-md"
                             onClick={() => onSelect(flight, "Business")}>
                             LỰA CHỌN
                         </button>
+                        )}
                     </div>
                 </div>
             </div>

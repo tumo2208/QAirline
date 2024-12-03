@@ -1,13 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {useLocation} from "react-router-dom";
 import logo from "../../logo.svg";
 
 function SearchBooking() {
     const [activeTab, setActiveTab] = useState("outbound");
     const { state } = useLocation();
-    const { booking } = state;
+    const { booking } = state || null;
     const [roundTrip, setRoundTrip] = useState(true);
-    console.log(booking?.outbound_tickets[0].seat_number);
+    const handleBack = () => {
+        window.history.back()
+    };
+
+    // This is used to determine if the booking is a one-way or round-trip ticket
+    useEffect(() => {
+        if (booking?.return_tickets.length === 0) {
+            setRoundTrip(false);
+        }
+    }, [booking]);
+
+    if (!booking) {
+        return (
+            <div className="bg-gray-10 p-60 flex flex-col items-center justify-center space-y-10">
+                <h2 className="text-5xl font-bold text-center text-[#002D74]">Mã đặt chỗ bạn tìm kiếm không tồn tại</h2>
+                <div className="text-left mx-8">
+                    <button
+                        type="button"
+                        className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
+                        onClick={() => handleBack()}
+                    >
+                        <span className="mr-2 font-bold text-lg">←</span>
+                        Quay lại trang trước
+                    </button>
+                </div>
+            </div>
+        );
+    }
+    
+
     return (
         <div className="bg-gray-100 p-10">
             <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -53,7 +82,7 @@ function SearchBooking() {
                         ))}
                         </div>
                     )}
-                    {activeTab === "return" && (
+                    {activeTab === "return" && roundTrip && (
                         <div>
                             {Array.from({length: booking?.return_tickets?.length}).map((_, index) => (
                             <TicketCard ticket={booking?.return_tickets[index]} flight_id={booking?.return_flight_id} class_type={booking?.return_class_type}/>

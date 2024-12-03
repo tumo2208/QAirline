@@ -353,7 +353,7 @@ const makeBooking = async (req, res) => {
             }
         );
 
-        res.status(200).json("Booking was creating");
+        res.status(200).json({bookingID: bookingID});
     } catch (error) {
         console.error("Error adding booking", error);
         res.status(500).json({ status: false, message: error.message });

@@ -78,9 +78,8 @@ function Passengers() {
 
             if (response.status === 200) {
                 const result = await response.data;
-                alert("Booking successful, returning to Homepage...");
                 console.log("Booking successful", result);
-                navigate("/");
+                navigate("/booking/booking-successfully", { state: { bookingID: result.bookingID }});
             } else {
                 alert("Booking failed: " + response.data.message);
             }
