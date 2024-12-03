@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const schedule = require('node-schedule');
 const cookieParser = require("cookie-parser");
+const redisClient = require("./redisClient");
 
 // Import routes
 const authRoutes = require("./routes/AuthRoute");

@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const redisClient = require("../redisClient");
 
 const register = async (req, res, next) => {
     const { full_name, gender, dob, nationality, email, password, phone_number, identification_id} = req.body;
@@ -85,6 +85,7 @@ const profile = async (req, res) => {
                 phone_number: user.phone_number,
                 identification_id: user.identification_id,
                 id_type: user.id_type,
+                user_type: user.user_type,
                 created_at: user.created_at
             }
         });
@@ -200,4 +201,21 @@ const changePassword = async (req, res) => {
     }
 };
 
-module.exports = { login, profile, register, update, changePassword };
+const logout = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ message: "No token found" });
+        }
+
+        await redisClient.SADD("blacklisted_token", token, { EX: 86400 });
+        res.clearCookie("token");
+
+        return res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error logging out" });
+    }
+};
+
+module.exports = { login, profile, register, update, changePassword, logout };
