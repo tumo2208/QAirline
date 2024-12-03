@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const redisClient = require("../redisClient");
 require("dotenv").config();
 
 const userVerification = async (req, res, next) => {
@@ -8,24 +9,25 @@ const userVerification = async (req, res, next) => {
         return res.status(400).json({ message: "No token, authorization denied" });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, async (err, data) => {
-        if (err) {
-            return res.status(400).json({ message: "Token is not valid" });
-        } else {
-            try {
-                const user = await User.findById(data.id);
-                if (user) {
-                    req.user = user; 
-                    next();
-                } else {
-                    return res.status(400).json({ message: "User not found", status: false });
-                }
-            } catch (error) {
-                console.error(error);
-                return res.status(500).json({ message: "Server error" });
-            }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Check if the token is blacklisted
+        const blacklisted = await redisClient.SISMEMBER("blacklisted_token", token);
+        if (blacklisted) {
+            return res.status(400).json({ message: "Token has been blacklisted, please login again" });
         }
-    });
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+        req.user = user;
+        next();
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+
 };
 
 module.exports = userVerification;

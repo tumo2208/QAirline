@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const redisClient = require("../redisClient");
 
 const register = async (req, res, next) => {
     const { full_name, gender, dob, nationality, email, password, phone_number, identification_id} = req.body;
@@ -84,6 +85,7 @@ const profile = async (req, res) => {
                 phone_number: user.phone_number,
                 identification_id: user.identification_id,
                 id_type: user.id_type,
+                user_type: user.user_type,
                 created_at: user.created_at
             }
         });
@@ -164,4 +166,56 @@ const update = async (req, res) => {
     }
 };
 
-module.exports = { login, profile, register, update };
+const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ message: "Password confirmation failed, try again!" });
+        }
+
+        const email = req.user.email;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Incorrect password" });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ message: "New password is too weak. It should be at least 8 characters long." });
+        }
+
+        user.password = newPassword;
+
+        await user.save();
+
+        return res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error updating password" });
+    }
+};
+
+const logout = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ message: "No token found" });
+        }
+
+        await redisClient.SADD("blacklisted_token", token, { EX: 86400 });
+        res.clearCookie("token");
+
+        return res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error logging out" });
+    }
+};
+
+module.exports = { login, profile, register, update, changePassword, logout };

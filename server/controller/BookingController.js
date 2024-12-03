@@ -272,12 +272,12 @@ const makeBooking = async (req, res) => {
 
             // Function to handle ticket creation
             const createTicketReturn = async (customer, type) => {
-                const seatNumber = determineNextChair(returnFlight, returnAircraft, classType);
+                const seatNumber = determineNextChair(returnFlight, returnAircraft, returnClassType);
                 const ticket = new Ticket({
                     booking_id: bookingID,
                     customer_type: type,
                     customer_details: customer,
-                    class_type: classType,
+                    class_type: returnClassType,
                     seat_number: seatNumber,
                     price: returnPrice
                 });
@@ -286,7 +286,7 @@ const makeBooking = async (req, res) => {
                 returnTickets.push(ticket);
                 totalPrice += returnPrice;
 
-                await updateOccupiedSeatsReturn(returnFlightID, classType, seatNumber);
+                await updateOccupiedSeatsReturn(returnFlightID, returnClassType, seatNumber);
             };
 
             // Create tickets for adults

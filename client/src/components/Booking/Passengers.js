@@ -10,7 +10,7 @@ function Passengers() {
     const navigate = useNavigate();
 
     const outboundFlightID = outboundFlight.flight.flight_number;
-    const returnFlightID = returnFlight ? returnFlight.flight.flight_number : null;
+    const returnFlightID = returnFlight?.flight?.flight_number || null;
 
     const [formData, setFormData] = useState({
         adults: Array.from({ length: passengers.adults }, () => ({
