@@ -1,9 +1,13 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import {useLocation} from "react-router-dom";
 import logo from "../../logo.svg";
 
 function SearchBooking() {
     const [activeTab, setActiveTab] = useState("outbound");
+    const { state } = useLocation();
+    const { booking } = state;
     const [roundTrip, setRoundTrip] = useState(true);
+    console.log(booking?.outbound_tickets[0].seat_number);
     return (
         <div className="bg-gray-100 p-10">
             <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -13,7 +17,7 @@ function SearchBooking() {
                 rel="stylesheet"/>
             <div className="flex flex-col space-y-4 pb-4">
                 <h2 className="text-5xl font-bold text-center text-[#002D74]">Mã đặt chỗ của bạn là</h2>
-                <p className="text-3xl font-bold text-center">ENF89P</p>
+                <p className="text-3xl font-bold text-center">{booking?.booking_id}</p>
             </div>
             <div className="p-10 bg-gray-100 min-h-screen flex flex-col items-center">
                 {roundTrip && (
@@ -44,13 +48,16 @@ function SearchBooking() {
                 <div className="w-full">
                     {activeTab === "outbound" && (
                         <div>
-                            <TicketCard/>
-                            <TicketCard/>
+                            {Array.from({length: booking?.outbound_tickets?.length}).map((_, index) => (
+                            <TicketCard ticket={booking?.outbound_tickets[index]} flight_id={booking?.flight_id} class_type={booking?.class_type}/>
+                        ))}
                         </div>
                     )}
                     {activeTab === "return" && (
                         <div>
-                            <TicketCard/>
+                            {Array.from({length: booking?.return_tickets?.length}).map((_, index) => (
+                            <TicketCard ticket={booking?.return_tickets[index]} flight_id={booking?.return_flight_id} class_type={booking?.return_class_type}/>
+                        ))}
                         </div>
                     )}
                 </div>
@@ -59,7 +66,7 @@ function SearchBooking() {
     )
 }
 
-function TicketCard() {
+function TicketCard({ticket, flight_id, class_type}) {
     return (
         <div className="bg-white border-4 p-2 mx-52 rounded-2xl shadow-lg">
             <div className="flex flex-row">
@@ -80,16 +87,23 @@ function TicketCard() {
                         </div>
                         <div
                             className="h-full py-4 px-10 bg-blue-100 text-black flex-grow rounded-r-3xl flex flex-col">
-                            <div className="text-center text-yellow-600 text-4xl" style={{fontFamily: "Pacifico"}}>
+                            {class_type === "Business" && (
+                                <div className="text-center text-yellow-600 text-4xl" style={{fontFamily: "Pacifico"}}>
+                                Business Class
+                            </div>
+                            )}
+                            {class_type === "Economy" && (
+                                <div className="text-center font-mono font-semibold text-yellow-600 text-4xl">
                                 Economy Class
                             </div>
+                            )}
                             <div className="flex mt-8 w-full justify-between items-center">
                                 <div className="flex flex-col items-center">
                                     <span className="text-4xl font-bold">HAN</span>
                                     <span className="text-zinc-500 text-sm">Hanoi</span>
                                 </div>
                                 <div className="flex flex-col flex-grow items-center px-10">
-                                    <span className="font-bold text-sm">FL1001</span>
+                                    <span className="font-bold text-sm">{flight_id}</span>
                                     <div className="w-full flex items-center mt-2">
                                         <div className="w-3 h-3 rounded-full border-2 border-zinc-900"></div>
                                         <div
@@ -123,11 +137,11 @@ function TicketCard() {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-xs text-gray-500">Passenger</span>
-                                    <span className="font-mono">ENDRICK</span>
+                                    <span className="font-mono">{ticket?.customer_details?.customer_name.toUpperCase()}</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-xs text-gray-500">Seat</span>
-                                    <span className="font-mono">A11</span>
+                                    <span className="font-mono">{ticket?.seat_number}</span>
                                 </div>
                             </div>
                         </div>
