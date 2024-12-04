@@ -1,20 +1,34 @@
-import {Link, useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 import logo from "./logo.svg";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Notification from "./shared/Notification";
 
 function AppHeader() {
     const [loginState, setLoginState] = useState(false);
     const [userName, setUserName] = useState(null);
     const [userGender, setUserGender] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const navigate = useNavigate();
+    const [showPrompt, setShowPrompt] = useState(false);
+    const [content, setContent] = useState("");
+
+    const showNoti = (newContent, timeout) => {
+        setContent(newContent);
+        setShowPrompt(true);
+        setTimeout(() => {
+            setShowPrompt(false);
+        }, timeout);
+    };
+
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     const handleLogout = async () => {
         try {
             await axios.get(`http://localhost:3001/logout`, {
                 withCredentials: true,
             });
+            showNoti("Đăng xuất thành công, đang đăng xuất...", 2000);
+            await delay(2000);
             setLoginState(false);
             window.location.reload();
         } catch (error) {
@@ -28,11 +42,13 @@ function AppHeader() {
                 const response = await axios.get(`http://localhost:3001/profile`, {
                     withCredentials: true,
                 });
+                showNoti("Bạn đã đăng nhập thành công !", 3000);
                 setUserName(response.data.user.full_name);
                 setUserGender(response.data.user.gender);
                 setLoginState(true);
                 if (response.data.user.user_type === "Admin") {
                     setIsAdmin(true);
+                    showNoti("Bạn đã đăng nhập thành công với tư cách quản trị viên !", 3000);
                 }
             } catch (error) {
                 console.error("Login unsuccessful:", error);
@@ -69,7 +85,7 @@ function AppHeader() {
         <nav className="sticky z-10 top-0 font-bold border-gray-200 p-1 h-50"
              style={{height: "75px", backgroundColor: "#eaf6f6"}}>
             <link rel="preconnect" href="https://fonts.googleapis.com"/>
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin/>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true"/>
             <link
                 href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Pangolin&family=Potta+One&family=Protest+Revolution&display=swap"
                 rel="stylesheet"/>
@@ -196,10 +212,9 @@ function AppHeader() {
                                                     fill="currentColor"
                                                     height="1.5em"
                                                     width="1.5em"
-                                                >
-                                                    <path fill="none" d="M0 0h24v24H0z"/>
-                                                    <path
-                                                        d="M18 8h2a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1h2V7a6 6 0 1112 0v1zM5 10v10h14V10H5zm6 4h2v2h-2v-2zm-4 0h2v2H7v-2zm8 0h2v2h-2v-2zm1-6V7a4 4 0 10-8 0v1h8z"/>
+                                                    >
+                                                    <path fill="none" d="M0 0h24v24H0z" />
+                                                    <path d="M12 14v2a6 6 0 00-6 6H4a8 8 0 018-8zm0-1c-3.315 0-6-2.685-6-6s2.685-6 6-6 6 2.685 6 6-2.685 6-6 6zm0-2c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm9 6h1v5h-8v-5h1v-1a3 3 0 016 0v1zm-2 0v-1a1 1 0 00-2 0v1h2z" />
                                                 </svg>
 
                                                 <p className="text-slate-800 font-medium ml-2">
@@ -331,6 +346,7 @@ function AppHeader() {
                     </ul>
                 </div>
             </div>
+            {showPrompt && <Notification content={content}/>}
         </nav>
     )
 }
