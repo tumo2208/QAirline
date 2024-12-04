@@ -6,7 +6,7 @@ const moment = require('moment-timezone');
 const updateFlightStatus = async () => {
     try {
         const now = new Date();
-        const result = await Flight.updateMany(
+        await Flight.updateMany(
             { status: 'Scheduled', departure_time: { $lte: now } },
             { $set: { status: 'HasFlied' } }
         );
@@ -95,8 +95,23 @@ const getAllFlights = async (req, res) => {
  */
 const getFlights = async (departCity, arriveCity, departDate) => {
     try {
-        const startOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").startOf('day').toDate();
-        const endOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").endOf('day').toDate();
+        const now = moment().toDate();
+
+        const matchCriteria = {
+            'departure_airport.city': departCity,
+            'arrival_airport.city': arriveCity
+        };
+
+        if (departDate) {
+            const startOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").startOf('day').toDate();
+            const endOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").endOf('day').toDate();
+            matchCriteria['departure_time'] = {
+                $gte: startOfDay,
+                $lte: endOfDay
+            };
+        } else {
+            matchCriteria['departure_time'] = { $gte: now };
+        }
 
         return await Flight.aggregate([
             {
@@ -116,14 +131,7 @@ const getFlights = async (departCity, arriveCity, departDate) => {
                 }
             },
             {
-                $match: {
-                    'departure_airport.city': departCity,
-                    'arrival_airport.city': arriveCity,
-                    'departure_time': {
-                        $gte: startOfDay,
-                        $lte: endOfDay
-                    }
-                }
+                $match: matchCriteria
             },
             {
                 $unwind: '$departure_airport'
@@ -139,11 +147,7 @@ const getFlights = async (departCity, arriveCity, departDate) => {
 };
 
 const getFlightsOneWay = async (req, res) => {
-    let {departCity, arriveCity, departDate} = req.body;
-    if (departDate === null) {
-        const date = new Date();
-        departDate = date.toISOString();
-    }
+    const {departCity, arriveCity, departDate} = req.body;
 
     try {
         const flights = await getFlights(departCity, arriveCity, departDate);
@@ -158,15 +162,8 @@ const getFlightsOneWay = async (req, res) => {
 };
 
 const getFlightsRoundTrip = async (req, res) => {
-    let {departCity, arriveCity, departDate, arriveDate} = req.body;
-    if (departDate === null) {
-        const date = new Date();
-        departDate = date.toISOString();
-    }
-    if (arriveDate === null) {
-        const date = new Date();
-        arriveDate = date.toISOString();
-    }
+    const {departCity, arriveCity, departDate, arriveDate} = req.body;
+
     try {
         const outboundFlights = await getFlights(departCity, arriveCity, departDate);
 
