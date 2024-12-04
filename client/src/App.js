@@ -11,8 +11,10 @@ import AppHeader from "./AppHeader";
 import AppFooter from "./AppFooter";
 import ChangePassword from "./components/Account/ChangePassword";
 import ForgotPassword from "./components/Account/ForgotPassword";
-
-
+import Admin from "./components/Admin/Admin";
+import AddFlight from "./components/Admin/AddFlight";
+import SetDelayTime from "./components/Admin/SetDelayTime";
+import AddAircraft from "./components/Admin/AddAircraft";
 
 
 function App() {
@@ -32,6 +34,10 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/change-password" element={<ChangePassword/>} />
                     <Route path="/forgot-password" element={<ForgotPassword/>} />
+                    <Route path="/admin" element={<Admin/>}/>
+                    <Route path="/admin/addFlight" element={<AddFlight/>}/>
+                    <Route path="/admin/setDelayTime" element={<SetDelayTime/>}/>
+                    <Route path="/admin/addAircraft" element={<AddAircraft/>}/>
                 </Routes>
 
                 <AppFooter/>
