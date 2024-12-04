@@ -86,6 +86,100 @@ const getAllFlights = async (req, res) => {
     }
 };
 
+const getFLightByArrival = async (req, res) => {
+    try {
+        const {arrivalCity} = req.body;
+        const flights = await Flight.aggregate([
+            {
+                $lookup: {
+                    from: 'airports',
+                    localField: 'departure_airport_id',
+                    foreignField: 'airport_code',
+                    as: 'departure_airport'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'airports',
+                    localField: 'arrival_airport_id',
+                    foreignField: 'airport_code',
+                    as: 'arrival_airport'
+                }
+            },
+            {
+                $match: {
+                    'arrival_airport.city': arrivalCity
+                }
+            },
+            {
+                $unwind: '$departure_airport'
+            },
+            {
+                $unwind: '$arrival_airport'
+            }
+        ]);
+
+        if (flights.length === 0) {
+            return res.status(404).json("No flights found");
+        }
+
+        return res.status(200).json(flights);
+    } catch (error) {
+        console.error("Error finding flights by arrival city", error);
+        return res.status(505).json({ status: false, message: error.message });
+    }
+};
+
+const getFlightByDepartureDate = async (req, res) => {
+    try {
+        const {departDate} = req.body;
+        const startOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").startOf('day').toDate();
+        const endOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").endOf('day').toDate();
+
+        const flights = await Flight.aggregate([
+            {
+                $lookup: {
+                    from: 'airports',
+                    localField: 'departure_airport_id',
+                    foreignField: 'airport_code',
+                    as: 'departure_airport'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'airports',
+                    localField: 'arrival_airport_id',
+                    foreignField: 'airport_code',
+                    as: 'arrival_airport'
+                }
+            },
+            {
+                $match: {
+                    'departure_time': {
+                        $gte: startOfDay,
+                        $lte: endOfDay
+                    }
+                }
+            },
+            {
+                $unwind: '$departure_airport'
+            },
+            {
+                $unwind: '$arrival_airport'
+            }
+        ]);
+
+        if (flights.length === 0) {
+            return res.status(404).json("No flights found");
+        }
+
+        return res.status(200).json(flights);
+    } catch (error) {
+        console.error("Error finding flights by departure time", error);
+        return res.status(505).json({ status: false, message: error.message });
+    }
+};
+
 /**
  * Support function to find flights.
  * @param departCity
@@ -325,15 +419,15 @@ const setDelayTime = async (req, res) => {
             return res.status(404).json({ error: "Flight not found." });
         }
 
-        const oldDepartDate = new Date(flight.departure_time);
-        const oldArrivalDate = new Date(flight.arrival_time);
-        const timeDif = oldArrivalDate - oldDepartDate;
+        // const oldDepartDate = new Date(flight.departure_time);
+        // const oldArrivalDate = new Date(flight.arrival_time);
+        // const timeDif = oldArrivalDate - oldDepartDate;
 
         const newDepartDate = new Date(newTime);
-        const newArrivalDate = new Date(newDepartDate.getTime() + timeDif);
+        // const newArrivalDate = new Date(newDepartDate.getTime() + timeDif);
 
-        flight.departure_date = newDepartDate;
-        flight.arrival_date = newArrivalDate;
+        // flight.departure_date = newDepartDate;
+        // flight.arrival_date = newArrivalDate;
 
         const delayMessage = `Chuyến bay của bạn đã bị delay sang ${newDepartDate.toISOString()}`;
         flight.notification.push(delayMessage);
@@ -348,4 +442,4 @@ const setDelayTime = async (req, res) => {
     }
 };
 
-module.exports = {getFlightByID, getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus, updatePrepareFlight, setDelayTime};
+module.exports = {getFlightByID, getFLightByArrival, getFlightByDepartureDate, getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus, updatePrepareFlight, setDelayTime};
