@@ -98,6 +98,8 @@ function Passengers() {
             console.error("Error details:", error.response ? error.response.data : error.message);
             alert(`Booking indeed failed: ${error.message}`);
         }
+
+        setLoading(false);
     };
 
     const validateForm = () => {
