@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { Link} from "react-router-dom";
 import axios from 'axios';
+import Loading from '../../shared/Loading';
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             const response = await axios.post('http://localhost:3001/login', { email, password }, { withCredentials: true });
             if (response.data.message === "Login successful") {
@@ -17,6 +20,7 @@ function Login() {
         } catch (error) {
             setError("Incorrect email or password");
         }
+        setLoading(false);
     };
 
     return (
@@ -91,6 +95,7 @@ function Login() {
                     </div>
                 </div>
             </div>
+            {loading && <Loading/>}
         </div>
     );
 }
