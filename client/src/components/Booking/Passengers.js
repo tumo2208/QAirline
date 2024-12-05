@@ -141,6 +141,7 @@ function Passengers() {
                                 key={`adult-${index}`}
                                 index={index}
                                 formData={formData}
+                                flightType={outboundFlight.flight.is_international}
                                 handleInputChange={handleInputChange}
                             />
                         ))}
@@ -201,7 +202,7 @@ function Passengers() {
     )
 }
 
-function AdultCard({ index, formData, handleInputChange }) {
+function AdultCard({ index, formData, flightType, handleInputChange }) {
     const passenger = formData.adults[index];
     return (
         <div className="bg-white border-4 p-10 mx-20 flex rounded-2xl shadow-lg">
@@ -290,9 +291,11 @@ function AdultCard({ index, formData, handleInputChange }) {
                             <label className="font-semibold block text-gray-700">Loại giấy tờ tùy thân</label>
                             <select 
                                 required
-                                value={passenger.id_type}
+                                value={flightType ? "Passport" : passenger.id_type}
                                 onChange={(e) => handleInputChange(e, "adults", index, "id_type")}
-                                className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
+                                className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
+                                disabled={flightType}
+                            >
                                 <option value="Citizen ID">Căn cước công dân</option>
                                 <option value="Passport">Hộ chiếu</option>
                             </select>
