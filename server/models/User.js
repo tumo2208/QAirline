@@ -30,8 +30,6 @@ const userSchema = new Schema({
             message: "Phone number must be 10 characters long!"
         }
     },
-    id_type: { type: String, enum: ['Citizen ID', 'Passport'] },
-    identification_id: { type: String, required: true, unique: true },
     user_type: {
         type: String,
         enum: ['Customer', 'Admin'],
