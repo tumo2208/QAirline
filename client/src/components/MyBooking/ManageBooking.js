@@ -4,7 +4,7 @@ import axios from "axios";
 import logo from "../../logo.svg";
 import unidecode from 'unidecode';
 
-function SearchBooking() {
+function ManageBooking() {
     const [activeTab, setActiveTab] = useState("outbound");
     const { state } = useLocation();
     const { booking } = state || null;
@@ -276,4 +276,4 @@ function convertDateFormat(timeInput) {
     return `${day}/${month}/${year}`;
 }
 
-export default SearchBooking;
+export default ManageBooking;

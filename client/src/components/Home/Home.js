@@ -121,6 +121,7 @@ function Home() {
             alert("Please fill in all required fields.");
             return;
         }
+        setLoading(true);
         try {
             const response = await axios.post(
                 "http://localhost:3001/api/bookings/getBookingByID", 
@@ -132,16 +133,16 @@ function Home() {
             console.log(`Response data: ${JSON.stringify(response.data)}`);
 
             if (response.status === 200) {
-                navigate("/mybooking/search-booking", {
+                navigate("/mybooking/manage-booking", {
                     state: {
                         booking: response.data,
                     }
                 });
             } else {
-                navigate("/mybooking/search-booking", { state: null });
+                navigate("/mybooking/manage-booking", { state: null });
             }
         } catch (error) {
-            navigate("/mybooking/search-booking", { state: null });
+            navigate("/mybooking/manage-booking", { state: null });
         }
     }
 

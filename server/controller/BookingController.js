@@ -590,7 +590,7 @@ const cancelTicket = async (req, res) => {
 
         await Ticket.findByIdAndDelete(ticketID);
 
-        res.status(200).json("Ticket deleted successfully!");
+        res.status(200).json("Ticket cancelled successfully!");
 
     } catch (err) {
         console.error("Error canceling ticket", err);
