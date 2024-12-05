@@ -11,7 +11,6 @@ function Profile() {
                 const response = await axios.get(`http://localhost:3001/profile`, {
                     withCredentials: true,
                 });
-                console.log(response.data.user);
                 setUser(response.data.user);
             } catch (error) {
                 console.error("Error fetching profile:", error);
@@ -87,15 +86,6 @@ function Profile() {
                             </dt>
                             <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-1">
                                 {user.phone_number}
-                            </dd>
-
-                        </div>
-                        <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                            <dt className="text-sm font-medium text-gray-500">
-                                Mã định danh
-                            </dt>
-                            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-1">
-                                {user.identification_id}
                             </dd>
 
                         </div>

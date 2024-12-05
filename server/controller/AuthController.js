@@ -3,15 +3,13 @@ const jwt = require("jsonwebtoken");
 const redisClient = require("../redisClient");
 
 const register = async (req, res, next) => {
-    const { full_name, gender, dob, nationality, email, password, phone_number, identification_id} = req.body;
+    const { full_name, gender, dob, nationality, email, password, phone_number } = req.body;
     try {
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({ message: "Email is already used" });
         }
 
-        let id_type = checkIdentification(identification_id);
-  
         const newUser = await User.create({
             full_name,
             gender,
@@ -19,9 +17,7 @@ const register = async (req, res, next) => {
             nationality,
             email,
             password,
-            phone_number,
-            identification_id,
-            id_type
+            phone_number
       });
 
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
@@ -79,12 +75,9 @@ const profile = async (req, res) => {
                 full_name: user.full_name,
                 email: user.email,
                 gender: user.gender,
-                age: user.age,
                 nationality: user.nationality,
                 dob: user.dob,
                 phone_number: user.phone_number,
-                identification_id: user.identification_id,
-                id_type: user.id_type,
                 user_type: user.user_type,
                 created_at: user.created_at
             }
@@ -108,7 +101,7 @@ function checkIdentification(identifiation_id) {
 
 const update = async (req, res) => {
     const userId = req.user.id;
-    const { full_name, gender, dob, nationality, email, phone_number, identification_id } = req.body;
+    const { full_name, gender, dob, nationality, email, phone_number } = req.body;
 
     try {
         const updates = {};
@@ -131,14 +124,6 @@ const update = async (req, res) => {
             }
             updates.phone_number = phone_number;
         }
-        if (identification_id) {
-            const idType = checkIdentification(identification_id);
-            if (!idType) {
-                return res.status(400).json({ message: "Invalid identification format" });
-            }
-            updates.identification_id = identification_id;
-            updates.id_type = idType;
-        }
 
         // Update the user in the database
         const user = await User.findByIdAndUpdate(userId, updates, { new: true });
@@ -155,8 +140,6 @@ const update = async (req, res) => {
                 dob: user.dob,
                 nationality: user.nationality,
                 phone_number: user.phone_number,
-                identification_id: user.identification_id,
-                id_type: user.id_type,
                 created_at: user.created_at,
             },
         });

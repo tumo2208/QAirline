@@ -1,6 +1,6 @@
 import {Route, Routes} from "react-router-dom";
 import HomePage from "../MyBooking/HomePage";
-import SearchBooking from "./SearchBooking";
+import ManageBooking from "./ManageBooking";
 import BookingHistory from "./BookingHistory";
 
 function MyBooking(){
@@ -8,7 +8,7 @@ function MyBooking(){
         <div>
             <Routes>
                 <Route path="/" element={<HomePage/>} />
-                <Route path="/search-booking" element={<SearchBooking/>}/>
+                <Route path="/manage-booking" element={<ManageBooking/>}/>
                 <Route path="/booking-history" element={<BookingHistory/>}/>
             </Routes>
         </div>

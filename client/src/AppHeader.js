@@ -121,7 +121,7 @@ function AppHeader() {
                     <div id="menu-container" className="flex items-center lg:order-3 space-x-2">
                         <p className="font-semibold">{userName}</p>
                         <div id="profile">
-                            <img src={`images/avatar/${userGender}.png`}
+                            <img src={`/../images/avatar/${userGender}.png`}
                                  onClick={toggleMenu}
                                  className="cursor-pointer w-12 h-12" alt="user"/>
 
@@ -178,27 +178,30 @@ function AppHeader() {
                                     </li>
                                     <li
                                         role="menuitem"
-                                        onClick={closeMenu}
-                                        className="menu-item profileMenuItem"
                                     >
-                                        <svg
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            viewBox="0 0 24 24"
-                                            height="1.5em"
-                                            width="1.5em"
-                                        >
-                                            <path stroke="none" d="M0 0h24v24H0z"/>
-                                            <path
-                                                d="M15 5v2M15 11v2M15 17v2M5 5h14a2 2 0 012 2v3a2 2 0 000 4v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 000-4V7a2 2 0 012-2"/>
-                                        </svg>
+                                        <Link to="/mybooking/booking-history"
+                                              onClick={closeMenu}
+                                              className="menu-item profileMenuItem">
+                                            <svg
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                viewBox="0 0 24 24"
+                                                height="1.5em"
+                                                width="1.5em"
+                                            >
+                                                <path stroke="none" d="M0 0h24v24H0z"/>
+                                                <path
+                                                    d="M15 5v2M15 11v2M15 17v2M5 5h14a2 2 0 012 2v3a2 2 0 000 4v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 000-4V7a2 2 0 012-2"/>
+                                            </svg>
 
-                                        <p className="text-slate-800 font-medium ml-2">
-                                            Vé của tôi
-                                        </p>
+                                            <p className="text-slate-800 font-medium ml-2">
+                                                Lịch sử đặt chỗ
+                                            </p>
+                                        </Link>
+                                        
                                     </li>
                                     {isAdmin && (
                                         <li

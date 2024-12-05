@@ -551,7 +551,7 @@ const cancelTicket = async (req, res) => {
         });
 
         if (!checkTimeToCancel(flight)) {
-            return res.status(404).json("Ticket can only be canceled at least 7 days before the departure time.");
+            return res.status(404).json("Ticket can only be cancelled at least 7 days before the departure time.");
         }
 
         if (ticket.customer_type !== 'Infant') {
@@ -590,7 +590,7 @@ const cancelTicket = async (req, res) => {
 
         await Ticket.findByIdAndDelete(ticketID);
 
-        res.status(200).json("Ticket deleted successfully!");
+        res.status(200).json("Ticket cancelled successfully!");
 
     } catch (err) {
         console.error("Error canceling ticket", err);
