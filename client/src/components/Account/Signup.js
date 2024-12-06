@@ -19,7 +19,7 @@ function Signup() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-          setError("Passwords do not match");
+          setError("Mật khẩu không khớp. Vui lòng thử lại.");
           return;
         }
         try {
@@ -34,12 +34,12 @@ function Signup() {
             },
             { withCredentials: true },
           );
-          if (response.data.message === "Registration successful") {
+          if (response.status === 200) {
             setError("");
             navigate(`/login`);
           }
         } catch (error) {
-          setError("Registration failed. Please try again.");
+          setError("Đã có lỗi khi đăng ký. Vui lòng thử lại sau.");
       }
   };
 

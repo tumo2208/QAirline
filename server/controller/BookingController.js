@@ -56,19 +56,19 @@ const getMyBookings = async (req, res) => {
     try {
         const user = req.user;
         if (!user) {
-            return res.status(403).json({ error: 'You need to login to view booking history'});
+            return res.status(403).json({ error: 'Bạn cần đăng nhập để xem thông tin đặt vé' });
         }
         const allMyBookings = await Booking.find({
             passenger_id: user._id
         });
 
         if (allMyBookings.length === 0) {
-            return res.status(404).json({ status: false, message: "No bookings found" });
+            return res.status(404).json({ status: false, message: "Không tìm thấy lịch sử đặt chuyến bay" });
         }
         return res.status(200).json(allMyBookings);
 
     } catch (error) {
-        console.error("Error fetching bookings", error);
+        console.error("Lỗi khi lấy danh sách đặt chuyến bay", error);
         return res.status(500).json({ status: false, message: error.message });
     }
 };
@@ -81,7 +81,7 @@ const getBookingByID = async (req, res) => {
         });
         return res.status(200).json(booking);
     }  catch (error) {
-        console.error("Error view booking details", error);
+        console.error("Lỗi xem thông tin đặt chuyến bay", error);
         return res.status(500).json({ status: false, message: error.message });
     }
 };
@@ -106,7 +106,7 @@ const makeBooking = async (req, res) => {
         const seatClass = flight.available_seats.find(sc => sc.class_type === classType);
         const price = seatClass.price;
         if (seatClass.seat_count < neededSeats) {
-            return res.status(404).json({ error: 'Out of seats'});
+            return res.status(404).json({ error: 'Hết chỗ'});
         }
 
         // Create Booking
@@ -252,7 +252,7 @@ const makeBooking = async (req, res) => {
             const returnSeatClass = returnFlight.available_seats.find(sc => sc.class_type === returnClassType);
             const returnPrice = returnSeatClass.price;
             if (seatClass.seat_count < neededSeats) {
-                return res.status(404).json({ error: 'Out of seats'});
+                return res.status(404).json({ error: 'Hết chỗ'});
             }
 
             // Function to update list occupiedSeats and availableSeats
@@ -501,7 +501,7 @@ const cancelBooking = async (req, res) => {
         });
 
         if (!checkTimeToCancel(flight)) {
-            return res.status(404).json("Ticket can only be canceled at least 7 days before the departure time.");
+            return res.status(404).json("Vé chỉ có thể được hủy ít nhất 7 ngày trước khi máy bay cất cánh!");
         }
 
         const tickets = await Ticket.find({ booking_id: bookingID });
@@ -526,10 +526,10 @@ const cancelBooking = async (req, res) => {
             booking_id: bookingID
         });
 
-        res.status(200).json("Booking and tickets cancelled successfully");
+        res.status(200).json("Hủy chuyến bay và vé thành công!");
 
     } catch (error) {
-        console.error("Error canceling booking", error);
+        console.error("Lỗi khi hủy chuyến bay", error);
         res.status(500).json({ status: false, message: error.message });
     }
 };
@@ -563,7 +563,7 @@ const cancelTicket = async (req, res) => {
             });
 
             if (!checkTimeToCancel(flight)) {
-                return res.status(404).json("Ticket can only be cancelled at least 7 days before the departure time.");
+                return res.status(404).json("Vé chỉ có thể được hủy ít nhất 7 ngày trước khi máy bay cất cánh!");
             }
 
             if (customerType === 'Adult') {
@@ -571,7 +571,7 @@ const cancelTicket = async (req, res) => {
                 const num_child = booking.num_child;
                 const num_infant = booking.num_infant;
                 if ((num_adult === 1 && (num_child > 0 || num_infant > 0)) || (num_adult === num_infant)) {
-                    return res.status(403).json("Policy Violation!");
+                    return res.status(403).json("Vi phạm quy tắc đặt vé");
                 }
             }
 
@@ -614,11 +614,11 @@ const cancelTicket = async (req, res) => {
                 res.status(200).json({newBooking: booking });
             }
         } else {
-            return res.status(401).json("Invalid confirmation code");
+            return res.status(401).json("Mã xác nhận không hợp lệ");
         }
         
     } catch (err) {
-        console.error("Error canceling ticket", err);
+        console.error("Lỗi khi hủy vé", err);
         res.status(500).json({ status: false, message: err.message });
     }
 };

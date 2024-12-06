@@ -32,7 +32,7 @@ function AppHeader() {
             setLoginState(false);
             window.location.reload();
         } catch (error) {
-            console.error("Logout unsuccessful:", error);
+            console.error("Đăng xuất thất bại:", error);
         }
     };
 
@@ -51,7 +51,7 @@ function AppHeader() {
                     showNoti("Bạn đã đăng nhập thành công với tư cách quản trị viên !", 3000);
                 }
             } catch (error) {
-                console.error("Login unsuccessful:", error);
+                console.error("Đăng nhập thất bại:", error);
             }
         };
         checkLogin();

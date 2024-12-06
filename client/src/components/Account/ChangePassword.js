@@ -27,7 +27,7 @@ function ChangePassword() {
             });
 
             if (response.status === 200) {
-                alert("Password changed successfully, please login again");
+                alert("Đổi mật khẩu thành công! Xin hãy đăng nhập lại");
                 setTimeout(() => {
                     navigate("/login");
                 }, 1000);
@@ -36,7 +36,7 @@ function ChangePassword() {
             if (error.response && error.response.data && error.response.data.message) {
                 setError(error.response.data.message);
             } else {
-                setError("Something went wrong. Please try again.");
+                setError("Đã có lỗi xảy ra. Vui lòng thử lại sau.");
             }
         }
     };
