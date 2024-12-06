@@ -14,6 +14,10 @@ function CreatePost() {
     const [thumbnail, setThumbnail] = useState(null);
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
+    const onEditorStateChange = (newState) => {
+        setEditorState(newState);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const content = draftToHtml(convertToRaw(editorState.getCurrentContent()));
@@ -71,9 +75,69 @@ function CreatePost() {
                     <label></label>
                     <Editor
                         editorState={editorState}
-                        wrapperClassName="demo-wrapper"
-                        editorClassName="demo-editor"
-                        onEditorStateChange={setEditorState}
+                        wrapperClassName="wrapper-class"
+                        editorClassName="editor-class"
+                        toolbarClassName="toolbar-class"
+                        onEditorStateChange={onEditorStateChange}
+                        toolbar={{
+                            options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'emoji', 'history'],
+                            blockType: {
+                                inDropdown: true,
+                                options: ['Normal', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'Blockquote', 'Code'],
+                                className: undefined,
+                                component: undefined,
+                                dropdownClassName: undefined,
+                            },
+                            fontSize: {
+                                options: [8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60, 72, 96],
+                                className: undefined,
+                                component: undefined,
+                                dropdownClassName: undefined,
+                            },
+                            fontFamily: {
+                                options: ['Arial', 'Georgia', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
+                                className: undefined,
+                                component: undefined,
+                                dropdownClassName: undefined,
+                            },
+                            list: {
+                                inDropdown: false,
+                                className: undefined,
+                                component: undefined,
+                                dropdownClassName: undefined,
+                                options: ['unordered', 'ordered'],
+                            },
+                            textAlign: {
+                                inDropdown: false,
+                                className: undefined,
+                                component: undefined,
+                                dropdownClassName: undefined,
+                                options: ['left', 'center', 'right', 'justify'],
+                            },
+                            emoji: {
+                                className: undefined,
+                                component: undefined,
+                                popupClassName: undefined,
+                                emojis: [
+                                    '😀', '😁', '😂', '😃', '😉', '😋', '😎', '😍', '😗', '🤗', '🤔', '😣', '😫', '😴', '😌', '🤓',
+                                    '😛', '😜', '😠', '😇', '😷', '😈', '👻', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '🙈',
+                                    '🙉', '🙊', '👼', '👮', '🕵', '💂', '👳', '🎅', '👸', '👰', '👲', '🙍', '🙇', '🚶', '🏃', '💃',
+                                    '⛷', '🏂', '🏌', '🏄', '🚣', '🏊', '⛹', '🏋', '🚴', '👫', '💪', '👈', '👉', '👉', '👆', '🖕',
+                                    '👇', '🖖', '🤘', '🖐', '👌', '👍', '👎', '✊', '👊', '👏', '🙌', '🙏', '🐵', '🐶', '🐇', '🐥',
+                                    '🐸', '🐌', '🐛', '🐜', '🐝', '🍉', '🍄', '🍔', '🍤', '🍨', '🍪', '🎂', '🍰', '🍾', '🍷', '🍸',
+                                    '🍺', '🌍', '🚑', '⏰', '🌙', '🌝', '🌞', '⭐', '🌟', '🌠', '🌨', '🌩', '⛄', '🔥', '🎄', '🎈',
+                                    '🎉', '🎊', '🎁', '🎗', '🏀', '🏈', '🎲', '🔇', '🔈', '📣', '🔔', '🎵', '🎷', '💰', '🖊', '📅',
+                                    '✅', '❎', '💯',
+                                ],
+                            },
+                            history: {
+                                inDropdown: false,
+                                className: undefined,
+                                component: undefined,
+                                dropdownClassName: undefined,
+                                options: ['undo', 'redo'],
+                            },
+                        }}
                     />
                 </div>
                 <button type="submit">Submit</button>
