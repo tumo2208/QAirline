@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from "react";
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import axios from "axios";
+import Loading from '../../shared/Loading';
 import logo from "../../logo.svg";
 import unidecode from 'unidecode';
+import { set } from "mongoose";
 
 function ManageBooking() {
     const [activeTab, setActiveTab] = useState("outbound");
     const { state } = useLocation();
     const { booking } = state || null;
     const [roundTrip, setRoundTrip] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const [outboundFlight, setOutboundFlight] = useState(null);
     const [returnFlight, setReturnFlight] = useState(null);
 
     const handleBack = () => {
-        window.history.back()
+        navigate("/");
     };
 
     // This is used to determine if the booking is a one-way or round-trip ticket
@@ -66,6 +70,53 @@ function ManageBooking() {
         FetchData();
     }, [booking]);
 
+    const cancelTicket = async (ticket) => {
+        try {
+            if (window.confirm("Bạn có chắc chắn muốn hủy vé ?")) {
+                let userInput = "";
+                if (ticket.customer_type === "Adult") {
+                    userInput = window.prompt("Nhập số định danh của người có tên trên vé");
+                } else {
+                    userInput = window.prompt("Nhập ngày sinh của người có tên trên vé (định dạng dd/mm/yyyy)");
+                }
+                if (userInput) {
+                    setLoading(true);
+                    const response = await axios.post(
+                        "http://localhost:3001/api/bookings/cancelTicket",
+                        { 
+                            ticketID: ticket._id,
+                            confirmation: userInput,
+                        },
+                        {
+                            withCredentials: true,
+                        }
+                    );
+                    if (response.status === 200) {
+                        alert("Hủy vé thành công");
+                        navigate("/mybooking/manage-booking", {
+                            state: {
+                                booking: response.data.newBooking,
+                            }
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+                alert("Thông tin xác nhận không chính xác!");
+            } else if (error.response && error.response.status === 403) {
+                alert("Bạn không thể hủy vé này vì sẽ vi phạm chính sách về số hành khách của hãng!");
+            } else if (error.response && error.response.status === 404) {
+                alert("Bạn chỉ có quyền hủy vé ít nhất 7 ngày trước giờ khởi hành!");
+            } else {
+                console.error("Error cancelling ticket:", error);
+                alert("Đã xảy ra lỗi khi hủy vé. Vui lòng thử lại!");
+            }
+        }
+        setLoading(false);
+    };
+    
+
     if (!booking) {
         return (
             <div className="bg-gray-10 p-60 flex flex-col items-center justify-center space-y-10">
@@ -77,13 +128,14 @@ function ManageBooking() {
                         onClick={() => handleBack()}
                     >
                         <span className="mr-2 font-bold text-lg">←</span>
-                        Quay lại trang trước
+                        Quay lại trang chủ
                     </button>
                 </div>
             </div>
         );
     }
-    
+
+      
 
     return (
         <div className="bg-gray-100 p-10">
@@ -126,24 +178,25 @@ function ManageBooking() {
                     {activeTab === "outbound" && (
                         <div>
                             {Array.from({length: booking?.outbound_tickets?.length}).map((_, index) => (
-                            <TicketCard ticket={booking?.outbound_tickets[index]} flight={outboundFlight} class_type={booking?.class_type}/>
+                            <TicketCard ticket={booking?.outbound_tickets[index]} flight={outboundFlight} class_type={booking?.class_type} cancel={cancelTicket}/>
                         ))}
                         </div>
                     )}
                     {activeTab === "return" && roundTrip && (
                         <div>
                             {Array.from({length: booking?.return_tickets?.length}).map((_, index) => (
-                            <TicketCard ticket={booking?.return_tickets[index]} flight={returnFlight} class_type={booking?.return_class_type}/>
+                            <TicketCard ticket={booking?.return_tickets[index]} flight={returnFlight} class_type={booking?.return_class_type} cancel={cancelTicket}/>
                         ))}
                         </div>
                     )}
                 </div>
             </div>
+            {loading && <Loading/>}
         </div>
     )
 }
 
-function TicketCard({ticket, flight, class_type}) {
+function TicketCard({ticket, flight, class_type, cancel}) {
     const [airportInfo, setAirportInfo] = useState([]);
 
     useEffect(() => {
@@ -257,6 +310,7 @@ function TicketCard({ticket, flight, class_type}) {
                 >
                     <button
                         type="button"
+                        onClick={() => cancel(ticket)}
                         className="items-center py-2.5 px-6 text-sm rounded-lg bg-red-500 text-white cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:bg-red-700"
                     >
                         Hủy vé

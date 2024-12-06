@@ -536,62 +536,87 @@ const cancelBooking = async (req, res) => {
 
 const cancelTicket = async (req, res) => {
     try {
-        const { ticketID } = req.body;
+        const { ticketID, confirmation } = req.body;
+        let trueConfirm = false;
 
         const ticket = await Ticket.findById(ticketID);
         const bookingID = ticket.booking_id;
         const booking = await Booking.findOne({
             booking_id: bookingID
         });
+
         const customerType = ticket.customer_type;
-        const ticketPrice = ticket.price;
 
-        const flight = await Flight.findOne({
-            flight_number: booking.flight_id
-        });
-
-        if (!checkTimeToCancel(flight)) {
-            return res.status(404).json("Ticket can only be cancelled at least 7 days before the departure time.");
-        }
-
-        if (ticket.customer_type !== 'Infant') {
-            await Flight.updateOne(
-                { flight_number: booking.flight_id },
-                { $pull: { [`occupied_seats.${booking.class_type}`]: ticket.seat_number } }
-            );
-
-            await Flight.updateOne(
-                { flight_number: booking.flight_id, "available_seats.class_type": booking.class_type },
-                { $inc: { "available_seats.$.seat_count": 1 } }
-            );
-        }
-
-        booking.total_price = booking.total_price - ticketPrice;
-        switch (customerType) {
-            case 'Adult':
-                booking.num_adult = booking.num_adult - 1;
-                break;
-            case 'Child':
-                booking.num_child = booking.num_child - 1;
-                break;
-            default:
-                booking.num_infant = booking.num_infant - 1;
-                break;
-        }
-        booking.tickets = booking.tickets.filter(t => t._id.toString() !== ticketID);
-
-        if (booking.tickets.length === 0) {
-            await Booking.findOneAndDelete({
-                booking_id: bookingID
-            });
+        if (customerType === 'Adult') {
+            if (confirmation === ticket.customer_details.id_number) trueConfirm = true;
         } else {
-            await booking.save();
+            const [day, month, year] = confirmation.split("/");
+            const inputDate = `${year}-${month}-${day}`;
+            if (inputDate === ticket.customer_details.dob) trueConfirm = true;
         }
 
-        await Ticket.findByIdAndDelete(ticketID);
+        if (trueConfirm) {
+            const ticketPrice = ticket.price;
 
-        res.status(200).json("Ticket cancelled successfully!");
+            const flight = await Flight.findOne({
+                flight_number: booking.flight_id
+            });
 
+            if (!checkTimeToCancel(flight)) {
+                return res.status(404).json("Ticket can only be cancelled at least 7 days before the departure time.");
+            }
+
+            if (customerType === 'Adult') {
+                const num_adult = booking.num_adult;
+                const num_child = booking.num_child;
+                const num_infant = booking.num_infant;
+                if ((num_adult === 1 && (num_child > 0 || num_infant > 0)) || (num_adult === num_infant)) {
+                    return res.status(403).json("Policy Violation!");
+                }
+            }
+
+            if (ticket.customer_type !== 'Infant') {
+                await Flight.updateOne(
+                    { flight_number: booking.flight_id },
+                    { $pull: { [`occupied_seats.${booking.class_type}`]: ticket.seat_number } }
+                );
+
+                await Flight.updateOne(
+                    { flight_number: booking.flight_id, "available_seats.class_type": booking.class_type },
+                    { $inc: { "available_seats.$.seat_count": 1 } }
+                );
+            }
+
+            booking.total_price = booking.total_price - ticketPrice;
+            switch (customerType) {
+                case 'Adult':
+                    booking.num_adult = booking.num_adult - 1;
+                    break;
+                case 'Child':
+                    booking.num_child = booking.num_child - 1;
+                    break;
+                default:
+                    booking.num_infant = booking.num_infant - 1;
+                    break;
+            }
+            booking.outbound_tickets = booking.outbound_tickets.filter(t => t._id.toString() !== ticketID);
+            booking.return_tickets = booking.return_tickets.filter(t => t._id.toString() !== ticketID);
+
+            if (booking.outbound_tickets.length === 0 && booking.return_tickets.length === 0) {
+                await Booking.findOneAndDelete({
+                    booking_id: bookingID
+                });
+                await Ticket.findByIdAndDelete(ticketID);
+                res.status(200).json({newBooking: null });
+            } else {
+                await booking.save();
+                await Ticket.findByIdAndDelete(ticketID);
+                res.status(200).json({newBooking: booking });
+            }
+        } else {
+            return res.status(401).json("Invalid confirmation code");
+        }
+        
     } catch (err) {
         console.error("Error canceling ticket", err);
         res.status(500).json({ status: false, message: err.message });

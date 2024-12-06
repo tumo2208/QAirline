@@ -59,47 +59,47 @@ function Passengers() {
             alert("Please fill out all required fields.");
             return;
         }
+        if (window.confirm("Hãy chắc chắn rằng bạn đã điền chính xác các thông tin, nếu chọn OK bạn sẽ không thể thay đổi các thông tin đã nhập !")) {
+            setLoading(true);
+            try {
+                const BookingData = {
+                    outboundFlightID: outboundFlightID,
+                    returnFlightID: returnFlightID,
 
-        setLoading(true);
+                    numAdult: passengers.adults,
+                    numChildren: passengers.children,
+                    numInfant: passengers.infants,
+                    classType: outboundFlight.classType,
+                    returnClassType: returnFlight ? returnFlight.classType : null,
 
-        try {
-            const BookingData = {
-                outboundFlightID: outboundFlightID,
-                returnFlightID: returnFlightID,
+                    adultList: formData.adults,
+                    childrenList: formData.children,
+                    infantList: formData.infants
+                };
 
-                numAdult: passengers.adults,
-                numChildren: passengers.children,
-                numInfant: passengers.infants,
-                classType: outboundFlight.classType,
-                returnClassType: returnFlight ? returnFlight.classType : null,
+                console.log("Booking Data:", JSON.stringify(BookingData, null, 2));
+                const response = await axios.post(
+                    "http://localhost:3001/api/bookings/newBooking", 
+                    BookingData,
+                    {
+                        withCredentials: true
+                    }
+                );
 
-                adultList: formData.adults,
-                childrenList: formData.children,
-                infantList: formData.infants
-            };
-
-            console.log("Booking Data:", JSON.stringify(BookingData, null, 2));
-            const response = await axios.post(
-                "http://localhost:3001/api/bookings/newBooking", 
-                BookingData,
-                {
-                    withCredentials: true
+                if (response.status === 200) {
+                    const result = await response.data;
+                    console.log("Booking successful", result);
+                    navigate("/booking/booking-successfully", { state: { bookingID: result.bookingID }});
+                } else {
+                    alert("Booking failed: " + response.data.message);
                 }
-            );
-
-            if (response.status === 200) {
-                const result = await response.data;
-                console.log("Booking successful", result);
-                navigate("/booking/booking-successfully", { state: { bookingID: result.bookingID }});
-            } else {
-                alert("Booking failed: " + response.data.message);
+            } catch (error) {
+                console.error("Error details:", error.response ? error.response.data : error.message);
+                alert(`Booking indeed failed: ${error.message}`);
             }
-        } catch (error) {
-            console.error("Error details:", error.response ? error.response.data : error.message);
-            alert(`Booking indeed failed: ${error.message}`);
-        }
 
-        setLoading(false);
+            setLoading(false);
+        }
     };
 
     const validateForm = () => {
