@@ -24,7 +24,7 @@ function AddAircraft() {
       const response = await axios.post("http://localhost:3001/api/airportAircraft/addAircraft",formData, { withCredentials: true });
 
       if (response.status === 200) {
-        setSuccess("Aircraft added successfully!");
+        setSuccess(response.data);
         setFormData({
           aircraftNumber: "",
           manufacturer: "",
@@ -32,9 +32,9 @@ function AddAircraft() {
         });
         setTimeout(() => setSuccess(""), 3000);
       }
-    } catch (err) {
-      console.error("Error adding aircraft", err);
-      setError(err.response?.data?.error || "Failed to add aircraft.");
+    } catch (error) {
+      console.error("Lỗi thêm máy bay", error);
+      setError(error.response?.data?.error || "Lỗi thêm máy bay");
       setTimeout(() => setError(""), 3000);
     }
   };

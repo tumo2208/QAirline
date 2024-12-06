@@ -13,7 +13,7 @@ function Profile() {
                 });
                 setUser(response.data.user);
             } catch (error) {
-                console.error("Error fetching profile:", error);
+                console.error("Lỗi lấy thông tin cá nhân", error);
             }
         };
         fetchProfile();

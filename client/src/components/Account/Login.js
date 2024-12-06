@@ -14,11 +14,11 @@ function Login() {
         setLoading(true);
         try {
             const response = await axios.post('http://localhost:3001/login', { email, password }, { withCredentials: true });
-            if (response.data.message === "Login successful") {
+            if (response.status === 200) {
                 window.location.href = 'http://localhost:3000/';
             }
         } catch (error) {
-            setError("Incorrect email or password");
+            setError(error.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng thử lại sau.");
         }
         setLoading(false);
     };

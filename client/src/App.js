@@ -15,6 +15,7 @@ import Admin from "./components/Admin/Admin";
 import AddFlight from "./components/Admin/AddFlight";
 import SetDelayTime from "./components/Admin/SetDelayTime";
 import AddAircraft from "./components/Admin/AddAircraft";
+import CreatePost from "./components/Admin/CreatePost";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
                     <Route path="/admin/addFlight" element={<AddFlight/>}/>
                     <Route path="/admin/setDelayTime" element={<SetDelayTime/>}/>
                     <Route path="/admin/addAircraft" element={<AddAircraft/>}/>
+                    <Route path="/admin/createPost" element={<CreatePost/>}/>
                 </Routes>
 
                 <AppFooter/>

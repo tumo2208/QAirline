@@ -7,7 +7,7 @@ const register = async (req, res, next) => {
     try {
         const userExists = await User.findOne({ email });
         if (userExists) {
-            return res.status(400).json({ message: "Email is already used" });
+            return res.status(400).json({ message: "Email đã được sử dụng" });
         }
 
         const newUser = await User.create({
@@ -27,12 +27,12 @@ const register = async (req, res, next) => {
         httpOnly: false,
       });
 
-      res.status(201).json({ message: "Registration successful", token });
+      res.status(201).json({ message: "Đăng ký tài khoản thành công!", token });
       next();
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error registering user" });
+        res.status(500).json({ message: "Lỗi đăng ký" });
     }
 };
 
@@ -41,12 +41,12 @@ const login = async (req, res, next) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: "Incorrect password or email" });
+            return res.status(400).json({ message: "Sai email hoặc mật khẩu." });
         }
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.status(400).json({ message: "Incorrect password or email" });
+            return res.status(400).json({ message: "Sai email hoặc mật khẩu." });
         }
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
@@ -56,12 +56,12 @@ const login = async (req, res, next) => {
             httpOnly: false,
           });
 
-        res.status(200).json({ message: "Login successful", token });
+        res.status(200).json({ message: "Đăng nhập thành công", token });
         next();
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error login user" });
+        res.status(500).json({ message: "Lỗi đăng nhập" });
     }
 };
 
@@ -70,7 +70,7 @@ const profile = async (req, res) => {
         const user = req.user;
 
         res.json({
-            message: "User profile retrieved successfully",
+            message: "Lấy thông tin người dùng thành công",
             user: {
                 full_name: user.full_name,
                 email: user.email,
@@ -85,7 +85,7 @@ const profile = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Invalid token" });
+        res.status(500).json({ message: "Token không hợp lệ" });
     }
 };
 
@@ -113,14 +113,14 @@ const update = async (req, res) => {
         if (email) {
             const emailExists = await User.findOne({ email });
             if (emailExists && emailExists.id !== userId) {
-                return res.status(400).json({ message: "Email is already in use" });
+                return res.status(400).json({ message: "Email này đã được sử dụng" });
             }
             updates.email = email;
         }
         if (phone_number) {
             const phoneExists = await User.findOne({ phone_number });
             if (phoneExists && phoneExists.id !== userId) {
-                return res.status(400).json({ message: "Phone number is already in use" });
+                return res.status(400).json({ message: "Số điện thoại này đã được sử dụng" });
             }
             updates.phone_number = phone_number;
         }
@@ -128,11 +128,11 @@ const update = async (req, res) => {
         // Update the user in the database
         const user = await User.findByIdAndUpdate(userId, updates, { new: true });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "Không tìm thấy người dùng" });
         }
 
         res.status(200).json({
-            message: "Profile updated successfully",
+            message: "Cập nhật trang cá nhân thành công!",
             user: {
                 full_name: user.full_name,
                 email: user.email,
@@ -145,7 +145,7 @@ const update = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error updating user" });
+        res.status(500).json({ message: "Lỗi cập nhật người dùng" });
     }
 };
 
@@ -154,33 +154,33 @@ const changePassword = async (req, res) => {
         const { currentPassword, newPassword, confirmPassword } = req.body;
 
         if (newPassword !== confirmPassword) {
-            return res.status(400).json({ message: "Password confirmation failed, try again!" });
+            return res.status(400).json({ message: "Xác nhận lại mật khẩu bị sai. Xin hãy thử lại!" });
         }
 
         const email = req.user.email;
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "Không tìm thấy người dùng" });
         }
 
         const isMatch = await user.comparePassword(currentPassword);
         if (!isMatch) {
-            return res.status(400).json({ message: "Incorrect password" });
+            return res.status(400).json({ message: "Nhập sai mật khẩu" });
         }
 
         if (newPassword.length < 8) {
-            return res.status(400).json({ message: "New password is too weak. It should be at least 8 characters long." });
+            return res.status(400).json({ message: "Mật khẩu mới quá yếu! Cần ít nhất 8 kí tự!" });
         }
 
         user.password = newPassword;
 
         await user.save();
 
-        return res.status(200).json({ message: "Password updated successfully" });
+        return res.status(200).json({ message: "Mật khẩu cập nhật thành công!" });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error updating password" });
+        return res.status(500).json({ message: "Lỗi cập nhật mật khẩu!" });
     }
 };
 
@@ -188,16 +188,16 @@ const logout = async (req, res) => {
     try {
         const token = req.cookies.token;
         if (!token) {
-            return res.status(401).json({ message: "No token found" });
+            return res.status(401).json({ message: "Không tìm thấy token" });
         }
 
         await redisClient.SADD("blacklisted_token", token, { EX: 86400 });
         res.clearCookie("token");
 
-        return res.status(200).json({ message: "Logout successful" });
+        return res.status(200).json({ message: "Đăng xuất thành công!" });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error logging out" });
+        return res.status(500).json({ message: "Gặp lỗi khi đăng xuất!" });
     }
 };
 
