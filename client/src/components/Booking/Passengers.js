@@ -56,7 +56,7 @@ function Passengers() {
     const handleNext = async () => {
         const isValid = validateForm();
         if (!isValid) {
-            alert("Please fill out all required fields.");
+            alert("Xin hãy điền đầy đủ thông tin !");
             return;
         }
         if (window.confirm("Hãy chắc chắn rằng bạn đã điền chính xác các thông tin, nếu chọn OK bạn sẽ không thể thay đổi các thông tin đã nhập !")) {
@@ -88,14 +88,13 @@ function Passengers() {
 
                 if (response.status === 200) {
                     const result = await response.data;
-                    console.log("Booking successful", result);
                     navigate("/booking/booking-successfully", { state: { bookingID: result.bookingID }});
                 } else {
-                    alert("Booking failed: " + response.data.message);
+                    alert("Booking thất bại " + response.data.message);
                 }
             } catch (error) {
-                console.error("Error details:", error.response ? error.response.data : error.message);
-                alert(`Booking indeed failed: ${error.message}`);
+                console.error("Lỗi cụ thể:", error.response ? error.response.data : error.message);
+                alert(`Booking đã thất bại: ${error.message}`);
             }
 
             setLoading(false);

@@ -29,8 +29,8 @@ function SetDelayTime() {
                 setError('');
             }
         } catch (error) {
-            console.error('Error setting delay time:', error);
-            setError(error.response?.data?.error || 'Something went wrong.');
+            console.error('Lỗi cập nhật thời gian delay:', error);
+            setError(error.response?.data?.error || 'Lỗi cập nhật thời gian delay.');
             setSuccess('');
         }
     };
