@@ -16,7 +16,7 @@ const addAircraft = async (req, res) => {
       try {
           const user = req.user;
           if (user.user_type !== 'Admin') {
-              return res.status(404).json({error: 'You do not have access to this function'});
+              return res.status(404).json({error: 'Bạn không có thẩm quyền để sử dung chức năng này'});
           }
 
           const {aircraftNumber, manufacturer, seatNumber} = req.body;
@@ -26,9 +26,9 @@ const addAircraft = async (req, res) => {
               seat_number: seatNumber,
           });
           await newAircraft.save();
-          res.status(200).json("Aircraft added successfully");
+          res.status(200).json("Máy bay tạo thành công!");
       } catch (err) {
-          console.error("Error adding aircraft", err);
+          console.error("Lỗi thêm máy bay", err);
           return res.status(500).json({ status: false, message: err.message });
       }
 };
@@ -37,7 +37,7 @@ const removeAircraft = async (req, res) => {
     try {
         const user = req.user;
         if (user.user_type !== 'Admin') {
-            return res.status(404).json({error: 'You do not have access to this function'});
+            return res.status(404).json({error: 'Bạn không có thẩm quyền để sử dung chức năng này'});
         }
 
         const {aircraftID} = req.body;
@@ -47,7 +47,7 @@ const removeAircraft = async (req, res) => {
         });
 
         if (flights.length > 0) {
-            return res.status(404).json({ error: 'Cant remove this aircraft because some flight use it'});
+            return res.status(404).json({ error: 'Không thể xóa máy bay đang có lịch bay!'});
         }
 
         await Aircraft.findOneAndDelete({
@@ -55,7 +55,7 @@ const removeAircraft = async (req, res) => {
         });
 
     }  catch (err) {
-        console.error("Error removing aircraft", err);
+        console.error("Lỗi khi xóa máy bay", err);
         return res.status(500).json({ status: false, message: err.message });
     }
 };

@@ -41,7 +41,7 @@ function AddFlight() {
             const response = await axios.post('http://localhost:3001/api/flights/addflight', payload, { withCredentials: true });
             console.log(response.data);
             if (response.status === 200) {
-                setSuccess("Flight added successfully!");
+                setSuccess(response.data);
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
@@ -49,8 +49,9 @@ function AddFlight() {
                 setError(response.data.error);
             }
         } catch (error) {
-            console.error(error);
-            setError(error.response.data.error);
+            console.error("Lỗi thêm máy bay", error);
+            setError(error.response?.data?.error || "Lỗi thêm máy bay");
+            setTimeout(() => setError(""), 3000);
         }
     }
 

@@ -63,7 +63,7 @@ function Home() {
                     airport_code: airport.airport_code
                 })));
             } catch (error) {
-                console.error("Error fetching airports info:", error);
+                console.error("Lỗi lấy thông tin sân bay:", error);
             }
         };
 
@@ -74,7 +74,7 @@ function Home() {
         e.preventDefault();
 
         if (!departure || !destination || !departureDate) {
-            alert("Please fill in all required fields.");
+            alert("Xin hãy điền đầy đủ thông tin.");
             return;
         }
 
@@ -118,7 +118,7 @@ function Home() {
     const handleSubmit_mybooking = async (e) => {
         e.preventDefault();
         if (!bookingID) {
-            alert("Please fill in all required fields.");
+            alert("Xin hãy điền đầy đủ thông tin.");
             return;
         }
         setLoading(true);
