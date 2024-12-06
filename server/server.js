@@ -4,11 +4,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const schedule = require('node-schedule');
 const cookieParser = require("cookie-parser");
-const redisClient = require("./redisClient");
+// const redisClient = require("./redisClient");
 
 // Import routes
 const authRoutes = require("./routes/AuthRoute");
 const airportAircraftRoute = require("./routes/AirportAircraftRoute");
+const postRoute = require('./routes/PostRoute');
 const flightRoute = require("./routes/FlightRoute");
 const bookingRoute = require("./routes/BookingRoute");
 
@@ -45,7 +46,7 @@ schedule.scheduleJob('0 0 * * *', async () => {
 app.use('/', authRoutes);
 app.use("/api/airportAircraft", airportAircraftRoute);
 app.use("/api/flights", flightRoute);
-// app.use("/api/users", userRoute);
+app.use("/api/post", postRoute);
 app.use("/api/bookings", bookingRoute);
 
 
