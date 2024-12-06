@@ -442,7 +442,7 @@ function InfantCard({index, formData, handleInputChange}) {
 
                     <div className="flex flex-row space-x-4">
                         <div className="flex-1">
-                            <label className="font-semibold block text-gray-700">Người giám hộ</label>
+                            <label className="font-semibold block text-gray-700">Người đi cùng</label>
                             <input
                                 type="text"
                                 placeholder="Nhập số định danh của người đi cùng"

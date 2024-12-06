@@ -241,16 +241,9 @@ function TicketCard({ticket, flight, class_type, cancel}) {
                         </div>
                         <div
                             className="h-full py-4 px-10 bg-blue-100 text-black flex-grow rounded-r-3xl flex flex-col">
-                            {class_type === "Business" && (
-                                <div className="text-center text-yellow-600 text-4xl" style={{fontFamily: "Pacifico"}}>
-                                Business Class
+                            <div className="text-center text-yellow-600 text-4xl" style={{fontFamily: "Pacifico"}}>
+                                {class_type} Class
                             </div>
-                            )}
-                            {class_type === "Economy" && (
-                                <div className="text-center font-mono font-semibold text-yellow-600 text-4xl">
-                                Economy Class
-                            </div>
-                            )}
                             <div className="flex mt-8 w-full justify-between items-center">
                                 <div className="flex flex-col items-center">
                                     <span className="text-4xl font-bold">{flight?.departure_airport_id}</span>
