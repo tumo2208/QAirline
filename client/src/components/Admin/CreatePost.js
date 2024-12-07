@@ -80,9 +80,9 @@ function CreatePost() {
                             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                         >
                             <option value="" disabled>Select a category</option>
-                            <option value="place">Địa điểm</option>
-                            <option value="sale">Khuyến mãi</option>
-                            <option value="normal">Banner</option>
+                            <option value="destination">Địa điểm</option>
+                            <option value="offer">Khuyến mãi</option>
+                            <option value="banner">Banner</option>
                         </select>
                     </div>
 

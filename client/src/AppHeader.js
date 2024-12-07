@@ -81,6 +81,16 @@ function AppHeader() {
         };
     }, []);
 
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+    const handleMouseEnter = () => {
+        setIsDropdownVisible(true);
+    };
+
+    const handleMouseLeave = () => {
+        setIsDropdownVisible(false);
+    };
+
     return (
         <nav className="sticky z-10 top-0 font-bold border-gray-200 p-1 h-50"
              style={{height: "75px", backgroundColor: "#eaf6f6"}}>
@@ -321,12 +331,35 @@ function AppHeader() {
                     <ul
                         className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0"
                     >
-                        <li>
-                            <Link
-                                to="/explore"
-                                className="navItem"
-                                aria-current="page"
-                            >KHÁM PHÁ</Link>
+                        <li
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                            className="relative navItem"
+                        >
+                            <div className="font-semibold text-slate-800">
+                                KHÁM PHÁ
+                            </div>
+
+                            {isDropdownVisible && (
+                                <ul className="absolute left-0 mt-2 w-40 bg-gray-100 border border-gray-300 rounded-lg shadow-lg z-10">
+                                    <li>
+                                        <Link
+                                            to="/destination"
+                                            className="block px-4 py-2 text-slate-700 hover:bg-gray-200"
+                                        >
+                                            Điểm đến
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="/offer"
+                                            className="block px-4 py-2 text-slate-700 hover:bg-gray-200"
+                                        >
+                                            Ưu đãi
+                                        </Link>
+                                    </li>
+                                </ul>
+                            )}
                         </li>
                         <li>
                             <Link
