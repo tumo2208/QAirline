@@ -13,6 +13,8 @@ function CreatePost() {
     const [category, setCategory] = useState('');
     const [thumbnail, setThumbnail] = useState(null);
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
+    const [success, setSuccess] = useState('');
+    const [error, setError] = useState('');
 
     const onEditorStateChange = (newState) => {
         setEditorState(newState);
@@ -28,120 +30,157 @@ function CreatePost() {
         formData.append('content', content);
 
         try {
-            await axios.post('http://localhost:3001/api/post/createPost', formData, {
+            const response = await axios.post('http://localhost:3001/api/post/createPost', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            navigate('/');
+            if (response.status === 201) {
+                setSuccess('Bài viết đã được tạo thành công!');
+                setTimeout(() => {
+                    setSuccess('');
+                }, 3000);
+            }
         } catch (err) {
             console.error(err);
-            alert(`Create post fail: ${err.message}`);
+            setError(`Không thể tạo bài viết: ${err.message}`);
+            setTimeout(() => {
+                setSuccess('');
+            }, 3000);
         }
     };
 
     return (
-        <div>
-            <h1>Create Post</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="flex-1">
-                    <label></label>
-                    <input
-                        type="text"
-                        placeholder="Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        required
-                    /> <br/>
-                </div>
-                <div className="flex-1">
-                    <label></label>
-                    <select
-                        required
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}>
-                        <option value="place">InterestPlace</option>
-                        <option value="sale">Sale</option>
-                        <option value="normal">Banner</option>
-                    </select>
-                </div>
-                <div className="flex-1">
-                    <label></label>
-                    <input
-                        type="file"
-                        onChange={(e) => setThumbnail(e.target.files[0])}
-                        required
-                    /> <br/>
-                </div>
-                <div className="flex-1">
-                    <label></label>
-                    <Editor
-                        editorState={editorState}
-                        wrapperClassName="wrapper-class"
-                        editorClassName="editor-class"
-                        toolbarClassName="toolbar-class"
-                        onEditorStateChange={onEditorStateChange}
-                        toolbar={{
-                            options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'emoji', 'history'],
-                            blockType: {
-                                inDropdown: true,
-                                options: ['Normal', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'Blockquote', 'Code'],
-                                className: undefined,
-                                component: undefined,
-                                dropdownClassName: undefined,
-                            },
-                            fontSize: {
-                                options: [8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60, 72, 96],
-                                className: undefined,
-                                component: undefined,
-                                dropdownClassName: undefined,
-                            },
-                            fontFamily: {
-                                options: ['Arial', 'Georgia', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
-                                className: undefined,
-                                component: undefined,
-                                dropdownClassName: undefined,
-                            },
-                            list: {
-                                inDropdown: false,
-                                className: undefined,
-                                component: undefined,
-                                dropdownClassName: undefined,
-                                options: ['unordered', 'ordered'],
-                            },
-                            textAlign: {
-                                inDropdown: false,
-                                className: undefined,
-                                component: undefined,
-                                dropdownClassName: undefined,
-                                options: ['left', 'center', 'right', 'justify'],
-                            },
-                            emoji: {
-                                className: undefined,
-                                component: undefined,
-                                popupClassName: undefined,
-                                emojis: [
-                                    '😀', '😁', '😂', '😃', '😉', '😋', '😎', '😍', '😗', '🤗', '🤔', '😣', '😫', '😴', '😌', '🤓',
-                                    '😛', '😜', '😠', '😇', '😷', '😈', '👻', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '🙈',
-                                    '🙉', '🙊', '👼', '👮', '🕵', '💂', '👳', '🎅', '👸', '👰', '👲', '🙍', '🙇', '🚶', '🏃', '💃',
-                                    '⛷', '🏂', '🏌', '🏄', '🚣', '🏊', '⛹', '🏋', '🚴', '👫', '💪', '👈', '👉', '👉', '👆', '🖕',
-                                    '👇', '🖖', '🤘', '🖐', '👌', '👍', '👎', '✊', '👊', '👏', '🙌', '🙏', '🐵', '🐶', '🐇', '🐥',
-                                    '🐸', '🐌', '🐛', '🐜', '🐝', '🍉', '🍄', '🍔', '🍤', '🍨', '🍪', '🎂', '🍰', '🍾', '🍷', '🍸',
-                                    '🍺', '🌍', '🚑', '⏰', '🌙', '🌝', '🌞', '⭐', '🌟', '🌠', '🌨', '🌩', '⛄', '🔥', '🎄', '🎈',
-                                    '🎉', '🎊', '🎁', '🎗', '🏀', '🏈', '🎲', '🔇', '🔈', '📣', '🔔', '🎵', '🎷', '💰', '🖊', '📅',
-                                    '✅', '❎', '💯',
-                                ],
-                            },
-                            history: {
-                                inDropdown: false,
-                                className: undefined,
-                                component: undefined,
-                                dropdownClassName: undefined,
-                                options: ['undo', 'redo'],
-                            },
-                        }}
-                    />
-                </div>
-                <button type="submit">Submit</button>
-            </form>
+        <div className="min-h-screen bg-gray-100 py-8 px-4">
+            <div className="max-w-5xl mx-auto bg-white shadow-md rounded-lg p-6">
+                <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Tạo bài đăng</h1>
+                {success && (<div className="mb-4 text-green-500 text-center">{success}</div>)}
+                {error && (<div className="mb-4 text-red-500 text-center">{error}</div>)}
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                            Tiêu đề
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Enter post title"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            required
+                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                            Chủ đề
+                        </label>
+                        <select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            required
+                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        >
+                            <option value="" disabled>Select a category</option>
+                            <option value="place">Địa điểm</option>
+                            <option value="sale">Khuyến mãi</option>
+                            <option value="normal">Banner</option>
+                        </select>
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-700">
+                            Ảnh đại diện
+                        </label>
+                        <input
+                            type="file"
+                            onChange={(e) => setThumbnail(e.target.files[0])}
+                            required
+                            className="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-md shadow-sm cursor-pointer bg-gray-50"
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+                            Nội dung
+                        </label>
+                        <div className="border border-gray-300 rounded-md p-2">
+                            <Editor
+                                editorState={editorState}
+                                wrapperClassName="wrapper-class"
+                                editorClassName="editor-class"
+                                toolbarClassName="toolbar-class"
+                                onEditorStateChange={onEditorStateChange}
+                                toolbar={{
+                                    options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'emoji', 'history'],
+                                    blockType: {
+                                        inDropdown: true,
+                                        options: ['Normal', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'Blockquote', 'Code'],
+                                        className: undefined,
+                                        component: undefined,
+                                        dropdownClassName: undefined,
+                                    },
+                                    fontSize: {
+                                        options: [8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60, 72, 96],
+                                        className: undefined,
+                                        component: undefined,
+                                        dropdownClassName: undefined,
+                                    },
+                                    fontFamily: {
+                                        options: ['Arial', 'Georgia', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
+                                        className: undefined,
+                                        component: undefined,
+                                        dropdownClassName: undefined,
+                                    },
+                                    list: {
+                                        inDropdown: false,
+                                        className: undefined,
+                                        component: undefined,
+                                        dropdownClassName: undefined,
+                                        options: ['unordered', 'ordered'],
+                                    },
+                                    textAlign: {
+                                        inDropdown: false,
+                                        className: undefined,
+                                        component: undefined,
+                                        dropdownClassName: undefined,
+                                        options: ['left', 'center', 'right', 'justify'],
+                                    },
+                                    emoji: {
+                                        className: undefined,
+                                        component: undefined,
+                                        popupClassName: undefined,
+                                        emojis: [
+                                            '😀', '😁', '😂', '😃', '😉', '😋', '😎', '😍', '😗', '🤗', '🤔', '😣', '😫', '😴', '😌', '🤓',
+                                            '😛', '😜', '😠', '😇', '😷', '😈', '👻', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '🙈',
+                                            '🙉', '🙊', '👼', '👮', '🕵', '💂', '👳', '🎅', '👸', '👰', '👲', '🙍', '🙇', '🚶', '🏃', '💃',
+                                            '⛷', '🏂', '🏌', '🏄', '🚣', '🏊', '⛹', '🏋', '🚴', '👫', '💪', '👈', '👉', '👉', '👆', '🖕',
+                                            '👇', '🖖', '🤘', '🖐', '👌', '👍', '👎', '✊', '👊', '👏', '🙌', '🙏', '🐵', '🐶', '🐇', '🐥',
+                                            '🐸', '🐌', '🐛', '🐜', '🐝', '🍉', '🍄', '🍔', '🍤', '🍨', '🍪', '🎂', '🍰', '🍾', '🍷', '🍸',
+                                            '🍺', '🌍', '🚑', '⏰', '🌙', '🌝', '🌞', '⭐', '🌟', '🌠', '🌨', '🌩', '⛄', '🔥', '🎄', '🎈',
+                                            '🎉', '🎊', '🎁', '🎗', '🏀', '🏈', '🎲', '🔇', '🔈', '📣', '🔔', '🎵', '🎷', '💰', '🖊', '📅',
+                                            '✅', '❎', '💯',
+                                        ],
+                                    },
+                                    history: {
+                                        inDropdown: false,
+                                        className: undefined,
+                                        component: undefined,
+                                        dropdownClassName: undefined,
+                                        options: ['undo', 'redo'],
+                                    },
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
+                    >
+                        Submit
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }
