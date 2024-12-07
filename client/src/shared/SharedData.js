@@ -25,6 +25,12 @@ const nationalities = [
     "Vanuatu", "Vatican City", "Venezuela", "Yemen", "Zambia", "Zimbabwe"
 ];
 
+const cities = [
+    "Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Quảng Ninh", "Khánh Hòa", "Huế", "Cần Thơ", "Phú Quốc", "Nghệ An", "Bình Định", "Hải Phòng",
+    "Thanh Hóa", "Lâm Đồng", "Cà Mau", "Bà Rịa - Vũng Tàu", "Gia Lai", "Đắk Lăk", "Phú Yên", "Quảng Bình", "Quảng Nam", "Điện Biên",
+    "Melbourne"
+];
+
 class Adult {
     constructor(customer_name, dob, gender, nationality, phone_number, email, id_type, id_number, country_issuing, date_expiration, address = '', receive_flight_info = 'none') {
         this.customer_name = customer_name;
@@ -59,4 +65,4 @@ class Infant {
     }
 }
 
-module.exports = {nationalities, Adult, Children, Infant};
+module.exports = {nationalities, cities, Adult, Children, Infant};
