@@ -26,9 +26,9 @@ const nationalities = [
 ];
 
 const cities = [
-    "Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Quảng Ninh", "Khánh Hòa", "Huế", "Cần Thơ", "Phú Quốc", "Nghệ An", "Bình Định", "Hải Phòng",
-    "Thanh Hóa", "Lâm Đồng", "Cà Mau", "Bà Rịa - Vũng Tàu", "Gia Lai", "Đắk Lăk", "Phú Yên", "Quảng Bình", "Quảng Nam", "Điện Biên",
-    "Melbourne"
+    'Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Quảng Ninh', 'Khánh Hòa', 'Huế', 'Cần Thơ', 'Phú Quốc', 'Nghệ An', 'Bình Định', 'Hải Phòng',
+    'Thanh Hóa', 'Lâm Đồng', 'Cà Mau', 'Bà Rịa – Vũng Tàu', 'Gia Lai', 'Đắk Lăk', 'Phú Yên', 'Quảng Bình', 'Quảng Nam', 'Điện Biên',
+    'Melbourne'
 ];
 
 class Adult {
