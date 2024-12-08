@@ -1,6 +1,5 @@
 import Home from "./components/Home/Home";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import Explore from "./components/Explore/Explore";
 import Booking from "./components/Booking/Booking";
 import FlightInfo from "./components/FlightInfo/FlightInfo";
 import MyBooking from "./components/MyBooking/MyBooking";
@@ -16,7 +15,9 @@ import AddFlight from "./components/Admin/AddFlight";
 import SetDelayTime from "./components/Admin/SetDelayTime";
 import AddAircraft from "./components/Admin/AddAircraft";
 import CreatePost from "./components/Admin/CreatePost";
-
+import Destination from "./components/Explore/Destination";
+import Offer from "./components/Explore/Offer";
+import PostDetail from "./components/Explore/PostDetail";
 
 function App() {
     return (
@@ -26,7 +27,10 @@ function App() {
 
                 <Routes>
                     <Route path="/" element={<Home/>}/>
-                    <Route path="/explore/*" element={<Explore/>}/>
+                    <Route path="/destination" element={<Destination/>}/>
+                    <Route path="/destination/:id" element={<PostDetail/>}/>
+                    <Route path="/offer" element={<Offer/>}/>
+                    <Route path="/offer/:id" element={<PostDetail/>}/>
                     <Route path="/booking/*" element={<Booking/>}/>
                     <Route path="/flight-info/*" element={<FlightInfo />} />
                     <Route path="/mybooking/*" element={<MyBooking/>}/>

@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const postSchema = new Schema({
     title: { type: String, required: true },
-    category: { type: String, enum: ['place', 'sale', 'mail', 'normal'], required: true },
+    category: { type: String, enum: ['destination', 'offer', 'mail', 'banner'], required: true },
     thumbnail: {type: Buffer},
     content: { type: String, required: true }
 });

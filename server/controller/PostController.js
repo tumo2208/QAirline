@@ -41,7 +41,7 @@ const listPost = async (req, res) => {
 
 const getPost = async (req, res) => {
     try {
-        const {id} = req.body;
+        const {id} = req.params;
         const post = await Post.findById(id);
         const formattedPost = {
             id: post._id,

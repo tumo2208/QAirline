@@ -10,6 +10,6 @@ const upload = multer({ storage });
 
 router.post('/createPost', userVerification, upload.single('thumbnail'), createPost);
 router.post('/listPost', listPost);
-router.post('/getPost', getPost);
+router.get('/getPost/:id', getPost);
 
 module.exports = router;
