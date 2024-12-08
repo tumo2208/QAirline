@@ -290,12 +290,10 @@ function AdultCard({ index, formData, flightType, handleInputChange }) {
                             <label className="font-semibold block text-gray-700">Loại giấy tờ tùy thân</label>
                             <select 
                                 required
-                                value={flightType ? "Passport" : passenger.id_type}
                                 onChange={(e) => handleInputChange(e, "adults", index, "id_type")}
                                 className="w-full px-3 py-2 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none"
-                                disabled={flightType}
                             >
-                                <option value="Citizen ID">Căn cước công dân</option>
+                                {!flightType && <option value="Citizen ID">Căn cước công dân</option>}
                                 <option value="Passport">Hộ chiếu</option>
                             </select>
                         </div>

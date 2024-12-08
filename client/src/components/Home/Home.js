@@ -1,9 +1,10 @@
 import './Home.css';
-import {useEffect, useState} from "react";
+import {useEffect, useState, useMemo} from "react";
 import {AutocompleteInput} from "../../shared/AutoComplete";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import Loading from '../../shared/Loading';
+import FetchAirportInfo from "../../shared/AirportInfo";
 
 function Home() {
     const location = useLocation();
@@ -51,30 +52,37 @@ function Home() {
         return `${adults} người lớn, ${children} trẻ em, ${infants} trẻ sơ sinh`;
     };
 
-    const [suggestions, setSuggestions] = useState([]);
+    const suggestions = FetchAirportInfo();
 
-    useEffect(() => {
-        const fetchSuggestions = async () => {
-            try {
-                const response = await axios.get("http://localhost:3001/api/airportAircraft/allAirports");
-                setSuggestions(response.data.map((airport) => ({
-                    name: airport.name,
-                    city: airport.city,
-                    airport_code: airport.airport_code
-                })));
-            } catch (error) {
-                console.error("Lỗi lấy thông tin sân bay:", error);
-            }
-        };
-
-        fetchSuggestions();
-    }, []);
+    const cities = useMemo(() => suggestions.map((suggestion) => suggestion.city), [suggestions]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!departure || !destination || !departureDate) {
             alert("Xin hãy điền đầy đủ thông tin.");
+            return;
+        }
+
+        if (departure === destination) {
+            alert("Điểm khởi hành và điểm đến không thể là cùng một địa điểm!");
+            return;
+        }
+
+        if (roundTrip && (returnDate < departureDate)) {
+            alert("Ngày đi không thể muộn hơn ngày về!");
+            return;
+        }
+
+        if (!cities.includes(departure)) {
+            document.querySelector(".departure").value = "";
+            alert("Vui lòng nhập đúng định dạng điểm khởi hành theo gợi ý");
+            return;
+        }
+
+        if (!cities.includes(destination)) {
+            document.querySelector(".destination").value = "";
+            alert("Vui lòng nhập đúng định dạng điểm đến theo gợi ý");
             return;
         }
 
@@ -210,11 +218,12 @@ function Home() {
                                                 <path
                                                     d="M3 18h18v2H3zm18.509-9.473a1.61 1.61 0 00-2.036-1.019L15 9 7 6 5 7l6 4-4 2-4-2-1 1 4 4 14.547-5.455a1.611 1.611 0 00.962-2.018z"/>
                                             </svg>
-                                            <AutocompleteInput 
+                                            <AutocompleteInput
                                                 suggestions={suggestions}
-                                                style="w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
+                                                style={"departure w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"}
                                                 value={departure}
                                                 onChange={(e) => setDeparture(e.target.value)}
+                                                onlyPlaces={false}
                                             />
                                         </div>
                                     </div>
@@ -244,11 +253,12 @@ function Home() {
                                                 <path
                                                     d="M2.5 19h19v2h-19v-2m7.18-5.73l4.35 1.16 5.31 1.42c.8.21 1.62-.26 1.84-1.06.21-.79-.26-1.62-1.06-1.84l-5.31-1.42-2.76-9.03-1.93-.5v8.28L5.15 8.95l-.93-2.32-1.45-.39v5.17l1.6.43 5.31 1.43z"/>
                                             </svg>
-                                            <AutocompleteInput 
+                                            <AutocompleteInput
                                                 suggestions={suggestions}
-                                                style="w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
+                                                style={"destination w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"}
                                                 value={destination}
                                                 onChange={(e) => setDestination(e.target.value)}
+                                                onlyPlaces={false}
                                             />
                                         </div>
                                     </div>

@@ -4,7 +4,6 @@ import axios from "axios";
 import Loading from '../../shared/Loading';
 import logo from "../../logo.svg";
 import unidecode from 'unidecode';
-import { set } from "mongoose";
 
 function ManageBooking() {
     const [activeTab, setActiveTab] = useState("outbound");
@@ -287,7 +286,7 @@ function TicketCard({ticket, flight, class_type, cancel}) {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-xs text-gray-500">Passenger</span>
-                                    <span className="font-mono">{ticket?.customer_details?.customer_name.toUpperCase()}</span>
+                                    <span className="font-mono">{unidecode(ticket?.customer_details?.customer_name.toUpperCase())}</span>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-xs text-gray-500">Seat</span>
