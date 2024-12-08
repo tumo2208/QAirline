@@ -1,9 +1,21 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useMemo} from "react";
 import {AutocompleteInput} from "../../shared/AutoComplete";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useLocation} from "react-router-dom";
 import axios from "axios";
+import FetchAirportInfo from "../../shared/AirportInfo";
+import Loading from '../../shared/Loading';
 
 function HomePage() {
+    const location = useLocation();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location]);
+
+    const {state} = location ? location : null;
+    
+    const [loading, setLoading] = useState(false);
+
     const [roundTrip, setRoundTrip] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [passengers, setPassengers] = useState({
@@ -18,7 +30,26 @@ function HomePage() {
     const [destination, setDestination] = useState("");
     const [departureDate, setDepartureDate] = useState("");
     const [returnDate, setReturnDate] = useState("");
-    const [error, setError] = useState("");
+
+    useEffect(() => {
+        if (state) {
+            setRoundTrip(false);
+            const {depart, arrival, departDate} = state;
+            if (depart) {
+                console.log(depart);
+                setDeparture(depart);
+            }
+        
+            if (arrival) {
+                setDestination(arrival);
+            }
+        
+            if (departDate) {
+                setDepartureDate(departDate);
+            }
+        }
+    }, [state]);
+    
 
     // Hàm tăng/giảm số lượng hành khách
     const handlePassengerChange = (type, operation) => {
@@ -41,24 +72,9 @@ function HomePage() {
         return `${adults} người lớn, ${children} trẻ em, ${infants} trẻ sơ sinh`;
     };
 
-    const [suggestions, setSuggestions] = useState([]);
+    const suggestions = FetchAirportInfo();
 
-    useEffect(() => {
-        const fetchSuggestions = async () => {
-            try {
-                const response = await axios.get("http://localhost:3001/api/airportAircraft/allAirports");
-                setSuggestions(response.data.map((airport) => ({
-                    name: airport.name,
-                    city: airport.city,
-                    airport_code: airport.airport_code
-                })));
-            } catch (error) {
-                console.error("Lỗi trích xuất thông tin sân bay:", error);
-            }
-        };
-
-        fetchSuggestions();
-    }, []);
+    const cities = useMemo(() => suggestions.map((suggestion) => suggestion.city), [suggestions]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -67,6 +83,30 @@ function HomePage() {
             alert("Xin hãy điền đầy đủ thông tin.");
             return;
         }
+
+        if (departure === destination) {
+            alert("Điểm khởi hành và điểm đến không thể là cùng một địa điểm!");
+            return;
+        }
+
+        if (roundTrip && (returnDate < departureDate)) {
+            alert("Ngày đi không thể muộn hơn ngày về!");
+            return;
+        }
+
+        if (!cities.includes(departure)) {
+            document.querySelector(".departure").value = "";
+            alert("Vui lòng nhập đúng định dạng điểm khởi hành theo gợi ý");
+            return;
+        }
+
+        if (!cities.includes(destination)) {
+            document.querySelector(".destination").value = "";
+            alert("Vui lòng nhập đúng định dạng điểm đến theo gợi ý");
+            return;
+        }
+
+        setLoading(true);
 
         try {
             let response;
@@ -102,6 +142,7 @@ function HomePage() {
             navigate("/booking/flight-selection", { state: { flights: null } });
         }
     };
+
     return (
         <div className="py-10" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
             <div className="border-4 mx-20 my-5 rounded-2xl shadow-lg">
@@ -151,7 +192,7 @@ function HomePage() {
                                             </svg>
                                             <AutocompleteInput
                                                 suggestions={suggestions}
-                                                style="w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
+                                                style="departure w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
                                                 value={departure}
                                                 onChange={(e) => setDeparture(e.target.value)}
                                             />
@@ -161,7 +202,7 @@ function HomePage() {
                                         <label className="text-gray-600 text-sm font-medium"> Ngày đi</label>
                                         <input
                                             type="date"
-                                            className="w-full border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
+                                            className="departDate w-full border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
                                             value={departureDate}
                                             onChange={(e) => setDepartureDate(e.target.value)}
                                         />
@@ -185,7 +226,7 @@ function HomePage() {
                                             </svg>
                                             <AutocompleteInput
                                                 suggestions={suggestions}
-                                                style="w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
+                                                style="destination w-full pl-10 border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"
                                                 value={destination}
                                                 onChange={(e) => setDestination(e.target.value)}
                                             />
@@ -358,6 +399,7 @@ function HomePage() {
                     </div>
                 </div>
             </div>
+            {loading && <Loading/>}
         </div>
     )
 }

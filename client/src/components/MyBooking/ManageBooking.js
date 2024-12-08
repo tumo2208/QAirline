@@ -4,7 +4,6 @@ import axios from "axios";
 import Loading from '../../shared/Loading';
 import logo from "../../logo.svg";
 import unidecode from 'unidecode';
-import { set } from "mongoose";
 
 function ManageBooking() {
     const [activeTab, setActiveTab] = useState("outbound");

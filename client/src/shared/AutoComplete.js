@@ -1,27 +1,40 @@
 import React, { useEffect, useRef } from "react";
 import autocompleter from "autocompleter";
 
-export function AutocompleteInput({ suggestions , style, value, onChange}) {
-    const inputRef = useRef(null);
+export function AutocompleteInput({ suggestions , style, value, onChange, onlyPlaces}) {
+    const inputRef = useRef("");
 
     useEffect(() => {
         autocompleter({
             input: inputRef.current,
+            click: e => e.fetch(),
+            keyup: e => e.fetch(),
+            minLength: 0,
             fetch: (text, update) => {
                 const query = text.toLowerCase();
                 const filtered = suggestions.filter((item) => {
-                    return (
-                        item.city.toLowerCase().includes(query) ||
-                        item.name.toLowerCase().includes(query) ||
-                        item.airport_code.toLowerCase().includes(query)
-                    );
+                    if (!onlyPlaces) {
+                        return (
+                            item.city.toLowerCase().includes(query) ||
+                            item.name.toLowerCase().includes(query) ||
+                            item.airport_code.toLowerCase().includes(query)
+                        );
+                    } else {
+                        return (
+                            item.city.toLowerCase().includes(query)
+                        )
+                    }
                 });
 
                 update(query ? filtered : suggestions);
             },
             render: (item) => {
                 const div = document.createElement("div");
-                div.textContent = `[${item.airport_code}] Sân bay ${item.name}, ${item.city}`
+                if (!onlyPlaces) {
+                    div.textContent = `[${item.airport_code}] Sân bay ${item.name}, ${item.city}`;
+                } else {
+                    div.textContent = `${item.city}`;
+                }                
                 div.className = `
                     suggestions-items
                     px-4 py-2
@@ -36,7 +49,7 @@ export function AutocompleteInput({ suggestions , style, value, onChange}) {
                 return div;
             },
             onSelect: (item) => {
-                inputRef.current.value = `${item.city} (${item.airport_code})`;
+                inputRef.current.valueOf = `${item.city}`;
                 const suggestions_items = document.querySelectorAll(".suggestions-items");
                 suggestions_items.forEach((item) => {
                     item.className = "hidden";
@@ -44,7 +57,7 @@ export function AutocompleteInput({ suggestions , style, value, onChange}) {
                 onChange({target : { value: item.city} });
             },
         });
-    }, [suggestions, onChange]);
+    }, [suggestions, onChange, onlyPlaces]);
 
     return (
         <input
