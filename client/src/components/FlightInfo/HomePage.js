@@ -95,7 +95,10 @@ function HomePage() {
                                     ? "bg-blue-500 text-white"
                                     : "bg-gray-300 text-gray-800"
                             }`}
-                            onClick={() => setActiveTab("byPlace")}
+                            onClick={() =>  {
+                                setActiveTab("byPlace");
+                                setCurrentPage(1);
+                            }}
                         >
                             Theo điểm đến
                         </button>
@@ -105,7 +108,10 @@ function HomePage() {
                                     ? "bg-blue-500 text-white"
                                     : "bg-gray-300 text-gray-800"
                             }`}
-                            onClick={() => setActiveTab("byDate")}
+                            onClick={() => {
+                                setActiveTab("byDate");
+                                setCurrentPage(1);
+                            }}
                         >
                             Theo ngày bay
                         </button>
