@@ -55,33 +55,6 @@ app.get("/", (req, res) => {
   res.send("Hello from Node API Server Updated");
 });
 
-let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        type: 'OAuth2',
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PASSWORD,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        refreshToken: process.env.REFRESH_TOKEN,
-    }
-});
-
-let mailOptions = {
-    from: 'bqtrung1001@gmail.com',
-    to: 'qairline203@gmail.com',
-    subject: 'Nodemailer Project',
-    text: 'Hi from your nodemailer project'
-};
-
-transporter.sendMail(mailOptions, function(err, data) {
-    if (err) {
-      console.log("Error " + err);
-    } else {
-      console.log("Email sent successfully");
-    }
-});
-
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URL)
