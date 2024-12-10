@@ -4,7 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const schedule = require('node-schedule');
 const cookieParser = require("cookie-parser");
-// const redisClient = require("./redisClient");
+const nodemailer = require('nodemailer');
 
 // Import routes
 const authRoutes = require("./routes/AuthRoute");
@@ -12,6 +12,7 @@ const airportAircraftRoute = require("./routes/AirportAircraftRoute");
 const postRoute = require('./routes/PostRoute');
 const flightRoute = require("./routes/FlightRoute");
 const bookingRoute = require("./routes/BookingRoute");
+const emailRoute = require('./routes/EmailRoute');
 
 const {updateFlightStatus, updatePrepareFlight} = require("./controller/FlightController");
 
@@ -48,7 +49,7 @@ app.use("/api/airportAircraft", airportAircraftRoute);
 app.use("/api/flights", flightRoute);
 app.use("/api/post", postRoute);
 app.use("/api/bookings", bookingRoute);
-
+app.use("/email", emailRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello from Node API Server Updated");

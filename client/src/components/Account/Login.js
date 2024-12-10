@@ -61,7 +61,7 @@ function Login() {
                             {error && <div className="text-red-500 mt-2">{error}</div>}
 
                             <div className="text-right mt-2">
-                                <Link to="/forgotpassword" className="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700">Quên mật khẩu?</Link>
+                                <Link to="/forgot-password" className="text-sm font-semibold text-gray-700 hover:text-blue-700 focus:text-blue-700">Quên mật khẩu?</Link>
                             </div>
 
                             <button type="submit" className="w-full block bg-blue-500 hover:bg-blue-400 focus:bg-blue-400 text-white font-semibold rounded-lg px-4 py-3 mt-3">
