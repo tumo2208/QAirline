@@ -145,10 +145,10 @@ function HomePage() {
 
     return (
         <div className="py-10" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
-            <div className="border-4 mx-20 my-5 rounded-2xl shadow-lg">
-                <div className="h-full flex flex-row p-5"
+            <div className="border-4 lg:mx-20 sm:mx-5 my-5 rounded-2xl shadow-lg">
+                <div className="flex flex-row p-5"
                      style={{backgroundColor: "#d9f2ff"}}>
-                    <div style={{flex: 2}}>
+                    <div className="flex-1">
                         <div className="max-w-md mx-auto my-10 bg-white rounded-xl shadow-lg p-6">
                             <form className="space-y-3" onSubmit={handleSubmit}>
                                 <div className="space-x-5">
@@ -388,11 +388,10 @@ function HomePage() {
                         </div>
                     </div>
                     <div
-                        className="md:block lg:block hidden"
-                        style={{flex: 2}}
+                        className="lg:flex hidden px-5 items-center object-cover object-center flex-1"
                     >
                         <img
-                            className=" w-full rounded-2xl object-cover object-center"
+                            className="w-full m-auto rounded-2xl"
                             src="/images/intro.gif"
                             alt=""
                         />

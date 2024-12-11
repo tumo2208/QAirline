@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import Loading from '../../shared/Loading';
+import BookingHistory from "./BookingHistory";
 
 function HomePage(){
     const [activeTab, setActiveTab] = useState("searchbooking");
@@ -43,7 +44,7 @@ function HomePage(){
     return (
         <div>
             <div className="py-10" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
-            <div className="  border-4 mx-60 my-5 rounded-2xl shadow-lg">
+            <div className="border-4 mx-auto max-w-5xl my-5 rounded-2xl shadow-lg">
                 <div className="flex select-none cursor-pointer justify-between text-white text-center w-full font-bold">
                     <button
                         className={`text-lg rounded-tl-lg w-1/2 py-3 ${
@@ -70,14 +71,14 @@ function HomePage(){
                     {activeTab === "searchbooking" && (
                         <div className="relative">
                             <img
-                                className="w-full h-full md:block lg:block hidden rounded-b-2xl object-fit object-center"
+                                className="w-full h-full md:block lg:block  rounded-b-2xl object-fit object-center"
                                 style={{height: "500px"}}
                                 src="https://i.imgur.com/6nhgeK0.png"
                                 alt=""
                             />
-                            <div className="absolute bottom-32 left-24  px-4 py-5 sm:p-0">
-                                <h2 className="text-3xl font-bold text-center text-[#002D74]">NHẬP MÃ ĐẶT CHỖ</h2>
-                                <form className="space-y-7 p-12" onSubmit={handleSubmit}>
+                            <div className="max-w-sm absolute lg:bottom-24 lg:left-24 md:bottom-24 md:left-24 left-10 bottom-10 rounded-2xl bg-gray-100 md:bg-transparent lg:bg-transparent  lg:px-4 lg:py-5 md:px-4 md:py-5 p-20">
+                                <h2 className="lg:text-3xl md:text-3xl text-xl font-bold text-center text-[#002D74]">NHẬP MÃ ĐẶT CHỖ</h2>
+                                <form className="space-y-7 py-12" onSubmit={handleSubmit}>
                                     <div>
                                         <label className="text-gray-600 text-left text-sm font-medium"> Mã đặt chỗ</label>
                                         <input type="text"
@@ -98,23 +99,9 @@ function HomePage(){
                     )}
                     {
                         activeTab === "bookinghistory" && (
-                            <div className="relative">
-                            <img
-                                className="w-full h-full md:block lg:block hidden rounded-b-2xl object-fit object-center"
-                                style={{height: "500px"}}
-                                src="https://i.imgur.com/6nhgeK0.png"
-                                alt=""
-                            />
-                            <div className="absolute bottom-56 left-24 flex flex-col space-y-10  px-4 py-5 sm:p-0">
-                                <h2 className="text-3xl font-bold text-center text-[#002D74]">ĐI TỚI LỊCH SỬ ĐẶT CHỖ</h2>
-                                <button
-                                        type="submit"
-                                        onClick={() => navigate("/mybooking/booking-history")}
-                                        className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg p-3">
-                                        Tiếp tục <span className="ml-2 font-bold text-lg">→</span>
-                                    </button>
+                            <div className=" bg-gray-100">
+                                <BookingHistory/>
                             </div>
-                        </div>
                         )
                     }
                 </div>

@@ -13,7 +13,7 @@ function BookingSuccessful() {
       }, [location]);
 
     return (
-        <div className="bg-white px-60 pb-40 flex flex-col items-center justify-center space-y-10">
+        <div className="bg-white mx-auto px-10 mb-32 max-w-5xl flex flex-col items-center justify-center space-y-10">
             <div>
                 <img
                     src={logo}
@@ -22,10 +22,10 @@ function BookingSuccessful() {
                 />
             </div>
             <div className="flex flex-col space-y-4 pb-4">
-                <h2 className="text-5xl font-bold text-center text-[#002D74]">Chúc mừng, bạn đã đặt chỗ thành công !</h2>
-                <p className="text-3xl font-bold text-center">Mã đặt chỗ của bạn là: <span className="text-yellow-600">{bookingID}</span></p>
+                <h2 className="lg:text-5xl md:text-4xl text-3xl font-bold text-center text-[#002D74]">Chúc mừng, bạn đã đặt chỗ thành công !</h2>
+                <p className="text-2xl md:text-3xl lg:text-3xl font-bold text-center">Mã đặt chỗ của bạn là: <span className="text-yellow-600">{bookingID}</span></p>
             </div>
-            <div className="text-lg text-center">
+            <div className="lg:text-lg md:text-lg text-md text-center">
                 <i>Nếu bạn muốn xem lại thông tin của các vé đã đặt hoặc hủy vé, hãy tra cứu mã đặt chỗ này ở <Link to="/" className="font-semibold underline text-blue-500 hover:text-blue-700 focus:text-blue-700">Trang chủ</Link> ➡️ Quản lý đặt chỗ
                  <strong> HOẶC</strong> <Link to="/mybooking" className="font-semibold underline text-blue-500 hover:text-blue-700 focus:text-blue-700">Vé của tôi</Link> ➡️ Tra cứu mã đặt chỗ</i>
             </div>

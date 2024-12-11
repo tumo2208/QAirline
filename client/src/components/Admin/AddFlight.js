@@ -58,21 +58,21 @@ function AddFlight() {
     return (
         <div className="flight-form-container">
             <div
-                className="relative flex items-center justify-center bg-center bg-cover"
+                className="relative w-full mx-auto flex items-center justify-center bg-center bg-cover"
                 style={{
                     backgroundImage:
                         "url('https://lindaontherun.com/wp-content/uploads/2021/07/How-to-avoid-getting-sick-on-a-plane-flying.jpg')",
                 }}
             >
-                <div className="bg-gray-100 p-10 my-14 flex rounded-2xl shadow-lg max-w-4xl">
-                    <div className="px-5">
+                <div className="bg-gray-100 p-10 my-14 mx-auto flex rounded-2xl shadow-lg max-w-3xl">
+                    <div className="px-5 w-full mx-auto">
                         {success && <p className="text-green-500">{success}</p>}
                         {error && <p className="text-red-500 mt-4">{error}</p>}
                         <h2 className="text-3xl font-bold text-[#002D74]">Thông tin chuyến bay</h2>
 
                         <form className="mt-6 space-y-4 flex flex-col" onSubmit={handleSubmit}>
-                            <div>
-                                <label className="font-semibold block text-gray-700">Mã chuyến bay</label>
+                            <div className="flex flex-col">
+                                <label className="font-semibold text-gray-700">Mã chuyến bay</label>
                                 <input
                                     type="text"
                                     name="flightID"
@@ -129,7 +129,7 @@ function AddFlight() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-row space-x-4">
+                            <div className="flex lg:flex-row md:flex-row flex-col lg:space-x-4 md:space-x-4 space-y-4 md:space-y-0 lg:space-y-0">
                                 <div className="flex-1">
                                     <label className="font-semibold block text-gray-700">Thời gian cất cánh</label>
                                     <input
