@@ -6,7 +6,7 @@ function BookingInfo({ outboundFlight, returnFlight, tripType, passengers }) {
 
     const totalCost = (outboundCost + returnCost) * (passengers.adults + passengers.children + 0.1 * passengers.infants);
     return (
-        <div className="sticky top-20 my-8 mx-16 bg-white">
+        <div className="sticky top-20 my-8 max-w-sm justify-center mx-auto bg-white">
             <div className="bg-blue-800 text-white text-center font-bold py-2 rounded-t-lg">
                 THÔNG TIN ĐẶT CHỖ
             </div>

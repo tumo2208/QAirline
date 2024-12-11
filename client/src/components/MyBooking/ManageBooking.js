@@ -147,7 +147,7 @@ function ManageBooking() {
                 <h2 className="text-5xl font-bold text-center text-[#002D74]">Mã đặt chỗ của bạn là</h2>
                 <p className="text-3xl font-bold text-center">{booking?.booking_id}</p>
             </div>
-            <div className="p-10 bg-gray-100 min-h-screen flex flex-col items-center">
+            <div className="py-10 bg-gray-100 min-h-screen flex flex-col items-center">
                 {roundTrip && (
                     <div className="flex space-x-4 mb-6">
                         <button
@@ -173,7 +173,7 @@ function ManageBooking() {
                     </div>
                 )}
 
-                <div className="w-full">
+                <div className="lg:w-full md:w-full">
                     {activeTab === "outbound" && (
                         <div>
                             {Array.from({length: booking?.outbound_tickets?.length}).map((_, index) => (
@@ -221,12 +221,12 @@ function TicketCard({ticket, flight, class_type, cancel}) {
     };
 
     return (
-        <div className="bg-white border-4 p-2 mx-52 rounded-2xl shadow-lg">
-            <div className="flex flex-row">
+        <div className="bg-white border-4 p-2 lg:mx-auto md:mx-auto mx-0 max-w-5xl rounded-2xl shadow-lg">
+            <div className="flex flex-col lg:flex-row">
                 <div className="w-full flex-grow flex items-center justify-center p-4"
                      style={{flex: 5}}>
                     <div className="flex w-full max-w-3xl text-zinc-50 h-64">
-                        <div className="h-full bg-blue-900 flex items-center justify-center rounded-l-3xl">
+                        <div className="h-full bg-blue-900 hidden lg:flex md:flex items-center justify-center rounded-l-3xl">
                             <img
                                 src={logo}
                                 className="text-white sm:h-11 rotate-[270deg] filter invert"
@@ -240,7 +240,7 @@ function TicketCard({ticket, flight, class_type, cancel}) {
                         </div>
                         <div
                             className="h-full py-4 px-10 bg-blue-100 text-black flex-grow rounded-r-3xl flex flex-col">
-                            <div className="text-center text-yellow-600 text-4xl" style={{fontFamily: "Pacifico"}}>
+                            <div className="text-center text-yellow-600 lg:text-4xl md:text-4xl text-2xl" style={{fontFamily: "Pacifico"}}>
                                 {class_type} Class
                             </div>
                             <div className="flex mt-8 w-full justify-between items-center">

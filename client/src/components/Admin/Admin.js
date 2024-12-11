@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 function AdminPage() {
     return (
         <div className="admin flex flex-col items-center justify-top min-h-screen bg-gray-100">
-            <h1 className="text-4xl font-bold text-blue-600 mb-8">
+            <h1 className="text-4xl font-bold text-blue-600 my-8">
                 Chào mừng quản trị viên!
             </h1>
             <div className="flex flex-col space-y-4">

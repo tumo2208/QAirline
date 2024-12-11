@@ -117,7 +117,7 @@ function FlightSelection() {
 
     return (
         <div>
-            <div className="bg-gray-100 flex">
+            <div className="bg-gray-100 flex flex-col lg:flex-row">
                 <link rel="preconnect" href="https://fonts.googleapis.com"/>
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true"/>
                 <link
@@ -127,20 +127,20 @@ function FlightSelection() {
                      style={{flex: 7}}>
                     {showOutbound ? (
                         <div>
-                            <div className="sticky top-20 z-20 bg-yellow-100 p-6 rounded-lg shadow-lg mb-6">
+                            <div className="sticky top-20 z-8 bg-sky-200 p-6 rounded-lg shadow-lg mb-6">
                                 <div className="flex items-center justify-between"
                                      style={{fontFamily: "Barlow Condensed"}}>
-                                    <div className="flex flex-col items-center justify-center">
+                                    <div className="lg:flex flex-col whitespace-nowrap hidden items-center justify-center">
                                         <div className="text-2xl font-semibold">
                                             📅 Ngày
                                         </div>
                                         <p className="text-lg">{convertDateFormat(outboundFlights[0].departure_time)}</p>
                                     </div>
-                                    <div className="flex items-center justify-center space-x-4">
+                                    <div className="flex items-center justify-center mx-auto space-x-4">
                                         <div className="text-3xl font-bold">
                                             {outboundFlights[0]?.departure_airport?.city || "Depart"}
                                         </div>
-                                        <div className="px-10 text-blue-600">
+                                        <div className="lg:px-10 sm:px-5 text-blue-600">
                                             <svg
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
@@ -155,7 +155,7 @@ function FlightSelection() {
                                             {outboundFlights[0]?.arrival_airport?.city || "Arrival"}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-center justify-center">
+                                    <div className="lg:flex flex-col hidden whitespace-nowrap items-center justify-center">
                                         <div className="text-2xl font-semibold">
                                             👫 Số hành khách
                                         </div>
@@ -172,20 +172,20 @@ function FlightSelection() {
                         </div>
                     ) : (
                         <div>
-                            <div className="sticky top-20 z-20 bg-yellow-100 p-6 rounded-lg shadow-lg mb-6">
+                            <div className="sticky top-20 z-8 bg-sky-200 p-6 rounded-lg shadow-lg mb-6">
                                 <div className="flex items-center justify-between"
                                      style={{fontFamily: "Barlow Condensed"}}>
-                                    <div className="flex flex-col items-center justify-center">
+                                    <div className="lg:flex flex-col whitespace-nowrap hidden items-center justify-center">
                                         <div className="text-2xl font-semibold">
                                             📅 Ngày
                                         </div>
                                         <p className="text-lg">{convertDateFormat(returnFlights[0].arrival_time)}</p>
                                     </div>
-                                    <div className="flex items-center justify-center space-x-4">
+                                    <div className="flex items-center justify-center mx-auto space-x-4">
                                         <div className="text-3xl font-bold">
                                             {returnFlights[0]?.departure_airport?.city || "Depart"}
                                         </div>
-                                        <div className="px-10 text-blue-600">
+                                        <div className="lg:px-10 sm:px-5 text-blue-600">
                                             <svg
                                                 viewBox="0 0 20 20"
                                                 fill="currentColor"
@@ -200,7 +200,7 @@ function FlightSelection() {
                                             {returnFlights[0]?.arrival_airport?.city || "Arrival"}
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-center justify-center">
+                                    <div className="lg:flex flex-col hidden whitespace-nowrap items-center justify-center">
                                         <div className="text-2xl font-semibold">
                                             👫 Số hành khách
                                         </div>
@@ -223,35 +223,35 @@ function FlightSelection() {
                                  passengers={passengers}/>
                 </div>
             </div>
-            <div className="sticky bottom-0 z-20 bg-blue-200 p-5 rounded-lg shadow-lg">
-                <div className="flex w-full items-center justify-between">
-                    <div className="text-left mx-8">
+            <div className="sticky bottom-0 z-20 bg-blue-200 py-5 px-0 lg:px-5 md:px-5 rounded-lg shadow-lg">
+                <div className="flex items-center justify-between">
+                    <div className="text-left lg:mx-8 md:mx-8 mx-4 ">
                         <button
                             type="button"
                             className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
                             onClick={() => handleBack()}
                         >
-                            <span className="mr-2 font-bold text-lg">←</span>
+                            <span className="mr-2 font-bold lg:text-lg md:text-lg text-xs">←</span>
                             Quay lại
                         </button>
                     </div>
-                    <div className="flex items-center justify-center">
-                        <div className="text-center mx-8">
-                            <p className="font-bold text-2xl"
+                    <div className="flex items-center justify-center ">
+                        <div className="text-center lg:mx-8 md:mx-8 mx-4">
+                            <p className="font-bold lg:text-2xl md:text-2xl text-lg"
                                style={{fontFamily: "Barlow Condensed"}}>Tổng chi phí</p>
-                            <p className="font-bold text-red-700 text-lg">{new Intl.NumberFormat("en-US", {
+                            <p className="font-bold text-red-700 lg:text-lg md:text-lg text-md">{new Intl.NumberFormat("en-US", {
                                 style: "currency",
                                 currency: "VND"
                             }).format(totalCost)}</p>
                         </div>
-                        <div className="text-right mx-8">
+                        <div className="text-right lg:mx-8 md:mx-8 mx-4 ">
                             <button
                                 type="button"
                                 className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
                                 onClick={() => handleNext()}
                             >
                                 Tiếp theo
-                                <span className="ml-2 font-bold text-lg">→</span>
+                                <span className="ml-2 font-bold lg:text-lg md:text-lg text-xs">→</span>
                             </button>
                         </div>
                     </div>
@@ -264,35 +264,48 @@ function FlightSelection() {
 function FlightCard({flight, onSelect}) {
     return (
         <div>
-            <div className="bg-white rounded-lg shadow flex justify-between">
-                <div className="p-6">
-                    <p className="text-center">{flight.flight_number}</p>
-                    <p className="px-4 text-2xl font-bold">{new Date(flight.departure_time).toLocaleTimeString("en-GB", {
+            <div className="bg-white rounded-lg shadow flex flex-col lg:flex-row md:flex-row justify-between">
+                <div className="px-6 py-10 flex flex-row space-x-4 justify-between lg:w-full">
+                    <div className="text-center lg:whitespace-nowrap md:whitespace-nowrap whitespace-normal">
+                        <p className="px-4 text-2xl font-bold">{new Date(flight.departure_time).toLocaleTimeString("en-GB", {
                         hour: "2-digit",
                         minute: "2-digit",
-                    })} ---------------╰┈➤--------------- {new Date(flight.arrival_time).toLocaleTimeString("en-GB", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    })}</p>
-                    <div className="flex w-full justify-between">
-                        <div className="text-sm font-semibold text-left text-gray-500">
+                        })} </p>
+                        <div className="text-sm font-semibold text-center text-gray-500">
                             <p>Sân bay {flight?.departure_airport?.name}</p>
-                            <p className="pl-8">{flight.departure_airport_id}</p>
-                        </div>
-                        <div className="text-sm font-semibold text-right text-gray-500">
-                            <p>Sân bay {flight?.arrival_airport?.name}</p>
-                            <p className="pr-8">{flight.arrival_airport_id}</p>
+                            <p>{flight.departure_airport_id}</p>
                         </div>
                     </div>
-                    <p className="text-md text-center text-gray-500">⏱ Thời gian
-                        bay {flightDuration(flight.departure_time, flight.arrival_time)}</p>
+                    <div className="w-full">
+                        <p className="text-center">{flight.flight_number}</p>
+                        <div className="flex items-center text-2xl mb-2">
+                            <div className="w-3 h-3 rounded-full border-2 border-zinc-900"></div>
+                            <div
+                                className="flex-grow border-t-2 border-zinc-400 border-dotted h-px"></div>
+                            ╰┈➤
+                            <div
+                                className="flex-grow border-t-2 border-zinc-400 border-dotted h-px"></div>
+                            <div className="w-3 h-3 rounded-full border-2 border-zinc-900"></div>
+                        </div>
+                        <p className="text-md text-center text-gray-500">⏱ Thời gian bay {flightDuration(flight.departure_time, flight.arrival_time)}</p>
+                    </div>
+                    <div className="text-center lg:whitespace-nowrap md:whitespace-nowrap whitespace-normal">
+                        <p className="px-4 text-2xl font-bold">{new Date(flight.arrival_time).toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })}</p>
+                        <div className="text-sm font-semibold text-gray-500">
+                            <p>Sân bay {flight?.arrival_airport?.name}</p>
+                            <p>{flight.arrival_airport_id}</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                <div
-                        className="text-center p-5 flex flex-col space-y-2 rounded w-full h-full bg-blue-400 relative">
+                <div className="flex items-center lg:w-2/3 md:w-1/2 sm:w-full justify-between space-x-2 whitespace-nowrap">
+                    <div
+                        className="text-center w-1/2 min-w-40 p-5 flex flex-col space-y-3 rounded h-full bg-blue-400">
                         <p className="font-bold text-white text-lg">Phổ thông</p>
-                        <hr className="w-32"/>
+                        <hr className="w-full"/>
                         <p className="font-bold whitespace-nowrap">{new Intl.NumberFormat("en-US", {
                             style: "currency",
                             currency: "VND"
@@ -300,16 +313,16 @@ function FlightCard({flight, onSelect}) {
                         <i className="text-sm text-white">Còn {flight.available_seats[0]?.seat_count} ghế</i>
                         {flight.available_seats[0]?.seat_count > 0 && (
                             <button
-                            className="absolute bottom-4 right-11 lg:hover:scale-110 text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-md"
+                            className="hover:scale-110 text-xs font-bold text-white bg-green-500 mx-auto px-2 py-1 rounded-md"
                             onClick={() => onSelect(flight, "Economy")}>
                             LỰA CHỌN
                         </button>
                         )}
                     </div>
                     <div
-                        className="relative space-y-2 text-center flex flex-col p-5 rounded w-full h-full bg-yellow-300">
+                        className="text-center w-1/2 min-w-40 p-5 flex flex-col space-y-3 rounded h-full bg-yellow-300">
                         <p className="font-bold text-red-700 text-lg">Thương gia</p>
-                        <hr className="border-red-500 w-32"/>
+                        <hr className="border-red-500 w-full"/>
                         <p className="font-bold whitespace-nowrap">{new Intl.NumberFormat("en-US", {
                             style: "currency",
                             currency: "VND"
@@ -317,7 +330,7 @@ function FlightCard({flight, onSelect}) {
                         <i className="text-sm text-red-500">Còn {flight.available_seats[1]?.seat_count} ghế</i>
                         {flight.available_seats[1]?.seat_count > 0 && (
                             <button
-                            className="absolute bottom-4 right-11 text-xs lg:hover:scale-110 font-bold text-white bg-green-600 px-2 py-1 rounded-md"
+                            className="text-xs lg:hover:scale-110 font-bold text-white bg-green-500 px-2 py-1 mx-auto rounded-md"
                             onClick={() => onSelect(flight, "Business")}>
                             LỰA CHỌN
                         </button>

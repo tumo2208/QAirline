@@ -21,6 +21,11 @@ function HomePage() {
     const [currentPage, setCurrentPage] = useState(1);
     
 
+    /**
+     * Fetches flights by arrival city
+     * @param {string} destination Arrival city
+     * @returns {Promise<void>}
+     */
     const searchByPlace = async () => {
         try {
             setPlaceResults([]);
@@ -37,6 +42,11 @@ function HomePage() {
         }
     }
 
+    /**
+     * Fetches flights by departure date
+     * @param {string} departureDate - Departure date in the format "YYYY-MM-DD"
+     * @returns {Promise<void>}
+     */
     const searchByDate = async () => {
         try {
             setDateResults([]);
@@ -53,17 +63,29 @@ function HomePage() {
         }
     }
 
+    /**
+     * Handles pagination by changing the current page number and scrolling to the top of the page.
+     * @param {number} pageNumber - The page number to navigate to.
+     */
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
         window.scrollTo(0, 0);
     };
 
+    /**
+     * Renders a list of flight results for the current page.
+     * Pagination is applied based on the current page and page size.
+     * Each flight is displayed using the FlightCard component.
+     *
+     * @param {Array} typeResults - The array of flight results to be displayed.
+     * @returns {JSX.Element} A JSX element containing the flight results for the current page.
+     */
     const renderResults = (typeResults) => {
         const startIndex = (currentPage - 1) * pageSize;
         const endIndex = startIndex + pageSize;
         const results = typeResults.slice(startIndex, endIndex);
         return (
-            <div class="flex px-16 py-5 space-y-4 flex-col">
+            <div class="flex mx-auto max-w-5xl py-5 space-y-4 flex-col">
                 {results.map((flight) => (
                     <FlightCard flight={flight} onSelect={handleSelect} />
                 ))}
@@ -72,6 +94,10 @@ function HomePage() {
     };
     
 
+    /**
+     * Handles when a flight is selected from the search results.
+     * @param {object} flight - The flight object that was selected.
+     */
     const handleSelect = (flight) => {
         navigate("/booking", {
                 state: {
@@ -85,8 +111,8 @@ function HomePage() {
 
     return (
         <div>
-            <div className="py-10 px-40" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
-                <div className="bg-gray-100 rounded-2xl shadow-lg p-5 w-full">
+            <div className="py-10 justify-center items-center" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
+                <div className="bg-gray-100 max-w-6xl mx-auto justify-center rounded-2xl shadow-lg p-5 w-full">
                     <h2 className="text-5xl font-bold text-center text-[#002D74]">Thông tin chuyến bay</h2>
                     <div className="flex justify-center items-center space-x-4 m-6">
                         <button
@@ -219,53 +245,86 @@ function HomePage() {
     )
 }
 
+/**
+ * A component that renders a card for a flight
+ * @param {{flight: Object, onSelect: Function}} props
+ * @param {Object} props.flight - The flight object
+ * @param {Function} props.onSelect - The function to call when the card is clicked
+ * @returns {ReactElement} The component
+ */
 function FlightCard({flight, onSelect}) {
     return (
         <div>
-            <div className="bg-white rounded-lg shadow-lg flex items-center justify-between border-2">
-                <div className="flex flex-col h-full p-6 space-y-1">
-                    <div className="text-center text-green-500 text-lg font-semibold whitespace-nowrap">Ngày bay</div>
-                    <div className="text-center whitespace-nowrap">{convertDateFormat(flight.departure_time)}</div>
-                </div>
-                <div className="p-6">
-                    <p className="text-center">{flight.flight_number}</p>
-                    <p className="px-4 text-2xl font-bold">{new Date(flight.departure_time).toLocaleTimeString("en-GB", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    })} ------------╰┈➤------------ {new Date(flight.arrival_time).toLocaleTimeString("en-GB", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    })}</p>
-                    <div className="flex w-full justify-between">
-                        <div className="text-sm font-semibold text-left text-gray-500">
-                            <p>Sân bay {flight?.departure_airport?.name}</p>
-                            <p className="pl-4">{flight.departure_airport?.city}</p>
+            <div className="bg-white w-full rounded-lg shadow-lg px-6 py-6 md:py-0 lg:py-0 flex lg:flex-row md:flex-row flex-col items-center space-x-10 justify-between border-2">
+                <div className="flex items-center w-full">
+                    <div className="flex flex-col mr-6 h-full space-y-1">
+                        <div className="text-center text-green-500 text-lg font-semibold whitespace-nowrap">Ngày bay</div>
+                        <div className="text-center whitespace-nowrap">{convertDateFormat(flight.departure_time)}</div>
+                    </div>
+                    <div className="py-10 flex flex-row space-x-2 justify-between w-full">
+                        <div className="text-center lg:whitespace-nowrap md:whitespace-nowrap whitespace-normal">
+                            <p className="px-4 text-2xl font-bold">{new Date(flight.departure_time).toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            })} </p>
+                            <div className="text-sm font-semibold text-center text-gray-500">
+                                <p>Sân bay {flight?.departure_airport?.name}</p>
+                                <p>{flight.departure_airport?.city}</p>
+                            </div>
                         </div>
-                        <div className="text-sm font-semibold text-right text-gray-500">
-                            <p>Sân bay {flight?.arrival_airport?.name}</p>
-                            <p className="pr-4">{flight.arrival_airport?.city}</p>
+                        <div className="w-full">
+                            <p className="text-center">{flight.flight_number}</p>
+                            <div className="flex items-center text-2xl">
+                                <div className="w-3 h-3 rounded-full border-2 border-zinc-900"></div>
+                                <div
+                                    className="flex-grow border-t-2 border-zinc-400 border-dotted h-px"></div>
+                                ╰┈➤
+                                <div
+                                    className="flex-grow border-t-2 border-zinc-400 border-dotted h-px"></div>
+                                <div className="w-3 h-3 rounded-full border-2 border-zinc-900"></div>
+                            </div>
+                        </div>
+                        <div className="text-center lg:whitespace-nowrap md:whitespace-nowrap whitespace-normal">
+                            <p className="px-4 text-2xl font-bold">{new Date(flight.arrival_time).toLocaleTimeString("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}</p>
+                            <div className="text-sm font-semibold text-gray-500">
+                                <p>Sân bay {flight?.arrival_airport?.name}</p>
+                                <p>{flight.arrival_airport?.city}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col h-full p-6 space-y-1">
+
+                <div className="lg:flex flex-col hidden h-full space-y-1">
                     <div className="text-center text-red-500 text-lg font-semibold whitespace-nowrap">Giá vé chỉ từ</div>
                     <div className="text-center whitespace-nowrap"><i>{new Intl.NumberFormat("en-US", {
                     style: "currency",
                     currency: "VND"
                 }).format(flight.available_seats[0]?.price)} VND</i></div>
                 </div>
-                <button
+
+                <div>
+                    <button
                         type="button"
                         onClick = {() => onSelect(flight)}
-                        className=" m-auto items-center py-2.5 px-6 text-sm rounded-lg bg-yellow-500 cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:bg-yellow-600 hover:scale-110"
+                        className="whitespace-nowrap mx-auto items-center py-2.5 px-6 text-sm rounded-lg bg-yellow-500 cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:bg-yellow-600 hover:scale-110"
                     >
                         ĐẶT VÉ NGAY
                     </button>
+                </div>
+                
             </div>
         </div>
     );
 }
 
+/**
+ * Converts a date in milliseconds to the format DD/MM/YYYY
+ * @param {number} timeInput - The date in milliseconds
+ * @returns {string} The date in the format DD/MM/YYYY
+ */
 function convertDateFormat(timeInput) {
     const date = new Date(timeInput);
     const day = String(date.getDate()).padStart(2, '0');
@@ -275,6 +334,11 @@ function convertDateFormat(timeInput) {
     return `${day}/${month}/${year}`;
 }
 
+/**
+ * Converts a date in milliseconds to the format YYYY-MM-DD
+ * @param {number} timeInput - The date in milliseconds
+ * @returns {string} The date in the format YYYY-MM-DD
+ */
 function formatDate(timeInput) {
     const date = new Date(timeInput);
     const day = String(date.getDate()).padStart(2, '0');
