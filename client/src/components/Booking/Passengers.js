@@ -88,6 +88,42 @@ function Passengers() {
 
                 if (response.status === 200) {
                     const result = await response.data;
+                    for (let i = 0; i < BookingData.adultList.length; i++) {
+                        const person = BookingData.adultList[i];
+                        if (person && person.email) {
+                            const emailData = {
+                                email: person.email,
+                                subject: "QAriline - Xác nhận đặt chỗ",
+                                content:`
+                                    <div style="font-family: Arial, sans-serif; color: #333;">
+                                        <h1 style="color: #0066cc;">Chúc mừng bạn!</h1>
+                                        <p style="font-size: 16px;">
+                                            Bạn đã đặt chỗ thành công với mã đặt chỗ: 
+                                            <strong style="color: #ff6600;">${result.bookingID}</strong>.
+                                        </p>
+                                        <p style="font-size: 14px;">
+                                            Vui lòng giữ mã đặt chỗ này để tra cứu thông tin hoặc hủy vé nếu cần.
+                                        </p>
+                                        <div style="margin-top: 20px; padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9;">
+                                            <p>
+                                                Để xem chi tiết, vui lòng truy cập: 
+                                                <a href="http://localhost:3000/mybooking" style="color: #0066cc; text-decoration: none;">
+                                                    Tra cứu vé đặt chỗ
+                                                </a>
+                                            </p>
+                                        </div>
+                                        <p style="margin-top: 20px;">
+                                            Cảm ơn bạn đã sử dụng dịch vụ của <strong>QAriline</strong>!
+                                        </p>
+                                        <footer style="font-size: 12px; color: #777; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">
+                                            Đây là email tự động, vui lòng không trả lời trực tiếp. Nếu bạn cần hỗ trợ, vui lòng liên hệ <a href="mailto:support@qariline.com" style="color: #0066cc;">support@qariline.com</a>.
+                                        </footer>
+                                    </div>
+                                `
+                            };
+                            await axios.post("http://localhost:3001/email/send", emailData, { withCredentials: true });
+                        }
+                    }
                     navigate("/booking/booking-successfully", { state: { bookingID: result.bookingID }});
                 } else {
                     alert("Booking thất bại " + response.data.message);
@@ -105,8 +141,23 @@ function Passengers() {
         return (
             validatePassengers(formData.adults) &&
             validatePassengers(formData.children) &&
-            validatePassengers(formData.infants)
+            validatePassengers(formData.infants) && validateEmail()
         );
+    };
+
+    const validateEmail = () => {
+        for (let i = 0; i < formData.adults.length; i++) {
+            if (!isValidEmail(formData.adults[i].email)) {
+                alert(`Email không hợp lệ`);
+                return false;
+            }
+        }
+        return true;
+    };
+
+    const isValidEmail = (email) => {
+        const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+        return emailRegex.test(email);
     };
 
     const validatePassengers = (passengersArray) => {
