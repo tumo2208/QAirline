@@ -18,6 +18,7 @@ import CreatePost from "./components/Admin/CreatePost";
 import Destination from "./components/Explore/Destination";
 import Offer from "./components/Explore/Offer";
 import PostDetail from "./components/Explore/PostDetail";
+import ViewStatistic from "./components/Admin/ViewStatistic";
 
 function App() {
     return (
@@ -31,6 +32,7 @@ function App() {
                     <Route path="/destination/:id" element={<PostDetail/>}/>
                     <Route path="/offer" element={<Offer/>}/>
                     <Route path="/offer/:id" element={<PostDetail/>}/>
+                    <Route path="/banner/:id" element={<PostDetail/>}/>
                     <Route path="/booking/*" element={<Booking/>}/>
                     <Route path="/flight-info/*" element={<FlightInfo />} />
                     <Route path="/mybooking/*" element={<MyBooking/>}/>
@@ -44,6 +46,7 @@ function App() {
                     <Route path="/admin/setDelayTime" element={<SetDelayTime/>}/>
                     <Route path="/admin/addAircraft" element={<AddAircraft/>}/>
                     <Route path="/admin/createPost" element={<CreatePost/>}/>
+                    <Route path="/admin/viewStatistic" element={<ViewStatistic/>}/>
                 </Routes>
 
                 <AppFooter/>

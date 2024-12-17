@@ -1,8 +1,8 @@
 import './Home.css';
-import {useEffect, useState, useMemo} from "react";
+import React, {useEffect, useState, useMemo} from "react";
 import {AutocompleteInput} from "../../shared/AutoComplete";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import {useNavigate, useLocation, Link} from "react-router-dom";
 import Loading from '../../shared/Loading';
 import FetchAirportInfo from "../../shared/AirportInfo";
 
@@ -113,6 +113,7 @@ function Home() {
                         flights: response.data,
                         tripType: roundTrip ? "round-trip" : "one-way",
                         passengers: passengers,
+                        searchInfo: requestBody,
                     }
                 });
             } else {
@@ -153,6 +154,61 @@ function Home() {
             navigate("/mybooking/manage-booking", { state: null });
         }
     }
+
+    const [destinations, setDestinations] = useState([]);
+    const [loadingDestination, setLoadingDestination] = useState(true);
+    const [banners, setBanners] = useState([]);
+
+    useEffect(() => {
+        const fetchDestinations = async () => {
+            try {
+                setLoadingDestination(true);
+                const response = await axios.post("http://localhost:3001/api/post/listPost", {
+                    category: "destination",
+                });
+                setDestinations(response.data);
+                setLoadingDestination(false);
+            } catch (err) {
+                console.error("Error fetching destinations:", err);
+                setLoadingDestination(false);
+            }
+        };
+
+        const fetchBanners = async () => {
+            try {
+                const response = await axios.post('http://localhost:3001/api/post/listPost', {
+                    category: "banner",
+                });
+                setBanners(response.data);
+            } catch (error) {
+                console.error('Lỗi khi lấy bài đăng:', error);
+            }
+        };
+
+        fetchDestinations();
+        fetchBanners();
+    }, []);
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
+        }, 3000); // 3000ms = 3s
+
+        return () => clearInterval(interval); // Dọn dẹp khi component bị unmount
+    }, [banners.length]);
+
+    const getVisiblePosts = () => {
+        if (banners.length === 0) return [];
+
+        const visiblePosts = [];
+        for (let i = 0; i < 3; i++) {
+            const index = (currentIndex + i) % banners.length; // Đảm bảo quay lại đầu khi đến cuối
+            visiblePosts.push(banners[index]);
+        }
+
+        return visiblePosts;
+    };
 
     return (
         <div className="Home">
@@ -443,7 +499,7 @@ function Home() {
                         </div>
                     </div>
                 </div>
-                
+
             </div>
 
             <div className="section2 max-w-screen-xl mx-auto p-6">
@@ -513,146 +569,201 @@ function Home() {
                 </div>
             </div>
 
+            <div className="container mx-auto p-6">
+                <h1 className="text-3xl font-bold text-center mb-8">Trải Nghiệm Cùng QAirline</h1>
+                <div className="flex justify-center space-x-4 overflow-hidden">
+                    {getVisiblePosts().map((post, index) => {
+                        const isMainPost = index === 0;
+                        return (
+                            <div
+                                key={post._id}
+                                className={`${
+                                    isMainPost ? 'lg:w-3/4 w-full' : 'lg:w-1/4 w-full'
+                                } bg-white rounded-lg shadow-lg p-4 text-center transition-transform duration-1000 ease-in-out transform`}
+                                style={{
+                                    // transform: isMainPost ? 'scale(1.1)' : 'scale(0.9)',
+                                    // opacity: isMainPost ? 1 : 0.7,
+                                }}
+                            >
+                                <img
+                                    src={post.thumbnail}
+                                    alt={post.title}
+                                    className="w-full h-48 object-cover rounded-md"
+                                />
+                                <h3 className="text-xl font-semibold mt-4">{post.title}</h3>
+                                <Link
+                                    to={`/banner/${post.id}`}
+                                    className="text-blue-500 font-medium hover:underline"
+                                >
+                                    Xem Chi Tiết
+                                </Link>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
             <div className="section3 max-w-screen-xl mx-auto p-6">
                 <h1 className="text-4xl font-bold text-black mb-4">
                     📍Điểm Đến Hấp Dẫn
                 </h1>
-                <div className="slider flex items-center justify-center relative overflow-hidden shadow-lg">
-                    <div className="slide-track flex space-x-2 animate-scroll bg-cover relative">
-                        <div className="w-96 h-96 bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Phu Quoc.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Phú Quốc</p>
-                            </div>
+                <div
+                    className="slider flex items-center justify-center relative w-[1140px] h-[400px] overflow-hidden shadow-lg">
+                    {loadingDestination ? (
+                        <div className="text-center py-10 text-gray-500">Đang tải dữ liệu...</div>
+                    ) : (
+                        <div className="slide-track flex space-x-2 animate-scroll bg-cover relative"
+                             style={{width: 'calc(400px * 18)'}}>
+                            {/*<div className="w-[400px] h-[400px] bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Phu Quoc.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Phú Quốc</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Hanoi.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Hà Nội</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Da Nang.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Đà Nẵng</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Ho Chi Minh City.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">TP. Hồ Chí Minh</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Seoul.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Seoul</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Da Nang.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Đà Nẵng</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Moscow.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Moscow</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Singapore.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Singapore</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Paris.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Paris</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Phu Quoc.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Phú Quốc</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Da Lat.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Đà Lạt</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Tokyo.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Tokyo</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Da Lat.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Đà Lạt</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Paris.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Paris</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Hoi An.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Hội An</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Singapore.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Singapore</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Hanoi.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Hà Nội</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
+                            {/*     style={{backgroundImage: "url('/images/places/Tokyo.jpg')"}}>*/}
+                            {/*    <div*/}
+                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
+                            {/*        <p className="text-lg font-semibold">Tokyo</p>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
+                            {destinations.map((inDestination) => (
+                                <Link
+                                    key={inDestination.id}
+                                    to={`/destination/${inDestination.id}`}
+                                    className="w-full h-56 rounded-lg bg-cover bg-center relative"
+                                    style={{backgroundImage: `url(${inDestination.thumbnail})`}}
+                                >
+                                    <div
+                                        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                        <p className="text-lg font-semibold">{inDestination.title}</p>
+                                    </div>
+                                </Link>
+                            ))}
                         </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Hanoi.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Hà Nội</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Da Nang.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Đà Nẵng</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Ho Chi Minh City.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">TP. Hồ Chí Minh</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Seoul.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Seoul</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Da Nang.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Đà Nẵng</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Moscow.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Moscow</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Singapore.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Singapore</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Paris.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Paris</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Phu Quoc.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Phú Quốc</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Da Lat.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Đà Lạt</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Tokyo.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Tokyo</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Da Lat.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Đà Lạt</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Paris.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Paris</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Hoi An.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Hội An</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Singapore.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Singapore</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Hanoi.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Hà Nội</p>
-                            </div>
-                        </div>
-                        <div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
-                             style={{backgroundImage: "url('/images/places/Tokyo.jpg')"}}>
-                            <div
-                                className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
-                                <p className="text-lg font-semibold">Tokyo</p>
-                            </div>
-                        </div>
-                    </div>
+                    )}
+
                 </div>
                 <div className="flex justify-center items-center mt-8 mb-2">
-                    <button type="button"
-                            className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-125 px-5 py-2.5 text-center">
+                    <Link
+                        to='/destination'
+                        className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-125 px-5 py-2.5 text-center">
                         Khám phá ngay
                         <span className="ml-2">&rarr;</span>
-                    </button>
+                    </Link>
                 </div>
             </div>
             {loading && (<div><Loading/></div>)}
