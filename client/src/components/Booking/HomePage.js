@@ -108,14 +108,14 @@ function HomePage() {
 
         setLoading(true);
 
+        const requestBody = {
+            departCity: departure,
+            arriveCity: destination,
+            departDate: departureDate
+        };
+
         try {
             let response;
-
-            const requestBody = {
-                departCity: departure,
-                arriveCity: destination,
-                departDate: departureDate
-            };
 
             if (roundTrip === true) {
                 requestBody.arriveDate = returnDate;
@@ -133,13 +133,27 @@ function HomePage() {
                         flights: response.data,
                         tripType: roundTrip ? "round-trip" : "one-way",
                         passengers: passengers,
+                        searchInfo: requestBody
                     }
                 });
             } else {
-                navigate("/booking/flight-selection", { state: { flights: null } });
+                navigate("/booking/flight-selection", {
+                    state: {
+                        flights: null,
+                        tripType: roundTrip ? "round-trip" : "one-way",
+                        passengers: passengers,
+                        searchInfo: requestBody
+                    } });
             }
         } catch (error) {
-            navigate("/booking/flight-selection", { state: { flights: null } });
+            navigate("/booking/flight-selection", {
+                state: {
+                    flights: null,
+                    tripType: roundTrip ? "round-trip" : "one-way",
+                    passengers: passengers,
+                    searchInfo: requestBody
+                }
+            });
         }
     };
 

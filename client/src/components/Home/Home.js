@@ -88,14 +88,14 @@ function Home() {
 
         setLoading(true);
 
+        const requestBody = {
+            departCity: departure,
+            arriveCity: destination,
+            departDate: departureDate
+        };
+
         try {
             let response;
-
-            const requestBody = {
-                departCity: departure,
-                arriveCity: destination,
-                departDate: departureDate
-            };
 
             if (roundTrip === true) {
                 requestBody.arriveDate = returnDate;
@@ -117,10 +117,21 @@ function Home() {
                     }
                 });
             } else {
-                navigate("/booking/flight-selection", { state: { flights: null } });
+                navigate("/booking/flight-selection", {
+                    state: {
+                        flights: null,
+                        tripType: roundTrip ? "round-trip" : "one-way",
+                        passengers: passengers,
+                        searchInfo: requestBody,
+                    } });
             }
         } catch (error) {
-            navigate("/booking/flight-selection", { state: { flights: null } });
+            navigate("/booking/flight-selection", { state: {
+                    flights: null,
+                    tripType: roundTrip ? "round-trip" : "one-way",
+                    passengers: passengers,
+                    searchInfo: requestBody,
+                } });
         }
     };
 
@@ -209,6 +220,31 @@ function Home() {
 
         return visiblePosts;
     };
+
+    const genState = (flight) => {
+        const route = flight.route;
+        const type = flight.type;
+        let tripType;
+        if (type === "MỘT CHIỀU") tripType = "one-way";
+        else tripType = "round-trip";
+        const destination = route.split(" - ");
+        const requestBody = {
+            departCity: destination[0],
+            arriveCity: destination[1],
+            departDate: new Date(),
+        };
+        if (tripType === "round-trip") requestBody.arriveDate = new Date();
+        return {
+            flights: null,
+            tripType: tripType,
+            passengers: {
+                adults: 1,
+                children: 0,
+                infants: 0,
+            },
+            searchInfo: requestBody
+        }
+    }
 
     return (
         <div className="Home">
@@ -506,35 +542,37 @@ function Home() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
                             {
-                                route: 'Hanoi - Ho Chi Minh City',
+                                route: 'Hà Nội - TP. Hồ Chí Minh',
                                 destination: 'Ho Chi Minh City',
                                 date: '9 November 2024',
                                 price: '1.193.005 VND',
                                 type: 'MỘT CHIỀU',
                             },
                             {
-                                route: 'Ho Chi Minh City - Phu Quoc',
+                                route: 'TP. Hồ Chí Minh - Phú Quốc',
                                 destination: 'Phu Quoc',
                                 date: '28 November 2024',
                                 price: '691.525 VND',
                                 type: 'KHỨ HỒI',
                             },
                             {
-                                route: 'Hanoi - Da Nang',
+                                route: 'Hà Nội - Đà Nẵng',
                                 destination: 'Da Nang',
                                 date: '28 November 2024',
                                 price: '691.525 VND',
                                 type: 'MỘT CHIỀU',
                             },
                             {
-                                route: 'Ho Chi Minh City - Hanoi',
+                                route: 'TP. Hồ Chí Minh - Hà Nội',
                                 destination: 'Hanoi',
                                 date: '9 November 2024',
                                 price: '1.193.005 VND',
                                 type: 'KHỨ HỒI',
                             },
                         ].map((flight, index) => (
-                            <div
+                            <Link
+                                to={'/booking/flight-selection'}
+                                state={genState(flight)}
                                 key={index}
                                 className="shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer lg:hover:scale-105"
                                 style={{backgroundColor: "#ececec"}}
@@ -546,10 +584,10 @@ function Home() {
                     {flight.type}
                   </span>
                                     <h2 className="mt-1 text-lg font-bold text-gray-800">{flight.route}</h2>
-                                    <p className="text-sm text-gray-500">{flight.date}</p>
-                                    <p className="mt-1 text-red-600 font-semibold">{flight.price}</p>
+                                    {/*<p className="text-sm text-gray-500">{flight.date}</p>*/}
+                                    {/*<p className="mt-1 text-red-600 font-semibold">{flight.price}</p>*/}
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
 
