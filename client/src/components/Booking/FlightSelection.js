@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BookingInfo from "./BookingInfo";
+import axios from "axios";
 
 function FlightSelection() {
     const location = useLocation();
@@ -10,12 +11,69 @@ function FlightSelection() {
         window.scrollTo(0, 0);
     }, [location]);
 
-    const { flights, tripType, passengers } = state;
+    const { flights, tripType, passengers, searchInfo } = state;
     const navigate = useNavigate();
 
     const [showOutbound, setShowOutbound] = useState(true);
     const [selectedOutbound, setSelectedOutbound] = useState(null);
     const [selectedReturn, setSelectedReturn] = useState(null);
+
+    const [selectedDate, setSelectedDate] = useState(searchInfo.departDate);
+    const [selectedArrivalDate, setSelectedArrivalDate] = useState(searchInfo.arriveDate);
+
+    const [outboundFlights, setOutboundFlights] = useState([]);
+    const [returnFlights, setReturnFlights] = useState([]);
+
+    // init outbound and return flights
+    useEffect(() => {
+        if (tripType === "round-trip") {
+            setOutboundFlights(flights.outboundFlights);
+            setReturnFlights(flights.returnFlights);
+        } else if (tripType === "one-way") {
+            setOutboundFlights(flights);
+        }
+    }, []);
+
+    // fetch flights when selectedDate changed
+    const fetchFlights = async () => {
+        try {
+            const reqBody = {
+                departCity: searchInfo.departCity,
+                arriveCity: searchInfo.arriveCity,
+                departDate: selectedDate,
+            };
+            const response = await axios.post("http://localhost:3001/api/flights/oneway", reqBody);
+            setOutboundFlights(response.data);
+        } catch (err) {
+            console.error("Error fetching flights:", err);
+            setOutboundFlights([]);
+        }
+
+    };
+
+    useEffect(() => {
+        fetchFlights();
+    }, [selectedDate]);
+
+    const fetchArrivalFlights = async () => {
+        try {
+            const reqBody = {
+                departCity: searchInfo.arriveCity,
+                arriveCity: searchInfo.departCity,
+                departDate: selectedArrivalDate,
+            };
+            const response = await axios.post("http://localhost:3001/api/flights/oneway", reqBody);
+            setReturnFlights(response.data);
+        } catch (err) {
+            console.error("Error fetching flights:", err);
+            setReturnFlights([]);
+        }
+
+    };
+
+    useEffect(() => {
+        fetchArrivalFlights();
+    }, [selectedArrivalDate]);
 
     // Nếu không có chuyến bay phù hợp
     if (!flights) {
@@ -41,15 +99,36 @@ function FlightSelection() {
 
     const totalCost = (outboundCost + returnCost) * (passengers.adults + passengers.children + 0.1 * passengers.infants);
 
-    let outboundFlights = [];
-    let returnFlights = [];
+    // gen 5 date which selectedDate is in middle
+    const generateDateList = () => {
+        const dates = [];
+        for (let i = -2; i <= 2; i++) {
+            const date = new Date(selectedDate);
+            date.setDate(date.getDate() + i);
+            dates.push({
+                day: date.toLocaleDateString("vi-VN", { weekday: "long" }),
+                date: date.getDate(),
+                month: date.getMonth() + 1,
+                fullDate: new Date(date),
+            });
+        }
+        return dates;
+    };
 
-    if (tripType === "round-trip") {
-        outboundFlights = flights?.outboundFlights || [];
-        returnFlights = flights?.returnFlights || [];
-    } else if (tripType === "one-way") {
-        outboundFlights = flights || [];
-    }
+    const generateArrivalDateList = () => {
+        const dates = [];
+        for (let i = -2; i <= 2; i++) {
+            const date = new Date(selectedArrivalDate);
+            date.setDate(date.getDate() + i);
+            dates.push({
+                day: date.toLocaleDateString("vi-VN", { weekday: "long" }),
+                date: date.getDate(),
+                month: date.getMonth() + 1,
+                fullDate: new Date(date),
+            });
+        }
+        return dates;
+    };
 
     const handleSelect = (flight, classType) => {
         if (showOutbound) {
@@ -134,11 +213,11 @@ function FlightSelection() {
                                         <div className="text-2xl font-semibold">
                                             📅 Ngày
                                         </div>
-                                        <p className="text-lg">{convertDateFormat(outboundFlights[0].departure_time)}</p>
+                                        <p className="text-lg">{convertDateFormat(selectedDate)}</p>
                                     </div>
                                     <div className="flex items-center justify-center mx-auto space-x-4">
                                         <div className="text-3xl font-bold">
-                                            {outboundFlights[0]?.departure_airport?.city || "Depart"}
+                                            {searchInfo.departCity}
                                         </div>
                                         <div className="lg:px-10 sm:px-5 text-blue-600">
                                             <svg
@@ -152,7 +231,7 @@ function FlightSelection() {
                                             </svg>
                                         </div>
                                         <div className="text-3xl font-bold">
-                                            {outboundFlights[0]?.arrival_airport?.city || "Arrival"}
+                                            {searchInfo.arriveCity}
                                         </div>
                                     </div>
                                     <div className="lg:flex flex-col hidden whitespace-nowrap items-center justify-center">
@@ -162,6 +241,25 @@ function FlightSelection() {
                                         <p className="text-lg">{passengers.adults + passengers.children + passengers.infants}</p>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div className="flex justify-center space-x-4 my-4">
+                                {generateDateList().map((item, index) => (
+                                    <div
+                                        key={index}
+                                        onClick={() => { setSelectedDate(item.fullDate)}}
+                                        className={`cursor-pointer px-4 py-2 rounded-lg text-center ${
+                                            item.fullDate.toDateString() === new Date(selectedDate).toDateString()
+                                                ? "bg-yellow-400 text-red-600 font-bold"
+                                                : "bg-gray-200"
+                                        }`}
+                                    >
+                                        <div>{item.day}</div>
+                                        <div>
+                                            {item.date} tháng {item.month}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
 
                             <div className="space-y-4">
@@ -179,11 +277,11 @@ function FlightSelection() {
                                         <div className="text-2xl font-semibold">
                                             📅 Ngày
                                         </div>
-                                        <p className="text-lg">{convertDateFormat(returnFlights[0].arrival_time)}</p>
+                                        <p className="text-lg">{convertDateFormat(selectedArrivalDate)}</p>
                                     </div>
                                     <div className="flex items-center justify-center mx-auto space-x-4">
                                         <div className="text-3xl font-bold">
-                                            {returnFlights[0]?.departure_airport?.city || "Depart"}
+                                            {searchInfo.arriveCity}
                                         </div>
                                         <div className="lg:px-10 sm:px-5 text-blue-600">
                                             <svg
@@ -197,7 +295,7 @@ function FlightSelection() {
                                             </svg>
                                         </div>
                                         <div className="text-3xl font-bold">
-                                            {returnFlights[0]?.arrival_airport?.city || "Arrival"}
+                                            {searchInfo.departCity}
                                         </div>
                                     </div>
                                     <div className="lg:flex flex-col hidden whitespace-nowrap items-center justify-center">
@@ -207,6 +305,27 @@ function FlightSelection() {
                                         <p className="text-lg">{passengers.adults + passengers.children + passengers.infants}</p>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div className="flex justify-center space-x-4 my-4">
+                                {generateArrivalDateList().map((item, index) => (
+                                    <div
+                                        key={index}
+                                        onClick={() => {
+                                            setSelectedArrivalDate(item.fullDate)
+                                        }}
+                                        className={`cursor-pointer px-4 py-2 rounded-lg text-center ${
+                                            item.fullDate.toDateString() === new Date(selectedArrivalDate).toDateString()
+                                                ? "bg-yellow-400 text-red-600 font-bold"
+                                                : "bg-gray-200"
+                                        }`}
+                                    >
+                                        <div>{item.day}</div>
+                                        <div>
+                                            {item.date} tháng {item.month}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
 
                             <div className="space-y-4">

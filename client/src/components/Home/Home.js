@@ -113,6 +113,7 @@ function Home() {
                         flights: response.data,
                         tripType: roundTrip ? "round-trip" : "one-way",
                         passengers: passengers,
+                        searchInfo: requestBody,
                     }
                 });
             } else {
