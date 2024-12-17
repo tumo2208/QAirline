@@ -26,11 +26,13 @@ function FlightSelection() {
 
     // init outbound and return flights
     useEffect(() => {
-        if (tripType === "round-trip") {
-            setOutboundFlights(flights.outboundFlights);
-            setReturnFlights(flights.returnFlights);
-        } else if (tripType === "one-way") {
-            setOutboundFlights(flights);
+        if (flights) {
+            if (tripType === "round-trip") {
+                setOutboundFlights(flights.outboundFlights);
+                setReturnFlights(flights.returnFlights);
+            } else if (tripType === "one-way") {
+                setOutboundFlights(flights);
+            }
         }
     }, []);
 
@@ -76,23 +78,23 @@ function FlightSelection() {
     }, [selectedArrivalDate]);
 
     // Nếu không có chuyến bay phù hợp
-    if (!flights) {
-        return (
-            <div className="bg-white p-60 flex flex-col items-center justify-center space-y-10">
-                <h2 className="text-5xl font-bold text-center text-[#002D74]">Rất tiếc, không có chuyến bay phù hợp với tìm kiếm của bạn</h2>
-                <div className="text-left mx-8">
-                        <button
-                            type="button"
-                            className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
-                            onClick={() => window.history.back()}
-                        >
-                            <span className="mr-2 font-bold text-lg">←</span>
-                            Quay lại trang trước
-                        </button>
-                    </div>
-            </div>
-        )
-    }
+    // if (!flights) {
+    //     return (
+    //         <div className="bg-white p-60 flex flex-col items-center justify-center space-y-10">
+    //             <h2 className="text-5xl font-bold text-center text-[#002D74]">Rất tiếc, không có chuyến bay phù hợp với tìm kiếm của bạn</h2>
+    //             <div className="text-left mx-8">
+    //                     <button
+    //                         type="button"
+    //                         className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
+    //                         onClick={() => window.history.back()}
+    //                     >
+    //                         <span className="mr-2 font-bold text-lg">←</span>
+    //                         Quay lại trang trước
+    //                     </button>
+    //                 </div>
+    //         </div>
+    //     )
+    // }
 
     const outboundCost = selectedOutbound?.flight?.available_seats.find(seat => seat.class_type === selectedOutbound.classType)?.price || 0;
     const returnCost = selectedReturn?.flight?.available_seats.find(seat => seat.class_type === selectedReturn.classType)?.price || 0;
