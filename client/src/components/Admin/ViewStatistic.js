@@ -34,7 +34,7 @@ function ViewStatistic() {
             labels,
             datasets: [
                 {
-                    label: `Doanh thu năm ${year}`,
+                    label: `Doanh thu`,
                     data: revenues,
                     backgroundColor: "rgba(75, 192, 192, 0.5)",
                     borderColor: "rgba(75, 192, 192, 1)",

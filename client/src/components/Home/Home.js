@@ -156,6 +156,7 @@ function Home() {
 
     const [destinations, setDestinations] = useState([]);
     const [loadingDestination, setLoadingDestination] = useState(true);
+    const [banners, setBanners] = useState([]);
 
     useEffect(() => {
         const fetchDestinations = async () => {
@@ -172,8 +173,41 @@ function Home() {
             }
         };
 
+        const fetchBanners = async () => {
+            try {
+                const response = await axios.post('http://localhost:3001/api/post/listPost', {
+                    category: "banner",
+                });
+                setBanners(response.data);
+            } catch (error) {
+                console.error('Lỗi khi lấy bài đăng:', error);
+            }
+        };
+
         fetchDestinations();
+        fetchBanners();
     }, []);
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
+        }, 3000); // 3000ms = 3s
+
+        return () => clearInterval(interval); // Dọn dẹp khi component bị unmount
+    }, [banners.length]);
+
+    const getVisiblePosts = () => {
+        if (banners.length === 0) return [];
+
+        const visiblePosts = [];
+        for (let i = 0; i < 3; i++) {
+            const index = (currentIndex + i) % banners.length; // Đảm bảo quay lại đầu khi đến cuối
+            visiblePosts.push(banners[index]);
+        }
+
+        return visiblePosts;
+    };
 
     return (
         <div className="Home">
@@ -534,11 +568,46 @@ function Home() {
                 </div>
             </div>
 
+            <div className="container mx-auto p-6">
+                <h1 className="text-3xl font-bold text-center mb-8">Trải Nghiệm Cùng QAirline</h1>
+                <div className="flex justify-center space-x-4 overflow-hidden">
+                    {getVisiblePosts().map((post, index) => {
+                        const isMainPost = index === 0;
+                        return (
+                            <div
+                                key={post._id}
+                                className={`${
+                                    isMainPost ? 'lg:w-3/4 w-full' : 'lg:w-1/4 w-full'
+                                } bg-white rounded-lg shadow-lg p-4 text-center transition-transform duration-1000 ease-in-out transform`}
+                                style={{
+                                    // transform: isMainPost ? 'scale(1.1)' : 'scale(0.9)',
+                                    // opacity: isMainPost ? 1 : 0.7,
+                                }}
+                            >
+                                <img
+                                    src={post.thumbnail}
+                                    alt={post.title}
+                                    className="w-full h-48 object-cover rounded-md"
+                                />
+                                <h3 className="text-xl font-semibold mt-4">{post.title}</h3>
+                                <Link
+                                    to={`/banner/${post.id}`}
+                                    className="text-blue-500 font-medium hover:underline"
+                                >
+                                    Xem Chi Tiết
+                                </Link>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
             <div className="section3 max-w-screen-xl mx-auto p-6">
                 <h1 className="text-4xl font-bold text-black mb-4">
                     📍Điểm Đến Hấp Dẫn
                 </h1>
-                <div className="slider flex items-center justify-center relative w-[1140px] h-[400px] overflow-hidden shadow-lg">
+                <div
+                    className="slider flex items-center justify-center relative w-[1140px] h-[400px] overflow-hidden shadow-lg">
                     {loadingDestination ? (
                         <div className="text-center py-10 text-gray-500">Đang tải dữ liệu...</div>
                     ) : (
@@ -674,7 +743,7 @@ function Home() {
                                 <Link
                                     key={inDestination.id}
                                     to={`/destination/${inDestination.id}`}
-                                    className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"
+                                    className="w-full h-56 rounded-lg bg-cover bg-center relative"
                                     style={{backgroundImage: `url(${inDestination.thumbnail})`}}
                                 >
                                     <div

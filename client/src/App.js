@@ -32,6 +32,7 @@ function App() {
                     <Route path="/destination/:id" element={<PostDetail/>}/>
                     <Route path="/offer" element={<Offer/>}/>
                     <Route path="/offer/:id" element={<PostDetail/>}/>
+                    <Route path="/banner/:id" element={<PostDetail/>}/>
                     <Route path="/booking/*" element={<Booking/>}/>
                     <Route path="/flight-info/*" element={<FlightInfo />} />
                     <Route path="/mybooking/*" element={<MyBooking/>}/>
