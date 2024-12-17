@@ -372,12 +372,6 @@ function HomePage() {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center">
-                                    <a href="#" className="hover:underline text-sm text-blue-700 mr-2">Mã khuyến mãi</a>
-                                    <input type="text"
-                                           className="border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
-                                </div>
-
                                 <button
                                     type="submit"
                                     className="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-lg p-3"

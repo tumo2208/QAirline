@@ -258,13 +258,13 @@ function AppHeader() {
                             <div id="auth-buttons" className="flex items-center space-x-2">
                                 <Link to="/login">
                                     <button
-                                        className="bg-blue-900 text-white px-3 py-1 rounded-3xl font-semibold hover:bg-blue-700">
+                                        className="bg-blue-900 text-xs md:text-base lg:text-base text-white px-3 py-1 rounded-3xl font-semibold hover:bg-blue-700">
                                         Đăng nhập
                                     </button>
                                 </Link>
                                 <Link to="/signup">
                                     <button
-                                        className="border border-blue-600 text-blue-600 px-3 py-1 rounded-3xl font-semibold hover:bg-blue-100">
+                                        className="border border-blue-600 text-xs md:text-base lg:text-base text-blue-600 px-3 py-1 rounded-3xl font-semibold hover:bg-blue-100">
                                         Đăng ký
                                     </button>
                                 </Link>
@@ -316,7 +316,7 @@ function AppHeader() {
                                     </div>
 
                                     {isDropdownVisible && (
-                                        <ul className="absolute left-0 mt-2 w-40 bg-gray-100 border border-gray-300 rounded-lg shadow-lg z-10">
+                                        <ul className="absolute text-base left-0 mt-2 w-40 bg-gray-100 border border-gray-300 rounded-lg shadow-lg z-10">
                                             <li>
                                                 <Link
                                                     to="/destination"
@@ -379,7 +379,7 @@ function AppHeader() {
                             </div>
 
                             {isDropdownVisible && (
-                                <ul className="absolute left-0 mt-2 w-40 bg-gray-100 border border-gray-300 rounded-lg shadow-lg z-10">
+                                <ul className="absolute text-base left-0 mt-2 w-40 bg-gray-100 border border-gray-300 rounded-lg shadow-lg z-10">
                                     <li>
                                         <Link
                                             to="/destination"

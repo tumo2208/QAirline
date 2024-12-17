@@ -160,7 +160,7 @@ function Home() {
                  style={{ backgroundImage: "url('/images/background.png')"}}>
                 <div className="pl-6 pr-6 pb-6 lg:w-3/5 flex items-center">
                     <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg">
-                        <div className="flex rounded-t-xl border-b-4 shadow-lg p-3 bg-yellow-400 justify-around text-center">
+                        <div className="flex rounded-t-xl text-white border-b-4 shadow-lg p-3 bg-sky-500 justify-around text-center">
                             <button
                                 className={`font-bold pb-2  ${
                                     activeForm === "booking_form" ? "text-blue-900 border-b-4 border-blue-900" : "lg:hover:text-blue-700 lg:hover:border-blue-700"
@@ -178,7 +178,7 @@ function Home() {
                         </div>
                         <div className='p-6'>
                         {activeForm === "booking_form" && (
-                            <form className="space-y-3" onSubmit={handleSubmit}>
+                            <form className="space-y-5" onSubmit={handleSubmit}>
                                 <div className="space-x-5">
                                     <label className="inline-flex items-center">
                                         <input 
@@ -400,12 +400,6 @@ function Home() {
                                             </div>
                                         )}
                                     </div>
-                                </div>
-
-                                <div className="flex items-center">
-                                    <a href="example.com" className="hover:underline text-sm text-blue-700 mr-2">Mã khuyến mãi</a>
-                                    <input type="text"
-                                           className="border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
                                 </div>
 
                                 <button

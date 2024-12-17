@@ -13,10 +13,17 @@ function PostDetail() {
     if (!post) return <div>Đang tải dữ liệu...</div>;
 
     return (
-        <div>
-            <h1>{post.title}</h1>
-            <img src={post.thumbnail} alt={post.title} />
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div className="py-10 justify-center items-center" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
+            {post.category === 'destination' ? (
+                <div>
+                    <iframe src={post.content.slice(3, -6)} className='w-full h-screen max-w-6xl mx-auto rounded-lg'></iframe>
+                </div>
+            ) : <div>
+                    <h1>{post.title}</h1>
+                    <img src={post.thumbnail} alt={post.title} />
+                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                </div>
+            }
         </div>
     );
 }
