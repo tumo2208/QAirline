@@ -28,6 +28,12 @@ function AdminPage() {
                         Đăng post
                     </button>
                 </Link>
+                <Link to="/admin/viewStatistic">
+                    <button
+                        className="px-6 py-3 w-64 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-400 transition duration-300 transform hover:scale-105 focus:outline-none focus:ring focus:ring-blue-300">
+                        Xem thống kê
+                    </button>
+                </Link>
             </div>
         </div>
     );

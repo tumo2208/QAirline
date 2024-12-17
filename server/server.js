@@ -13,6 +13,7 @@ const postRoute = require('./routes/PostRoute');
 const flightRoute = require("./routes/FlightRoute");
 const bookingRoute = require("./routes/BookingRoute");
 const emailRoute = require('./routes/EmailRoute');
+const statisticRoute = require("./routes/StatisticRoute");
 
 const {updateFlightStatus, updatePrepareFlight} = require("./controller/FlightController");
 
@@ -50,6 +51,8 @@ app.use("/api/flights", flightRoute);
 app.use("/api/post", postRoute);
 app.use("/api/bookings", bookingRoute);
 app.use("/email", emailRoute);
+app.use("/api/statistic", statisticRoute);
+
 
 app.get("/", (req, res) => {
   res.send("Hello from Node API Server Updated");
