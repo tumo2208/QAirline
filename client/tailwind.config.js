@@ -7,14 +7,16 @@ export const theme = {
     textUnderlineOffset: {
       'custom': '4px',
     },
-    keyframes: {
-      scroll: {
-        '0%': { transform: 'translateX(0)' },
-        '100%': { transform: 'translateX(calc(-400px * 9))' },
-      },
-    },
     animation: {
-      scroll: 'scroll 80s linear infinite',
+      ["infinite-slider"]: "infiniteSlider 40s linear infinite",
+    },
+    keyframes: {
+      infiniteSlider: {
+        "0%": { transform: "translateX(0)" },
+        "100%": {
+          transform: "translateX(calc(-400px*3))",
+        },
+      },
     },
   },
 };
