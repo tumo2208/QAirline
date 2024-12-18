@@ -5,6 +5,7 @@ import axios from "axios";
 import {useNavigate, useLocation, Link} from "react-router-dom";
 import Loading from '../../shared/Loading';
 import FetchAirportInfo from "../../shared/AirportInfo";
+import { set } from 'mongoose';
 
 function Home() {
     const location = useLocation();
@@ -223,6 +224,9 @@ function Home() {
 
     const genState = (flight) => {
         const route = flight.route;
+        console.log(flight);
+        const departTime = flight?.departure_time;
+        console.log(departTime);
         const type = flight.type;
         let tripType;
         if (type === "MỘT CHIỀU") tripType = "one-way";
@@ -231,7 +235,7 @@ function Home() {
         const requestBody = {
             departCity: destination[0],
             arriveCity: destination[1],
-            departDate: new Date(),
+            departDate: departTime,
         };
         if (tripType === "round-trip") requestBody.arriveDate = new Date();
         return {
@@ -246,31 +250,83 @@ function Home() {
         }
     }
 
+    // 4 most popular flight
+    const [flight1, setFlight1] = useState(null);
+    const [flight2, setFlight2] = useState(null);
+    const [flight3, setFlight3] = useState(null);
+    const [flight4, setFlight4] = useState(null);
+
+    /**
+     * Converts a date in milliseconds to the format DD/MM/YYYY
+     * @param {number} date - The date in milliseconds
+     * @returns {string} The date in the format DD/MM/YYYY
+     */
+    const formatDate = (date) => {
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
+    useEffect(() => {
+        const fetchPopularFlights = async () => {
+            try {
+                const Flight1 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                    departureCity: "Hà Nội",
+                    arrivalCity: "TP. Hồ Chí Minh"
+                });
+                setFlight1(Flight1.data[0]);
+    
+                const Flight2 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                    departureCity: "TP. Hồ Chí Minh",
+                    arrivalCity: "Hà Nội",  
+                });
+                setFlight2(Flight2.data[0]);
+    
+                const Flight3 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                    departureCity: "Hà Nội",
+                    arrivalCity: "Đà Nẵng",
+                });
+                setFlight3(Flight3.data[0]);
+    
+                const Flight4 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {  
+                    departureCity: "TP. Hồ Chí Minh",
+                    arrivalCity: "Phú Quốc",
+                });
+                setFlight4(Flight4.data[0]);
+            } catch (error) {
+                console.error("Error fetching popular flights:", error);
+            }
+        }
+        fetchPopularFlights();
+    }, []);
+
     return (
         <div className="Home">
             <div className="section1 flex flex-wrap items-center bg-cover sm:bg-none h-[80vh] bg-center"
                  style={{ backgroundImage: "url('/images/background.png')"}}>
                 <div className="pl-6 pr-6 pb-6 lg:w-3/5 flex items-center">
                     <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg">
-                        <div className="flex rounded-t-xl border-b-4 shadow-lg p-3 bg-yellow-400 justify-around text-center">
+                        <div className="flex rounded-t-xl text-black border-b-4 border-gray-100  shadow-lg p-3 bg-sky-500 justify-around text-center">
                             <button
                                 className={`font-bold pb-2  ${
-                                    activeForm === "booking_form" ? "text-blue-900 border-b-4 border-blue-900" : "lg:hover:text-blue-700 lg:hover:border-blue-700"
+                                    activeForm === "booking_form" ? "text-white border-white border-b-4" : "lg:hover:text-white lg:hover:border-white"
                                 }`}
                                 onClick={() => setActiveForm("booking_form")}
-                            >🛫 Đặt vé
+                            >🛩️ Đặt vé
                             </button>
                             <button
                                 className={`font-bold pb-2 ${
-                                    activeForm === "myBooking_form" ? "text-blue-900 border-b-4 border-blue-900" : "lg:hover:text-blue-700 lg:hover:border-blue-700"
+                                    activeForm === "myBooking_form" ? "text-white border-white border-b-4" : "lg:hover:text-white lg:hover:border-white"
                                 }`}
                                 onClick={() => setActiveForm("myBooking_form")}
-                            >🎟️ Quản lý đặt chỗ
+                            >🎫 Quản lý đặt chỗ
                             </button>
                         </div>
                         <div className='p-6'>
                         {activeForm === "booking_form" && (
-                            <form className="space-y-3" onSubmit={handleSubmit}>
+                            <form className="space-y-4" onSubmit={handleSubmit}>
                                 <div className="space-x-5">
                                     <label className="inline-flex items-center">
                                         <input 
@@ -494,11 +550,18 @@ function Home() {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center">
-                                    <a href="example.com" className="hover:underline text-sm text-blue-700 mr-2">Mã khuyến mãi</a>
-                                    <input type="text"
-                                           className="border-2 border-gray-300 rounded-lg p-2 mt-1 text-gray-700 text-sm"/>
+                                <div></div>
+
+                                <div className="flex items-center text-sm space-x-2">
+                                    <label className="text-gray-700">
+                                        Tra cứu chuyến bay tại
+                                        <Link to ="/flight-info"
+                                            className="italic text-blue-600 hover:underline"> Thông tin chuyến bay
+                                        </Link>
+                                    </label>
                                 </div>
+
+                                
 
                                 <button
                                     type="submit"
@@ -544,36 +607,47 @@ function Home() {
                 </h1>
 
                 <div className="domestic">
-                    <h2 className="text-3xl font-bold text-purple-700 mb-4 mt-4">Nội Địa</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
                             {
                                 route: 'Hà Nội - TP. Hồ Chí Minh',
                                 destination: 'Ho Chi Minh City',
-                                date: '9 November 2024',
-                                price: '1.193.005 VND',
-                                type: 'MỘT CHIỀU',
-                            },
-                            {
-                                route: 'TP. Hồ Chí Minh - Phú Quốc',
-                                destination: 'Phu Quoc',
-                                date: '28 November 2024',
-                                price: '691.525 VND',
-                                type: 'KHỨ HỒI',
-                            },
-                            {
-                                route: 'Hà Nội - Đà Nẵng',
-                                destination: 'Da Nang',
-                                date: '28 November 2024',
-                                price: '691.525 VND',
+                                date: formatDate(flight1?.departure_time),
+                                price: new Intl.NumberFormat("en-US", {
+                                    style: "currency",
+                                    currency: "VND"
+                                }).format(flight1?.available_seats[0]?.price),
                                 type: 'MỘT CHIỀU',
                             },
                             {
                                 route: 'TP. Hồ Chí Minh - Hà Nội',
                                 destination: 'Hanoi',
-                                date: '9 November 2024',
-                                price: '1.193.005 VND',
-                                type: 'KHỨ HỒI',
+                                date: formatDate(flight2?.departure_time),
+                                price: new Intl.NumberFormat("en-US", {
+                                    style: "currency",
+                                    currency: "VND"
+                                }).format(flight2?.available_seats[0]?.price),
+                                type: 'MỘT CHIỀU',
+                            },
+                            {
+                                route: 'Hà Nội - Đà Nẵng',
+                                destination: 'Da Nang',
+                                date: formatDate(flight3?.departure_time),
+                                price: new Intl.NumberFormat("en-US", {
+                                    style: "currency",
+                                    currency: "VND"
+                                }).format(flight3?.available_seats[0]?.price),
+                                type: 'MỘT CHIỀU',
+                            },
+                            {
+                                route: 'TP. Hồ Chí Minh - Phú Quốc',
+                                destination: 'Phu Quoc',
+                                date: formatDate(flight4?.departure_time),
+                                price: new Intl.NumberFormat("en-US", {
+                                    style: "currency",
+                                    currency: "VND"
+                                }).format(flight4?.available_seats[0]?.price),
+                                type: 'MỘT CHIỀU',
                             },
                         ].map((flight, index) => (
                             <Link
@@ -590,8 +664,8 @@ function Home() {
                     {flight.type}
                   </span>
                                     <h2 className="mt-1 text-lg font-bold text-gray-800">{flight.route}</h2>
-                                    {/*<p className="text-sm text-gray-500">{flight.date}</p>*/}
-                                    {/*<p className="mt-1 text-red-600 font-semibold">{flight.price}</p>*/}
+                                    <p className="text-sm text-gray-500">{flight.date}</p>
+                                    <p className="mt-1  font-semibold">Chỉ từ <span className='text-red-600'>{flight.price}</span></p>
                                 </div>
                             </Link>
                         ))}
@@ -608,35 +682,39 @@ function Home() {
             </div>
 
             <div className="container mx-auto p-6">
-                <h1 className="text-3xl font-bold text-center mb-8">Trải Nghiệm Cùng QAirline</h1>
+            <h1 className="text-4xl font-bold text-black mb-4">
+                    🤝 Trải nghiệm cùng QAirline
+                </h1>
                 <div className="flex justify-center space-x-4 overflow-hidden">
-                    {getVisiblePosts().map((post, index) => {
+                    {getVisiblePosts().length > 0 && getVisiblePosts().map((post, index) => {
                         const isMainPost = index === 0;
                         return (
-                            <div
-                                key={post._id}
-                                className={`${
-                                    isMainPost ? 'lg:w-3/4 w-full' : 'lg:w-1/4 w-full'
-                                } bg-white rounded-lg shadow-lg p-4 text-center transition-transform duration-1000 ease-in-out transform`}
-                                style={{
-                                    // transform: isMainPost ? 'scale(1.1)' : 'scale(0.9)',
-                                    // opacity: isMainPost ? 1 : 0.7,
-                                }}
-                            >
-                                <img
-                                    src={post.thumbnail}
-                                    alt={post.title}
-                                    className="w-full h-48 object-cover rounded-md"
-                                />
-                                <h3 className="text-xl font-semibold mt-4">{post.title}</h3>
-                                <Link
-                                    to={`/banner/${post.id}`}
-                                    className="text-blue-500 font-medium hover:underline"
+                            post && (
+                                <div
+                                    key={post._id}
+                                    className={`${
+                                        isMainPost ? 'lg:w-3/4 w-full' : 'lg:w-1/4 w-full'
+                                    } bg-white rounded-lg shadow-lg p-4 text-center transition-transform duration-1000 ease-in-out transform`}
+                                    style={{
+                                        // transform: isMainPost ? 'scale(1.1)' : 'scale(0.9)',
+                                        // opacity: isMainPost ? 1 : 0.7,
+                                    }}
                                 >
-                                    Xem Chi Tiết
-                                </Link>
-                            </div>
-                        );
+                                    <img
+                                        src={post.thumbnail}
+                                        alt={post.title}
+                                        className="w-full h-48 object-cover rounded-md"
+                                    />
+                                    <h3 className="text-xl font-semibold mt-4">{post.title}</h3>
+                                    <Link
+                                        to={`/banner/${post.id}`}
+                                        className="text-blue-500 font-medium hover:underline"
+                                    >
+                                        Xem Chi Tiết
+                                    </Link>
+                                </div>
+                            )
+                        );                        
                     })}
                 </div>
             </div>
@@ -646,143 +724,31 @@ function Home() {
                     📍Điểm Đến Hấp Dẫn
                 </h1>
                 <div
-                    className="slider flex items-center justify-center relative w-[1140px] h-[400px] overflow-hidden shadow-lg">
+                    className="slider flex items-center mx-auto justify-center relative w-[1200px] h-[400px] overflow-hidden shadow-lg">
                     {loadingDestination ? (
                         <div className="text-center py-10 text-gray-500">Đang tải dữ liệu...</div>
                     ) : (
-                        <div className="slide-track flex space-x-2 animate-scroll bg-cover relative"
-                             style={{width: 'calc(400px * 18)'}}>
-                            {/*<div className="w-[400px] h-[400px] bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Phu Quoc.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Phú Quốc</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Hanoi.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Hà Nội</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Da Nang.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Đà Nẵng</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Ho Chi Minh City.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">TP. Hồ Chí Minh</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Seoul.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Seoul</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Da Nang.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Đà Nẵng</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Moscow.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Moscow</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Singapore.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Singapore</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Paris.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Paris</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Phu Quoc.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Phú Quốc</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Da Lat.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Đà Lạt</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Tokyo.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Tokyo</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Da Lat.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Đà Lạt</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Paris.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Paris</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Hoi An.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Hội An</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Singapore.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Singapore</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Hanoi.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Hà Nội</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
-                            {/*<div className="w-[400px] h-[400px] rounded-lg bg-cover bg-center relative"*/}
-                            {/*     style={{backgroundImage: "url('/images/places/Tokyo.jpg')"}}>*/}
-                            {/*    <div*/}
-                            {/*        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">*/}
-                            {/*        <p className="text-lg font-semibold">Tokyo</p>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
+                        <div className="animate-infinite-slider flex space-x-2 animate-scroll bg-cover relative "
+                             >
                             {destinations.map((inDestination) => (
                                 <Link
                                     key={inDestination.id}
                                     to={`/destination/${inDestination.id}`}
-                                    className="w-full h-56 rounded-lg bg-cover bg-center relative"
+                                    className="slide w-[400px] h-[400px] rounded-lg bg-cover bg-center relative hover:scale-110 transition duration-300 ease-in-out"
+                                    style={{backgroundImage: `url(${inDestination.thumbnail})`}}
+                                >
+                                    <div
+                                        className="absolute bottom-4 left-4 bg-red-600 bg-opacity-75 text-white px-3 py-1 rounded-lg">
+                                        <p className="text-lg font-semibold">{inDestination.title}</p>
+                                    </div>
+                                </Link>
+                            ))}
+                            {/*Duplicate to create an infinite loop*/}
+                            {destinations.map((inDestination) => (
+                                <Link
+                                    key={inDestination.id}
+                                    to={`/destination/${inDestination.id}`}
+                                    className="slide w-[400px] h-[400px] rounded-lg bg-cover bg-center relative hover:scale-110 transition duration-300 ease-in-out"
                                     style={{backgroundImage: `url(${inDestination.thumbnail})`}}
                                 >
                                     <div

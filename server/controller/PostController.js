@@ -47,6 +47,7 @@ const getPost = async (req, res) => {
             id: post._id,
             title: post.title,
             content: post.content,
+            category: post.category,
             thumbnail: `data:image/png;base64,${post.thumbnail.toString('base64')}`
         };
         return res.status(200).json(formattedPost);

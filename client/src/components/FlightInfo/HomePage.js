@@ -309,7 +309,7 @@ function FlightCard({flight, onSelect}) {
                     <button
                         type="button"
                         onClick = {() => onSelect(flight)}
-                        className="whitespace-nowrap mx-auto items-center py-2.5 px-6 text-sm rounded-lg bg-yellow-500 cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:bg-yellow-600 hover:scale-110"
+                        className="whitespace-nowrap mx-auto items-center text-white py-2.5 px-6 text-sm rounded-lg bg-sky-500 cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:bg-sky-700 hover:scale-110"
                     >
                         ĐẶT VÉ NGAY
                     </button>
