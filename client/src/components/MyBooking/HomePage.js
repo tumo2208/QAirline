@@ -43,7 +43,7 @@ function HomePage(){
     }
     return (
         <div>
-            <div className="py-10" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
+            <div className="py-10 select-none" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
             <div className="border-4 mx-auto max-w-5xl my-5 rounded-2xl shadow-lg">
                 <div className="flex select-none cursor-pointer justify-between text-white text-center w-full font-bold">
                     <button

@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useMemo} from "react";
 import {AutocompleteInput} from "../../shared/AutoComplete";
-import {useNavigate, useLocation} from "react-router-dom";
+import {Link, useNavigate, useLocation} from "react-router-dom";
 import axios from "axios";
 import FetchAirportInfo from "../../shared/AirportInfo";
 import Loading from '../../shared/Loading';
@@ -164,7 +164,7 @@ function HomePage() {
                      style={{backgroundColor: "#d9f2ff"}}>
                     <div className="flex-1">
                         <div className="max-w-md mx-auto my-10 bg-white rounded-xl shadow-lg p-6">
-                            <form className="space-y-3" onSubmit={handleSubmit}>
+                            <form className="space-y-4" onSubmit={handleSubmit}>
                                 <div className="space-x-5">
                                     <label className="inline-flex items-center">
                                         <input
@@ -384,6 +384,17 @@ function HomePage() {
                                             </div>
                                         )}
                                     </div>
+                                </div>
+
+                                <div></div>
+
+                                <div className="flex items-center text-sm space-x-2">
+                                    <label className="text-gray-700">
+                                        Tra cứu chuyến bay tại
+                                        <Link to ="/flight-info"
+                                            className="italic text-blue-600 hover:underline"> Thông tin chuyến bay
+                                        </Link>
+                                    </label>
                                 </div>
 
                                 <button
