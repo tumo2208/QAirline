@@ -130,6 +130,55 @@ const getFLightByArrival = async (req, res) => {
     }
 };
 
+const getFlightByDepartureAndArrival = async (req, res) => {
+    try {
+        const { departureCity, arrivalCity } = req.body;
+
+        const flights = await Flight.aggregate([
+            {
+                $lookup: {
+                    from: 'airports',
+                    localField: 'departure_airport_id',
+                    foreignField: 'airport_code',
+                    as: 'departure_airport'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'airports',
+                    localField: 'arrival_airport_id',
+                    foreignField: 'airport_code',
+                    as: 'arrival_airport'
+                }
+            },
+            {
+                $match: {
+                    'departure_airport.city': departureCity,
+                    'arrival_airport.city': arrivalCity,
+                    'status': "Scheduled",
+                }
+            },
+            {
+                $unwind: '$departure_airport'
+            },
+            {
+                $unwind: '$arrival_airport'
+            }
+        ]);
+
+        if (flights.length === 0) {
+            return res.status(404).json("Không tìm thấy chuyến bay phù hợp");
+        }
+
+        return res.status(200).json(flights);
+    } catch (error) {
+        console.error("Lỗi không tìm được chuyến bay bằng điểm khởi hành, điểm đến và thời gian", error);
+        return res.status(505).json({ status: false, message: error.message });
+    }
+};
+
+
+
 const getFlightByDepartureDate = async (req, res) => {
     try {
         const {departDate} = req.body;
@@ -442,4 +491,4 @@ const setDelayTime = async (req, res) => {
     }
 };
 
-module.exports = {getFlightByID, getFLightByArrival, getFlightByDepartureDate, getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus, updatePrepareFlight, setDelayTime};
+module.exports = {getFlightByID, getFLightByArrival, getFlightByDepartureAndArrival, getFlightByDepartureDate, getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, updateFlightStatus, updatePrepareFlight, setDelayTime};

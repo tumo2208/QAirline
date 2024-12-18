@@ -1,11 +1,12 @@
 const express = require('express');
-const {getFlightByID, getFLightByArrival, getFlightByDepartureDate, getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, setDelayTime } = require('../controller/FlightController');
+const {getFlightByID, getFLightByArrival, getFlightByDepartureAndArrival, getFlightByDepartureDate, getAllFlights, getFlightsOneWay, getFlightsRoundTrip, addFlight, setDelayTime } = require('../controller/FlightController');
 const userVerification = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
 router.post('/getFlightByID', getFlightByID);
 router.post('/getFlightByArrival', getFLightByArrival);
+router.post('/getFlightByDepartureAndArrival', getFlightByDepartureAndArrival);
 router.post('/getFlightByDepartureTime', getFlightByDepartureDate);
 router.get('/allflights', getAllFlights);
 router.post('/oneway', getFlightsOneWay);
