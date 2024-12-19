@@ -307,6 +307,14 @@ const getFlightsOneWay = async (req, res) => {
 const getFlightsRoundTrip = async (req, res) => {
     const {departCity, arriveCity, departDate, arriveDate} = req.body;
 
+    if (arriveDate < departDate) {
+        return res.status(400).json({ status: false, message: "Ngày về phải sau ngày đi" });
+    }
+
+    if (departCity === arriveCity) {
+        return res.status(400).json({ status: false, message: "Điểm đến và điểm khởi hành không được trùng nhau" });
+    }
+
     try {
         const outboundFlights = await getFlights(departCity, arriveCity, departDate);
 

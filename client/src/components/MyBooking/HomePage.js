@@ -9,10 +9,14 @@ function HomePage(){
     const navigate = useNavigate();
     const [bookingID, setBookingID] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!bookingID) {
-            alert("Please fill in all required fields.");
+            setError("Xin hãy điền toàn bộ thông tin.");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
@@ -67,6 +71,11 @@ function HomePage(){
                         LỊCH SỬ ĐẶT CHỖ
                     </button>
                 </div>
+
+                <div>
+                    {error && <div className="text-red-500 mb-4">{error}</div>}
+                </div>
+                
                 <div>
                     {activeTab === "searchbooking" && (
                         <div className="relative">
