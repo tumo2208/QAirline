@@ -245,7 +245,6 @@ const getFlightByDepartureDate = async (req, res) => {
  */
 const getFlights = async (departCity, arriveCity, departDate) => {
     try {
-        const now = moment().toDate();
         const endOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").endOf('day').toDate();
         const startOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").startOf('day').toDate();
 
