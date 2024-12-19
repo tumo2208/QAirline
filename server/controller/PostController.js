@@ -5,6 +5,11 @@ const createPost = async (req, res) => {
         const { title, category, content } = req.body;
         const thumbnail = req.file.buffer;
 
+        const user = req.user;
+        if (user.user_type !== 'Admin') {
+            return res.status(404).json({error: 'Bạn không có thẩm quyền để sử dung chức năng này'});
+        }
+
         const post = new Post({
             title: title,
             category: category,
