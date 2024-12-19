@@ -333,6 +333,14 @@ const getFlightsRoundTrip = async (req, res) => {
         return res.status(403).json({message: 'Bạn không thể tra cứu các chuyến bay trước thời điểm hiện tại'});
     }
 
+    if (arriveDate < departDate) {
+        return res.status(400).json({ status: false, message: "Ngày về phải sau ngày đi" });
+    }
+
+    if (departCity === arriveCity) {
+        return res.status(400).json({ status: false, message: "Điểm đến và điểm khởi hành không được trùng nhau" });
+    }
+
     try {
         const outboundFlights = await getFlights(departCity, arriveCity, departDate);
 

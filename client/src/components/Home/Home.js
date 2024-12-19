@@ -61,29 +61,44 @@ function Home() {
         e.preventDefault();
 
         if (!departure || !destination || !departureDate) {
-            alert("Xin hãy điền đầy đủ thông tin.");
+            setError("Xin hãy điền đầy đủ thông tin.");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
         if (departure === destination) {
-            alert("Điểm khởi hành và điểm đến không thể là cùng một địa điểm!");
+            setError("Điểm khởi hành và điểm đến không thể là cùng một địa điểm!");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
         if (roundTrip && (returnDate < departureDate)) {
-            alert("Ngày đi không thể muộn hơn ngày về!");
+            setError("Ngày đi không thể muộn hơn ngày về!");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
         if (!cities.includes(departure)) {
             document.querySelector(".departure").value = "";
-            alert("Vui lòng nhập đúng định dạng điểm khởi hành theo gợi ý");
+            setError("Vui lòng nhập đúng định dạng điểm khởi hành theo gợi ý");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
         if (!cities.includes(destination)) {
             document.querySelector(".destination").value = "";
-            alert("Vui lòng nhập đúng định dạng điểm đến theo gợi ý");
+            setError("Vui lòng nhập đúng định dạng điểm đến theo gợi ý");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
@@ -118,28 +133,35 @@ function Home() {
                     }
                 });
             } else {
-                navigate("/booking/flight-selection", {
-                    state: {
-                        flights: null,
-                        tripType: roundTrip ? "round-trip" : "one-way",
-                        passengers: passengers,
-                        searchInfo: requestBody,
-                    } });
+                if (error.response && error.response.data && error.response.data.message) {
+                    setError(error.response.data.message);
+                    setTimeout(() => {
+                        setError('');
+                    }, 2000);
+                }
             }
         } catch (error) {
-            navigate("/booking/flight-selection", { state: {
-                    flights: null,
-                    tripType: roundTrip ? "round-trip" : "one-way",
-                    passengers: passengers,
-                    searchInfo: requestBody,
-                } });
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message);
+                setTimeout(() => {
+                    setError('');
+                }, 2000);
+            } else {
+                setError("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+                setTimeout(() => {
+                    setError('');
+                }, 2000);
+            }
         }
     };
 
     const handleSubmit_mybooking = async (e) => {
         e.preventDefault();
         if (!bookingID) {
-            alert("Xin hãy điền đầy đủ thông tin.");
+            setError("Xin hãy điền đầy đủ thông tin.");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
         setLoading(true);
@@ -440,6 +462,9 @@ function Home() {
                         {activeForm === "booking_form" && (
                             <form className="space-y-4" onSubmit={handleSubmit}>
                                 <div className="space-x-5">
+                                    <div>
+                                        {error && <div className="text-red-500 mb-4">{error}</div>}
+                                    </div>
                                     <label className="inline-flex items-center">
                                         <input 
                                             type="radio" 
@@ -705,9 +730,6 @@ function Home() {
                             </form>
                         )}
                         </div>
-                        <div>
-                            {error && <p className="error">{error}</p>}
-                        </div>
                     </div>
                 </div>
 
@@ -842,7 +864,7 @@ function Home() {
                     </Link>
                 </div>
             </div>
-            {loading && (<div><Loading/></div>)}
+            {/* {loading && (<div><Loading/></div>)} */}
         </div>
     )
 }

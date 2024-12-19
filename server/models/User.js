@@ -5,7 +5,7 @@ const {nationalities} = require('../../client/src/shared/SharedData');
 
 const userSchema = new Schema({
     full_name: { type: String, required: true },
-    gender: { type: String, enum: ['Male', 'Female', 'Others'], required: true },
+    gender: { type: String, enum: ['Nam', 'Nữ', 'Khác'], required: true },
     dob: { type: Date, required: true },
     nationality: { type: String, enum: nationalities, required: true },
     email: { type: String, required: true, unique: true },

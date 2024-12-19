@@ -30,6 +30,7 @@ function HomePage() {
     const [destination, setDestination] = useState("");
     const [departureDate, setDepartureDate] = useState("");
     const [returnDate, setReturnDate] = useState("");
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (state) {
@@ -80,29 +81,44 @@ function HomePage() {
         e.preventDefault();
 
         if (!departure || !destination || !departureDate) {
-            alert("Xin hãy điền đầy đủ thông tin.");
+            setError("Xin hãy điền đầy đủ thông tin.");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
         if (departure === destination) {
-            alert("Điểm khởi hành và điểm đến không thể là cùng một địa điểm!");
+            setError("Điểm khởi hành và điểm đến không thể là cùng một địa điểm!");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
         if (roundTrip && (returnDate < departureDate)) {
-            alert("Ngày đi không thể muộn hơn ngày về!");
+            setError("Ngày đi không thể muộn hơn ngày về!");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
         if (!cities.includes(departure)) {
             document.querySelector(".departure").value = "";
-            alert("Vui lòng nhập đúng định dạng điểm khởi hành theo gợi ý");
+            setError("Vui lòng nhập đúng định dạng điểm khởi hành theo gợi ý");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
         if (!cities.includes(destination)) {
             document.querySelector(".destination").value = "";
-            alert("Vui lòng nhập đúng định dạng điểm đến theo gợi ý");
+            setError("Vui lòng nhập đúng định dạng điểm đến theo gợi ý");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
 
@@ -133,27 +149,29 @@ function HomePage() {
                         flights: response.data,
                         tripType: roundTrip ? "round-trip" : "one-way",
                         passengers: passengers,
-                        searchInfo: requestBody
+                        searchInfo: requestBody,
                     }
                 });
             } else {
-                navigate("/booking/flight-selection", {
-                    state: {
-                        flights: null,
-                        tripType: roundTrip ? "round-trip" : "one-way",
-                        passengers: passengers,
-                        searchInfo: requestBody
-                    } });
+                if (error.response && error.response.data && error.response.data.message) {
+                    setError(error.response.data.message);
+                    setTimeout(() => {
+                        setError('');
+                    }, 2000);
+                }
             }
         } catch (error) {
-            navigate("/booking/flight-selection", {
-                state: {
-                    flights: null,
-                    tripType: roundTrip ? "round-trip" : "one-way",
-                    passengers: passengers,
-                    searchInfo: requestBody
-                }
-            });
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message);
+                setTimeout(() => {
+                    setError('');
+                }, 2000);
+            } else {
+                setError("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+                setTimeout(() => {
+                    setError('');
+                }, 2000);
+            }
         }
     };
 
@@ -164,6 +182,7 @@ function HomePage() {
                      style={{backgroundColor: "#d9f2ff"}}>
                     <div className="flex-1">
                         <div className="max-w-md mx-auto my-10 bg-white rounded-xl shadow-lg p-6">
+                            {error && <div className="text-red-500 text-sm">{error}</div>}
                             <form className="space-y-4" onSubmit={handleSubmit}>
                                 <div className="space-x-5">
                                     <label className="inline-flex items-center">

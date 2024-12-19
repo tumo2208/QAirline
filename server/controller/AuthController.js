@@ -1,9 +1,80 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const redisClient = require("../redisClient");
+const {nationalities} = require('../../client/src/shared/SharedData');
+
+const validateUserData = (data, isUpdate = false) => {
+    if (!isUpdate) {
+        if (!data.full_name || data.full_name.trim() === "") {
+            return "Họ và tên không được để trống"; 
+        }
+
+        if (!data.gender || data.gender.trim() === "") {
+            return "Giới tính không được để trống"; 
+        }
+
+        if (!data.dob || data.dob.trim() === "") {
+            return "Ngày sinh không được để trống";
+        }
+
+        if (!data.nationality || data.nationality.trim() === "") {
+            return "Quốc tịch không được để trống";
+        }
+
+        if (!data.email || data.email.trim() === "") {
+            return "Email không được để trống";
+        }
+
+        if (!data.password || data.password.trim() === "") {
+            return "Mật khẩu không được để trống";
+        }
+
+        if (!data.phone_number || data.phone_number.trim() === "") {
+            return "Số điện thoại không được để trống";
+        }
+    }
+
+    if (data.email && !isValidEmail(data.email)) {
+        return "Email không hợp lệ";
+    }
+
+    if (data.password && data.password.length < 8) {
+        return "Mật khẩu phải có ít nhất 8 kí tự";
+    }
+
+    if (data.phone_number && data.phone_number.length < 10) {
+        return "Số điện thoại phải có ít nhất 10 kí tự";
+    }
+    
+    if (data.nationality && !nationalities.includes(data.nationality)) {
+        return "Quốc tịch không hợp lệ";
+    }
+
+    if (data.dob && new Date(data.dob) > new Date()) {
+        return "Ngày sinh không thể lớn hơn ngày hiện tại";
+    }
+
+    if (data.gender && !['Nam', 'Nữ', 'Khác'].includes(data.gender)) {
+        return "Giới tính không hợp lệ";
+    }
+
+    return null;
+};
+
+const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+};
 
 const register = async (req, res, next) => {
     const { full_name, gender, dob, nationality, email, password, phone_number } = req.body;
+
+    const error = validateUserData({ full_name, gender, email, password, phone_number, nationality, dob }, false);
+
+    if (error) {
+        return res.status(400).json({ message: error });
+    }
+
     try {
         const userExists = await User.findOne({ email });
         if (userExists) {
@@ -18,17 +89,17 @@ const register = async (req, res, next) => {
             email,
             password,
             phone_number
-      });
+        });
 
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
+        const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
 
-      res.cookie("token", token, {
-        withCredentials: true,
-        httpOnly: false,
-      });
+        res.cookie("token", token, {
+            withCredentials: true,
+            httpOnly: false,
+        });
 
-      res.status(201).json({ message: "Đăng ký tài khoản thành công!", token });
-      next();
+        res.status(201).json({ message: "Đăng ký tài khoản thành công!", token });
+        next();
 
     } catch (error) {
         console.error(error);
@@ -89,35 +160,36 @@ const profile = async (req, res) => {
     }
 };
 
-function checkIdentification(identifiation_id) {
-    if (/^[A-Z][0-9]{8,14}$/.test(identifiation_id)) {
-        return 'Passport';
-    } else if (/^\d{8,12}$/.test(identifiation_id)) {
-        return 'Citizen ID';
-    } else {
-        return null;
-    }
-}
-
 const update = async (req, res) => {
     const userId = req.user.id;
     const { full_name, gender, dob, nationality, email, phone_number } = req.body;
 
+    const error = validateUserData({ full_name, gender, email, phone_number, nationality, dob }, true);
+    if (error) {
+        return res.status(400).json({ message: error });
+    }
+
     try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "Không tìm thấy người dùng" });
+        }
+
         const updates = {};
 
-        if (full_name) updates.full_name = full_name;
-        if (gender) updates.gender = gender;
-        if (dob) updates.dob = dob;
-        if (nationality) updates.nationality = nationality;
-        if (email) {
+        if (full_name && full_name.trim() !== "" && full_name !== user.full_name) updates.full_name = full_name;
+        if (gender && gender.trim() !== "" && gender !== user.gender) updates.gender = gender;
+        if (dob && dob.trim() !== "" && dob !== user.dob) updates.dob = dob;
+        if (nationality && nationality.trim() !== "" && nationality !== user.nationality) updates.nationality = nationality;
+        if (email && email !== user.email) {
             const emailExists = await User.findOne({ email });
             if (emailExists && emailExists.id !== userId) {
                 return res.status(400).json({ message: "Email này đã được sử dụng" });
             }
             updates.email = email;
         }
-        if (phone_number) {
+        if (phone_number && phone_number.trim() !== "" && phone_number !== user.phone_number) {
             const phoneExists = await User.findOne({ phone_number });
             if (phoneExists && phoneExists.id !== userId) {
                 return res.status(400).json({ message: "Số điện thoại này đã được sử dụng" });
@@ -125,22 +197,22 @@ const update = async (req, res) => {
             updates.phone_number = phone_number;
         }
 
-        // Update the user in the database
-        const user = await User.findByIdAndUpdate(userId, updates, { new: true });
-        if (!user) {
-            return res.status(404).json({ message: "Không tìm thấy người dùng" });
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({ message: "Dữ liệu không thay đổi" });
         }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
 
         res.status(200).json({
             message: "Cập nhật trang cá nhân thành công!",
             user: {
-                full_name: user.full_name,
-                email: user.email,
-                gender: user.gender,
-                dob: user.dob,
-                nationality: user.nationality,
-                phone_number: user.phone_number,
-                created_at: user.created_at,
+                full_name: updatedUser.full_name,
+                email: updatedUser.email,
+                gender: updatedUser.gender,
+                dob: updatedUser.dob,
+                nationality: updatedUser.nationality,
+                phone_number: updatedUser.phone_number,
+                created_at: updatedUser.created_at,
             },
         });
     } catch (error) {
@@ -152,6 +224,10 @@ const update = async (req, res) => {
 const changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword, confirmPassword } = req.body;
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ message: "Mật khẩu mới quá yếu! Cần ít nhất 8 kí tự!" });
+        }
 
         if (newPassword !== confirmPassword) {
             return res.status(400).json({ message: "Xác nhận lại mật khẩu bị sai. Xin hãy thử lại!" });

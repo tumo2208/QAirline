@@ -17,6 +17,7 @@ function Passengers() {
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const outboundFlightID = outboundFlight.flight.flight_number;
     const returnFlightID = returnFlight?.flight?.flight_number || null;
@@ -56,7 +57,10 @@ function Passengers() {
     const handleNext = async () => {
         const isValid = validateForm();
         if (!isValid) {
-            alert("Xin hãy điền đầy đủ thông tin !");
+            setError("Xin hãy điền đầy đủ thông tin !");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
             return;
         }
         if (window.confirm("Hãy chắc chắn rằng bạn đã điền chính xác các thông tin, nếu chọn OK bạn sẽ không thể thay đổi các thông tin đã nhập !")) {
@@ -126,11 +130,17 @@ function Passengers() {
                     }
                     navigate("/booking/booking-successfully", { state: { bookingID: result.bookingID }});
                 } else {
-                    alert("Booking thất bại " + response.data.message);
+                    setError("Booking thất bại " + response.data.message);
+                    setTimeout(() => {
+                        setError('');
+                    }, 2000);
                 }
             } catch (error) {
                 console.error("Lỗi cụ thể:", error.response ? error.response.data : error.message);
-                alert(`Booking đã thất bại: ${error.message}`);
+                setError(`Booking đã thất bại: ${error.message}`);
+                setTimeout(() => {
+                    setError('');
+                }, 2000);
             }
 
             setLoading(false);
@@ -148,7 +158,10 @@ function Passengers() {
     const validateEmail = () => {
         for (let i = 0; i < formData.adults.length; i++) {
             if (!isValidEmail(formData.adults[i].email)) {
-                alert(`Email không hợp lệ`);
+                setError(`Email không hợp lệ`);
+                setTimeout(() => {
+                    setError('');
+                }, 2000);
                 return false;
             }
         }
@@ -179,6 +192,7 @@ function Passengers() {
                     href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lilita+One&family=Pangolin&family=Potta+One&family=Protest+Revolution&display=swap"
                     rel="stylesheet"/>
                 <div style={{flex: 7}}>
+                    {error && <div className="bg-red-200 p-3 text-red-700 text-center">{error}</div>}
                     <div className="bg-sky-200 my-5 mx-20 p-6 rounded-lg shadow-lg mb-6">
                         <div className="items-center text-center text-3xl font-semibold"
                              style={{fontFamily: "Barlow Condensed"}}>
