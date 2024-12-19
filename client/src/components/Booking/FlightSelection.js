@@ -148,6 +148,10 @@ function FlightSelection() {
     };
 
     const navigateToPassengers = () => {
+        if (outboundFlights[0].departure_time > returnFlights[0].departure_time) {
+            alert("Chuyến bay đi phải trước chuyến bay về");
+            return;
+        }
         navigate("/booking/passengers", {
             state: {
                 outboundFlight: selectedOutbound,

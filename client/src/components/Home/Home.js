@@ -110,49 +110,19 @@ function Home() {
             departDate: departureDate
         };
 
-        try {
-            let response;
-
-            if (roundTrip === true) {
-                requestBody.arriveDate = returnDate;
-            }
-
-            if (roundTrip === false) {
-                response = await axios.post("http://localhost:3001/api/flights/oneway", requestBody);
-            } else {
-                response = await axios.post("http://localhost:3001/api/flights/roundtrip", requestBody);
-            }
-
-            if (response.status === 200) {
-                navigate("/booking/flight-selection", {
-                    state: {
-                        flights: response.data,
-                        tripType: roundTrip ? "round-trip" : "one-way",
-                        passengers: passengers,
-                        searchInfo: requestBody,
-                    }
-                });
-            } else {
-                if (error.response && error.response.data && error.response.data.message) {
-                    setError(error.response.data.message);
-                    setTimeout(() => {
-                        setError('');
-                    }, 2000);
-                }
-            }
-        } catch (error) {
-            if (error.response && error.response.data && error.response.data.message) {
-                setError(error.response.data.message);
-                setTimeout(() => {
-                    setError('');
-                }, 2000);
-            } else {
-                setError("Đã xảy ra lỗi. Vui lòng thử lại sau.");
-                setTimeout(() => {
-                    setError('');
-                }, 2000);
-            }
+        if (roundTrip === true) {
+            requestBody.arriveDate = returnDate;
         }
+
+
+        navigate("/booking/flight-selection", {
+            state: {
+                flights: null,
+                tripType: roundTrip ? "round-trip" : "one-way",
+                passengers: passengers,
+                searchInfo: requestBody,
+            }
+        });
     };
 
     const handleSubmit_mybooking = async (e) => {
