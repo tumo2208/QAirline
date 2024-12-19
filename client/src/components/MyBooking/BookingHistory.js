@@ -51,8 +51,8 @@ function BookingHistory() {
 
     if (!bookings) {
         return (
-            <div className="bg-gray-10 p-60 flex flex-col items-center justify-center space-y-10">
-                <h2 className="text-5xl font-bold text-center text-[#002D74]">Bạn chưa từng đặt vé, không tồn tại lịch sử đặt chỗ của bạn</h2>
+            <div className="bg-gray-10 mx-auto py-60 flex flex-col items-center justify-center space-y-10">
+                <h2 className="lg:text-5xl md:text-5xl text-2xl text-center font-bold mx-auto text-[#002D74]">Bạn chưa từng đặt vé, không tồn tại lịch sử đặt chỗ của bạn</h2>
                 <div className="text-left mx-8">
                     <button
                         type="button"
