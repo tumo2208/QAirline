@@ -9,11 +9,11 @@ function Signup() {
     const [phone_number, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [gender, setGender] = useState("Male");
+    const [gender, setGender] = useState("Nam");
     const [nationality, setNationality] = useState("Vietnam");
     const [dob, setDob] = useState("");
-    const [identification_id, setIdentificationId] = useState("");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -34,12 +34,19 @@ function Signup() {
             },
             { withCredentials: true },
           );
-          if (response.status === 200) {
-            setError("");
-            navigate(`/login`);
-          }
+            if (response.status === 201) {
+                setSuccess("Đăng ký thành công, chuyển hướng tới trang đăng nhập...");
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 2000);
+            }
         } catch (error) {
-          setError("Đã có lỗi khi đăng ký. Vui lòng thử lại sau.");
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message);
+                setTimeout(() => {
+                    setError('');
+                }, 2000);
+            }
       }
   };
 
@@ -72,9 +79,9 @@ function Signup() {
                             <div className="flex-1">
                                 <label className="font-semibold block text-gray-700">Giới tính</label>
                                 <select value={gender} onChange={(e) => setGender(e.target.value)} required className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500 focus:bg-white focus:outline-none">
-                                    <option value="Male">Nam</option>
-                                    <option value="Female">Nữ</option>
-                                    <option value="Others">Khác</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
                                 </select>
                             </div>
 
@@ -157,7 +164,8 @@ function Signup() {
                                   className="w-full px-4 py-3 rounded-lg bg-gray-200 mt-2 border focus:border-blue-500
                   focus:bg-white focus:outline-none" required/>
                         </div>
-
+                        
+                        {success && <div className="text-green-500 mt-2">{success}</div>}
                         {error && <div className="text-red-500 mt-2">{error}</div>}
 
                         <div className="flex items-center space-x-2">

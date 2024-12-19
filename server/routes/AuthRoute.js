@@ -13,7 +13,7 @@ router.post('/login', login);
 router.get('/profile', userVerification, profile);
 
 // Update Identification
-router.put('/profile', userVerification, update);
+router.post('/update', userVerification, update);
 
 // Change password
 router.post('/change-password', userVerification, changePassword);
