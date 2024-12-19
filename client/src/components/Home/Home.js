@@ -224,9 +224,9 @@ function Home() {
 
     const genState = (flight) => {
         const route = flight.route;
-        console.log(flight);
-        const departTime = flight?.departure_time;
-        console.log(departTime);
+        const departTime = flight?.date;
+        const [day, month, year] = departTime.split('/');
+        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
         const type = flight.type;
         let tripType;
         if (type === "MỘT CHIỀU") tripType = "one-way";
@@ -235,7 +235,7 @@ function Home() {
         const requestBody = {
             departCity: destination[0],
             arriveCity: destination[1],
-            departDate: departTime,
+            departDate: new Date(formattedDate),
         };
         if (tripType === "round-trip") requestBody.arriveDate = new Date();
         return {

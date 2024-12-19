@@ -107,6 +107,11 @@ const getFLightByArrival = async (req, res) => {
                 }
             },
             {
+                $match:  {
+                    'status': 'Scheduled'
+                }
+            },
+            {
                 $match: {
                     'arrival_airport.city': arrivalCity
                 }
@@ -155,7 +160,7 @@ const getFlightByDepartureAndArrival = async (req, res) => {
                 $match: {
                     'departure_airport.city': departureCity,
                     'arrival_airport.city': arrivalCity,
-                    'status': "Scheduled",
+                    'status': 'Scheduled'
                 }
             },
             {
@@ -176,8 +181,6 @@ const getFlightByDepartureAndArrival = async (req, res) => {
         return res.status(505).json({ status: false, message: error.message });
     }
 };
-
-
 
 const getFlightByDepartureDate = async (req, res) => {
     try {
@@ -207,7 +210,8 @@ const getFlightByDepartureDate = async (req, res) => {
                     'departure_time': {
                         $gte: startOfDay,
                         $lte: endOfDay
-                    }
+                    },
+                    'status': 'Scheduled'
                 }
             },
             {
@@ -239,22 +243,18 @@ const getFlightByDepartureDate = async (req, res) => {
 const getFlights = async (departCity, arriveCity, departDate) => {
     try {
         const now = moment().toDate();
+        const endOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").endOf('day').toDate();
+        const startOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").startOf('day').toDate();
 
         const matchCriteria = {
             'departure_airport.city': departCity,
-            'arrival_airport.city': arriveCity
-        };
-
-        if (departDate) {
-            const startOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").startOf('day').toDate();
-            const endOfDay = moment.tz(departDate, "YYYY-MM-DD", "UTC").endOf('day').toDate();
-            matchCriteria['departure_time'] = {
+            'arrival_airport.city': arriveCity,
+            'departure_time': {
                 $gte: startOfDay,
                 $lte: endOfDay
-            };
-        } else {
-            matchCriteria['departure_time'] = { $gte: now };
-        }
+            },
+            'status': 'Scheduled'
+        };
 
         return await Flight.aggregate([
             {
@@ -290,7 +290,14 @@ const getFlights = async (departCity, arriveCity, departDate) => {
 };
 
 const getFlightsOneWay = async (req, res) => {
-    const {departCity, arriveCity, departDate} = req.body;
+    let {departCity, arriveCity, departDate} = req.body;
+    if (departDate === null) {
+        const date = new Date();
+        departDate = date.toISOString();
+    }
+    if (departDate < new Date()) {
+        return res.status(403).json({message: 'Bạn không thể tra cứu các chuyến bay trước thời điểm hiện tại'});
+    }
 
     try {
         const flights = await getFlights(departCity, arriveCity, departDate);
@@ -305,7 +312,23 @@ const getFlightsOneWay = async (req, res) => {
 };
 
 const getFlightsRoundTrip = async (req, res) => {
-    const {departCity, arriveCity, departDate, arriveDate} = req.body;
+    let {departCity, arriveCity, departDate, arriveDate} = req.body;
+    if (departDate === null) {
+        const date = new Date();
+        departDate = date.toISOString();
+    }
+    if (arriveDate === null) {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        arriveDate = tomorrow.toISOString();
+    }
+    if (departDate < new Date()) {
+        return res.status(402).json({message: 'Bạn không thể tra cứu các chuyến bay trước thời điểm hiện tại'});
+    }
+    if (arriveDate < new Date()) {
+        return res.status(403).json({message: 'Bạn không thể tra cứu các chuyến bay trước thời điểm hiện tại'});
+    }
 
     try {
         const outboundFlights = await getFlights(departCity, arriveCity, departDate);

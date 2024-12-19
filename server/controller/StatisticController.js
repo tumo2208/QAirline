@@ -2,6 +2,10 @@ const Booking = require('../models/Booking');
 
 const getMonthlyRevenue = async (req, res) => {
     const year = parseInt(req.params.year);
+    const user = req.user;
+    if (user.user_type !== 'Admin') {
+        return res.status(404).json({error: 'Bạn không có quyền để sử dụng chức năng này!'});
+    }
     try {
         const data = await Booking.aggregate([
             {
