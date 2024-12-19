@@ -8,7 +8,10 @@ const updateFlightStatus = async () => {
         const now = new Date();
         await Flight.updateMany(
             { status: 'Scheduled', departure_time: { $lte: now } },
-            { $set: { status: 'HasFlied' } }
+            { $set: {
+                status: 'HasFlied',
+                notification: ['Chuyến bay đã cất cánh']
+            } }
         );
     } catch (error) {
         console.error('Lỗi cập nhật trạng thái chuyến bay:', error);
@@ -502,6 +505,7 @@ const setDelayTime = async (req, res) => {
         // flight.arrival_date = newArrivalDate;
 
         const delayMessage = `Chuyến bay của bạn đã bị delay sang ${newDepartDate.toISOString()}`;
+        flight.notification = flight.notification.filter(notification => !notification.includes("Chuyến bay của bạn đã bị delay sang"));
         flight.notification.push(delayMessage);
 
         await flight.save();

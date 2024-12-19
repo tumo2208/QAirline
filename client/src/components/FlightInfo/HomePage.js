@@ -10,9 +10,12 @@ function HomePage() {
     const navigate = useNavigate();
     const [destination, setDestination] = useState("");
     const [departureDate, setDepartureDate] = useState("");
+    const [flightID, setFlightID] = useState("");
     const [loading, setLoading] = useState(false);
     const [placeResults, setPlaceResults] = useState([]);
     const [dateResults, setDateResults] = useState([]);
+    const [flight, setFlight] = useState(null);
+    const [noti, setNoti] = useState([]);
     const suggestions = FetchAirportInfo();
 
     const [placeTotalPages, setPlaceTotalPages] = useState(0);
@@ -59,6 +62,26 @@ function HomePage() {
             setLoading(false);
         } catch (error) {
             console.error("Error fetching offers:", error);
+            setLoading(false);
+        }
+    }
+
+    /**
+     *
+     */
+    const searchFlight = async() => {
+        try {
+            setFlight(null);
+            setNoti([]);
+            setLoading(true);
+            const response = await axios.post("http://localhost:3001/api/flights/getFlightByID", {
+                flightID: flightID,
+            });
+            setFlight(response.data);
+            setNoti(response.data.notification);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching flights:", error);
             setLoading(false);
         }
     }
@@ -144,7 +167,8 @@ function HomePage() {
                     </div>
                     {activeTab==="byPlace" && (
                         <div>
-                            <div class="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
+                            <div
+                                className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
                                 <AutocompleteInput
                                     suggestions={suggestions}
                                     style={"destination w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"}
@@ -152,11 +176,12 @@ function HomePage() {
                                     onChange={(e) => setDestination(e.target.value)}
                                     onlyPlaces={true}
                                 />
-                                <button type='button' class="flex items-center justify-center bg-[#007bff] px-5"
-                                    onClick={searchByPlace}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px" class="fill-white hover:scale-125">
+                                <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
+                                        onClick={searchByPlace}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
+                                         className="fill-white hover:scale-125">
                                         <path
-                                        d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
+                                            d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
                                         </path>
                                     </svg>
                                 </button>
@@ -165,24 +190,36 @@ function HomePage() {
                                 {placeResults.length > 0 && (
                                     <div>
                                         {renderResults(placeResults)}
-                                        <div class="flex justify-center items-center gap-8">
-                                            <button class="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button"
-                                                    onClick={() => handlePageChange(currentPage - 1)}
-                                                    disabled={currentPage === 1}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-                                                    <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                                        <div className="flex justify-center items-center gap-8">
+                                            <button
+                                                className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                                type="button"
+                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                disabled={currentPage === 1}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                     fill="currentColor" className="w-4 h-4">
+                                                    <path fill-rule="evenodd"
+                                                          d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
+                                                          clip-rule="evenodd"/>
                                                 </svg>
                                             </button>
-                                            
-                                            <p class="text-slate-600">
-                                                Trang <strong class="text-slate-800">{currentPage}</strong> trên&nbsp;<strong class="text-slate-800">{placeTotalPages}</strong>
+
+                                            <p className="text-slate-600">
+                                                Trang <strong
+                                                className="text-slate-800">{currentPage}</strong> trên&nbsp;<strong
+                                                className="text-slate-800">{placeTotalPages}</strong>
                                             </p>
-                                            
-                                            <button class="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button"
+
+                                            <button
+                                                className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                                type="button"
                                                 onClick={() => handlePageChange(currentPage + 1)}
                                                 disabled={currentPage === placeTotalPages}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-                                                    <path fill-rule="evenodd" d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                     fill="currentColor" className="w-4 h-4">
+                                                    <path fill-rule="evenodd"
+                                                          d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
+                                                          clip-rule="evenodd"/>
                                                 </svg>
                                             </button>
                                         </div>
@@ -190,57 +227,101 @@ function HomePage() {
                                 )}
                             </div>
                         </div>
-                        
+
                     )}
-                    {activeTab==="byDate" && (
+                    {activeTab === "byDate" && (
                         <div>
-                            <div class="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
-                            <input type="date"
-                                value={departureDate}
-                                onChange={(e) => setDepartureDate(e.target.value)}
-                                class="w-full outline-none bg-white text-gray-600 text-sm px-4 py-3" />
-                            <button type='button' class="flex items-center justify-center bg-[#007bff] px-5"
-                                onClick={searchByDate}>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px" class="fill-white hover:scale-125">
+                            <div
+                                className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
+                                <input type="date"
+                                       value={departureDate}
+                                       onChange={(e) => setDepartureDate(e.target.value)}
+                                       className="w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"/>
+                                <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
+                                        onClick={searchByDate}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
+                                         className="fill-white hover:scale-125">
+                                        <path
+                                            d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div>
+                                {dateResults.length > 0 && (
+                                    <div>
+                                        {renderResults(dateResults)}
+                                        <div className="flex justify-center items-center gap-8">
+                                            <button
+                                                className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                                type="button"
+                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                disabled={currentPage === 1}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                     fill="currentColor" className="w-4 h-4">
+                                                    <path fill-rule="evenodd"
+                                                          d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
+                                                          clip-rule="evenodd"/>
+                                                </svg>
+                                            </button>
+
+                                            <p className="text-slate-600">
+                                                Trang <strong
+                                                className="text-slate-800">{currentPage}</strong> trên&nbsp;<strong
+                                                className="text-slate-800">{dateTotalPages}</strong>
+                                            </p>
+
+                                            <button
+                                                className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                                type="button"
+                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                disabled={currentPage === dateTotalPages}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                     fill="currentColor" className="w-4 h-4">
+                                                    <path fill-rule="evenodd"
+                                                          d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
+                                                          clip-rule="evenodd"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="bg-gray-100 max-w-6xl mx-auto justify-center rounded-2xl shadow-lg p-5 w-full mt-20">
+                    <h2 className="text-5xl font-bold text-center text-[#002D74]">Theo dõi chuyến bay</h2>
+
+                    <div className="mt-6">
+                        <div
+                            className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
+                            <input type="text"
+                                   value={flightID}
+                                   onChange={(e) => setFlightID(e.target.value)}
+                                   className="w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"/>
+                            <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
+                                    onClick={searchFlight}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
+                                     className="fill-white hover:scale-125">
                                     <path
-                                    d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
+                                        d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
                                     </path>
                                 </svg>
                             </button>
                         </div>
                         <div>
-                            {dateResults.length > 0 && (
-                                <div>
-                                    {renderResults(dateResults)}
-                                    <div class="flex justify-center items-center gap-8">
-                                        <button class="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button"
-                                                onClick={() => handlePageChange(currentPage - 1)}
-                                                disabled={currentPage === 1}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-                                                <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                        
-                                        <p class="text-slate-600">
-                                            Trang <strong class="text-slate-800">{currentPage}</strong> trên&nbsp;<strong class="text-slate-800">{dateTotalPages}</strong>
-                                        </p>
-                                        
-                                        <button class="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button"
-                                            onClick={() => handlePageChange(currentPage + 1)}
-                                            disabled={currentPage === dateTotalPages}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-                                                <path fill-rule="evenodd" d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+                            {flight ? <FlightCardOther flight={flight}></FlightCardOther> : <div></div>}
+                            {noti.map((notification) => (
+                                <div>{notification}</div>
+                            ))}
+
                         </div>
-                    </div>  
-                    )}
+                    </div>
                 </div>
             </div>
-        {loading && <Loading/>}
+            {loading && <Loading/>}
         </div>
     )
 }
@@ -314,7 +395,65 @@ function FlightCard({flight, onSelect}) {
                         ĐẶT VÉ NGAY
                     </button>
                 </div>
-                
+
+            </div>
+        </div>
+    );
+}
+
+/**
+ * A component that renders a card for a flight
+ * @param {{flight: Object, onSelect: Function}} props
+ * @param {Object} props.flight - The flight object
+ * @returns {ReactElement} The component
+ */
+function FlightCardOther({flight}) {
+    return (
+        <div>
+            <div
+                className="bg-white w-full rounded-lg shadow-lg px-6 py-6 md:py-0 lg:py-0 flex lg:flex-row md:flex-row flex-col items-center space-x-10 justify-between border-2">
+                <div className="flex items-center w-full">
+                    <div className="flex flex-col mr-6 h-full space-y-1">
+                        <div className="text-center text-green-500 text-lg font-semibold whitespace-nowrap">Ngày bay
+                        </div>
+                        <div className="text-center whitespace-nowrap">{convertDateFormat(flight.departure_time)}</div>
+                    </div>
+                    <div className="py-10 flex flex-row space-x-2 justify-between w-full">
+                        <div className="text-center lg:whitespace-nowrap md:whitespace-nowrap whitespace-normal">
+                            <p className="px-4 text-2xl font-bold">{new Date(flight.departure_time).toLocaleTimeString("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })} </p>
+                            <div className="text-sm font-semibold text-center text-gray-500">
+                                <p>Sân bay {flight?.departure_airport?.name}</p>
+                                <p>{flight.departure_airport?.city}</p>
+                            </div>
+                        </div>
+                        <div className="w-full">
+                            <p className="text-center">{flight.flight_number}</p>
+                            <div className="flex items-center text-2xl">
+                                <div className="w-3 h-3 rounded-full border-2 border-zinc-900"></div>
+                                <div
+                                    className="flex-grow border-t-2 border-zinc-400 border-dotted h-px"></div>
+                                ╰┈➤
+                                <div
+                                    className="flex-grow border-t-2 border-zinc-400 border-dotted h-px"></div>
+                                <div className="w-3 h-3 rounded-full border-2 border-zinc-900"></div>
+                            </div>
+                        </div>
+                        <div className="text-center lg:whitespace-nowrap md:whitespace-nowrap whitespace-normal">
+                            <p className="px-4 text-2xl font-bold">{new Date(flight.arrival_time).toLocaleTimeString("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}</p>
+                            <div className="text-sm font-semibold text-gray-500">
+                                <p>Sân bay {flight?.arrival_airport?.name}</p>
+                                <p>{flight.arrival_airport?.city}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     );
