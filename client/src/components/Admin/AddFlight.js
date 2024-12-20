@@ -35,11 +35,9 @@ function AddFlight() {
             departureTime: formattedDepartureTime,
             arrivalTime: formattedArrivalTime,
         };
-        console.log(payload);
 
         try {
             const response = await axios.post('http://localhost:3001/api/flights/addflight', payload, { withCredentials: true });
-            console.log(response.data);
             if (response.status === 200) {
                 setSuccess(response.data);
                 setTimeout(() => {

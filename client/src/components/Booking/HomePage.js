@@ -37,7 +37,6 @@ function HomePage() {
             setRoundTrip(false);
             const {depart, arrival, departDate} = state;
             if (depart) {
-                console.log(depart);
                 setDeparture(depart);
             }
         

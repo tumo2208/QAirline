@@ -82,6 +82,14 @@ function Home() {
             return;
         }
 
+        if (departureDate < new Date()) {
+            setError("Bạn không thể tìm ngày đã qua!");
+            setTimeout(() => {
+                setError('');
+            }, 2000);
+            return;
+        }
+
         if (!cities.includes(departure)) {
             document.querySelector(".departure").value = "";
             setError("Vui lòng nhập đúng định dạng điểm khởi hành theo gợi ý");
@@ -139,7 +147,6 @@ function Home() {
                     withCredentials: true
                 }
             );
-            console.log(`Response data: ${JSON.stringify(response.data)}`);
 
             if (response.status === 200) {
                 navigate("/mybooking/manage-booking", {
@@ -199,11 +206,16 @@ function Home() {
     const [currentIndex, setCurrentIndex] = useState(0);
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % posts.length);
+            setCurrentIndex((prevIndex) => {
+                if (posts.length !== 0)
+                    return (prevIndex + 1) % posts.length;
+                else
+                    return 0;
+            });
         }, 3000); // 3000ms = 3s
 
         return () => clearInterval(interval); // Dọn dẹp khi component bị unmount
-    }, [posts.length]);
+    }, [posts]);
 
     const getVisiblePosts = () => {
         if (posts.length === 0) return [];
@@ -318,7 +330,6 @@ function Home() {
                     departureCity: "Hà Nội",
                     arrivalCity: "Cần Thơ",
                 });
-                console.log(Flight8);
                 setFlight8(Flight8.data[0]);
             } catch (error) {
                 console.error("Error fetching popular flights:", error);
@@ -798,7 +809,7 @@ function Home() {
                     📍Điểm Đến Hấp Dẫn
                 </h1>
                 <div
-                    className="slider flex items-center mx-auto justify-center relative w-[1200px] h-[400px] overflow-hidden shadow-lg">
+                    className="slider flex items-center mx-auto justify-center relative h-[400px] overflow-hidden shadow-lg">
                     {loadingDestination ? (
                         <div className="text-center py-10 text-gray-500">Đang tải dữ liệu...</div>
                     ) : (

@@ -30,7 +30,6 @@ function HomePage(){
                     withCredentials: true
                 }
             );
-            console.log(`Response data: ${JSON.stringify(response.data)}`);
 
             if (response.status === 200) {
                 navigate("/mybooking/manage-booking", {
