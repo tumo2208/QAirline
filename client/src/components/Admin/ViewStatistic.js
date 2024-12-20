@@ -99,19 +99,24 @@ function ViewStatistic() {
 
     const handlePreviousMonth = () => {
         if (month === 1) {
-            setMonth(12);
-            setYear((prev) => prev - 1);
+            if (year > 2024) {
+                setMonth(12);
+                setYear((prev) => prev - 1);
+            }
         } else {
             setMonth((prev) => prev - 1);
         }
     };
 
     const handleNextMonth = () => {
-        if (month === 12) {
-            setMonth(1);
-            setYear((prev) => prev + 1);
-        } else {
-            setMonth((prev) => prev + 1);
+        if (year < new Date().getFullYear() ||
+            (year === new Date().getFullYear() && month < new Date().getMonth()) ) {
+            if (month === 12) {
+                setMonth(1);
+                setYear((prev) => prev + 1);
+            } else {
+                setMonth((prev) => prev + 1);
+            }
         }
     };
 
