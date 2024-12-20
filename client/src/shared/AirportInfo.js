@@ -9,9 +9,10 @@ const FetchAirportInfo = () => {
         try {
           const response = await axios.get("http://localhost:3001/api/airportAircraft/allAirports");
           setSuggestions(response.data.map((airport) => ({
-            name: airport.name,
-            city: airport.city,
-            airport_code: airport.airport_code
+              name: airport.name,
+              city: airport.city,
+              country: airport.country,
+              airport_code: airport.airport_code
           })));
         } catch (error) {
           console.error("Lỗi lấy thông tin sân bay:", error);

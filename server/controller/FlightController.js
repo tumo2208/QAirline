@@ -28,7 +28,12 @@ const updatePrepareFlight = async () => {
         });
 
         for (const flight of flights) {
-            const notificationMessage = `Chuyến bay của bạn chuẩn bị cất cánh vào lúc ${flight.departure_time.toISOString()}, vui lòng chuẩn bị`;
+            const formattedDate = `${flight.departure_time.getDate().toString().padStart(2, '0')}/${
+                (flight.departure_time.getMonth() + 1).toString().padStart(2, '0')}/${
+                flight.departure_time.getFullYear()}, ${
+                flight.departure_time.getHours().toString().padStart(2, '0')}:${
+                flight.departure_time.getMinutes().toString().padStart(2, '0')}`;
+            const notificationMessage = `Chuyến bay của bạn chuẩn bị cất cánh vào lúc ${formattedDate}, vui lòng chuẩn bị`;
 
             if (!flight.notification.includes(notificationMessage)) {
                 flight.notification.push(notificationMessage);

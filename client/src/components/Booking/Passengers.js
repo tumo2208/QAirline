@@ -81,7 +81,6 @@ function Passengers() {
                     infantList: formData.infants
                 };
 
-                console.log("Booking Data:", JSON.stringify(BookingData, null, 2));
                 const response = await axios.post(
                     "http://localhost:3001/api/bookings/newBooking", 
                     BookingData,
