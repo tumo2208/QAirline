@@ -333,7 +333,7 @@ function HomePage() {
                                         </svg>
                                     </button>
                                 </div>
-                                <div className="p-5">
+                                <div className="flex mx-auto max-w-5xl py-5 space-y-4 flex-col">
                                     {flight ? <FlightCardOther flight={flight}></FlightCardOther> : 
                                     <div>
                                     </div>
@@ -476,7 +476,7 @@ function FlightCardOther({flight}) {
                         </div>
                     </div>
                 </div>
-                <div className="text-red-500 font-semibold">
+                <div className="text-red-500 font-semibold text-center">
                     {flight?.notification?
                     <div>
                         {flight?.notification.slice(-1)[0]}

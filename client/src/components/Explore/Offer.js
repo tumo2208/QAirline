@@ -35,36 +35,45 @@ function Offer() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold text-center mb-8">Ưu Đãi</h1>
-            <div className="space-y-6">
+        <div className="py-10 justify-center items-center" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
+            <div className="bg-sky-200 max-w-6xl flex flex-col mx-auto justify-center rounded-2xl shadow-lg border-4 p-5 w-full">
+                <h1 className="text-5xl pb-5 font-bold text-center text-[#002D74]">Ưu Đãi</h1>
+                <div className="max-w-4xl grid grid-cols-1 sm:grid-cols-2 gap-12 mx-auto">
                 {offers.map((offer) => (
-                    <div
-                        key={offer.id}
-                        className="bg-white rounded-lg shadow-md overflow-hidden"
-                    >
-                        <img
-                            src={offer.thumbnail}
-                            alt={offer.title}
-                            className="w-full h-64 object-cover"
-                        />
-                        <div className="p-4 flex items-center justify-between">
-                            <div>
-                                <h2 className="text-xl font-semibold mb-2">{offer.title}</h2>
-                                <p className="text-gray-600">{offer.content}</p>
-                            </div>
-                            <Link
-                                to={`/offer/${offer.id}`}
-                                className="text-blue-500 font-medium hover:underline"
-                            >
-                                Chi Tiết
-                            </Link>
-                        </div>
-                    </div>
+                    <OfferCard key={offer.id} offer={offer} />
                 ))}
+                </div>
             </div>
         </div>
     );
 }
+
+function OfferCard({ offer }) {
+    return (
+        <div
+            key={offer.id}
+            className="bg-white rounded-lg shadow-md overflow-hidden mx-auto"
+        >
+            <img
+                src={offer.thumbnail}
+                alt={offer.title}
+                className="w-full h-48 object-cover"
+            />
+            <div className="p-4 flex items-center justify-between space-x-6">
+                <div>
+                    <h2 className="text-xl font-semibold mb-2">{offer.title}</h2>
+                    <p className="text-gray-600">{offer.content}</p>
+                </div>
+                <Link
+                    to={`/offer/${offer.id}`}
+                    className="text-blue-500 font-medium hover:underline whitespace-nowrap"
+                >
+                    Chi Tiết
+                </Link>
+            </div>
+        </div>
+    );
+}
+
 
 export default Offer;
