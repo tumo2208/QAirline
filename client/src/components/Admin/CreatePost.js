@@ -32,6 +32,7 @@ function CreatePost() {
         try {
             const response = await axios.post('http://localhost:3001/api/post/createPost', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
+                withCredentials: true
             });
             if (response.status === 201) {
                 setSuccess('Bài viết đã được tạo thành công!');
