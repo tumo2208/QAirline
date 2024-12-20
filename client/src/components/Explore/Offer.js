@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Offer() {
+    const navigate = useNavigate();
+
     const [offers, setOffers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -32,6 +34,26 @@ function Offer() {
 
     if (error) {
         return <div className="text-center py-10 text-red-500">{error}</div>;
+    }
+
+    if (offers.length === 0) {
+        return (
+            <div className="bg-white p-60 flex flex-col items-center justify-center space-y-10">
+                <h2 className="text-5xl font-bold text-center text-[#002D74]">
+                    Hiện đang không có ưu đãi nào
+                </h2>
+                <div className="text-left mx-8">
+                    <button
+                        type="button"
+                        className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
+                        onClick={() => navigate('/')}
+                    >
+                        <span className="mr-2 font-bold text-lg">←</span>
+                        Quay lại trang chủ
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     return (
