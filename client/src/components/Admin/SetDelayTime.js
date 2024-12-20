@@ -59,7 +59,7 @@ function SetDelayTime() {
                     <div>
                         <label className="block text-gray-700 font-medium mb-2">Thời gian cất cánh mới</label>
                         <input
-                            type="date"
+                            type="datetime-local"
                             name="newTime"
                             value={formData.newTime}
                             onChange={handleChange}

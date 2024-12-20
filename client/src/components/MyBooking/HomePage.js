@@ -53,7 +53,7 @@ function HomePage(){
                     <button
                         className={`text-lg rounded-tl-lg w-1/2 py-3 ${
                             activeTab === "searchbooking"
-                                ? "bg-blue-300 text-black"
+                                ? "bg-sky-200 text-black"
                                 : "bg-blue-800 text-white"
                         }`}
                         onClick={() => setActiveTab("searchbooking")}
@@ -63,7 +63,7 @@ function HomePage(){
                     <button
                         className={`text-lg rounded-tr-lg py-3 w-1/2 ${
                             activeTab === "bookinghistory"
-                                ? "bg-blue-300 text-black"
+                                ? "bg-sky-200 text-black"
                                 : "bg-blue-800 text-white"
                         }`}
                         onClick={() => setActiveTab("bookinghistory")}

@@ -137,15 +137,16 @@ function ViewStatistic() {
     };
 
     return (
-        <div>
-            <div style={{width: "80%", margin: "0 auto"}}>
-                <h2>Doanh thu theo tháng</h2>
-                <div style={{display: "flex", justifyContent: "space-between", marginBottom: "10px"}}>
-                    <button onClick={handlePreviousYear} disabled={currentYear <= 2024}>
+        <div className="py-10 mx-auto max-w-6xl flex flex-col items-center space-y-10">
+            <h2 className="text-5xl font-bold text-center text-[#002D74]">Thống kê</h2>
+            <div className="w-full space-y-5">
+                <h2 className="text-3xl font-bold">Doanh thu theo tháng</h2>
+                <div className="flex flex-row w-full space-x-10 items-center justify-center text-sm">
+                    <button className="bg-blue-500 select-none hover:bg-blue-700 text-white py-2 px-4 rounded-full" onClick={handlePreviousYear} disabled={currentYear <= 2024}>
                         ← Năm trước
                     </button>
-                    <span>{currentYear}</span>
-                    <button onClick={handleNextYear} disabled={currentYear >= new Date().getFullYear()}>
+                    <span className="text-blue-800 text-2xl font-semibold">{currentYear}</span>
+                    <button className="bg-blue-500 select-none hover:bg-blue-700 text-white py-2 px-4 rounded-full" onClick={handleNextYear} disabled={currentYear >= new Date().getFullYear()}>
                         Năm sau →
                     </button>
                 </div>
@@ -171,83 +172,99 @@ function ViewStatistic() {
                 />
             </div>
 
-            <div>
-                <h2>Top 3 Tourist Destinations by Passengers</h2>
-                <div>
-                    <button onClick={handlePreviousMonth}>← Previous Month</button>
-                    <span>
-                    {month}/{year}
-                </span>
-                    <button onClick={handleNextMonth}>Next Month →</button>
-                </div>
-                <ol>
-                    {destinations.map((destination, index) => (
-                        <li key={index}>
-                            <h3>{destination.city}</h3>
-                            {/*<p>Total Passengers: {destination.totalPassengers}</p>*/}
-                        </li>
-                    ))}
-                </ol>
-            </div>
-
-            <div style={{padding: "20px"}}>
-                <h1>Flight Statistics</h1>
-                <div>
-                    <input
-                        type="text"
-                        placeholder="Enter Flight ID"
+            <div className="mx-auto w-full space-y-5">
+                <h1 className="text-3xl font-bold">Thống kê về chuyến bay</h1>
+                <div
+                    className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
+                    <input type="text"
+                        placeholder="Nhập mã chuyến bay"
                         value={flightID}
                         onChange={(e) => setFlightID(e.target.value)}
-                    />
-                    <button onClick={handleSearch}>Search</button>
+                        className="w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"/>
+                    <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
+                            onClick={handleSearch}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
+                                className="fill-white hover:scale-125">
+                            <path
+                                d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
+                            </path>
+                        </svg>
+                    </button>
                 </div>
+                
                 {flightData && (
-                    <div>
-                        <h2>Flight Details</h2>
-                        <p><strong>Flight Number:</strong> {flightData.flight_number}</p>
-                        <p><strong>Departure City:</strong> {flightData.departure_city}</p>
-                        <p><strong>Arrival City:</strong> {flightData.arrival_city}</p>
-                        <p><strong>Departure Time:</strong> {new Date(flightData.departure_time).toLocaleString()}</p>
-                        <p><strong>Arrival Time:</strong> {new Date(flightData.arrival_time).toLocaleString()}</p>
+                    <div className="text-center max-w-5xl mx-auto">
+                        <p><strong>Mã chuyến bay:</strong> {flightData.flight_number}</p>
+                        <p><strong>Điểm khởi hành:</strong> {flightData.departure_city}</p>
+                        <p><strong>Điểm đến:</strong> {flightData.arrival_city}</p>
+                        <p><strong>Thời gian khởi hành:</strong> {new Date(flightData.departure_time).toLocaleString()}</p>
+                        <p><strong>Thời gian hạ cánh:</strong> {new Date(flightData.arrival_time).toLocaleString()}</p>
 
-                        <div style={{display: "flex", justifyContent: "space-around", marginTop: "20px"}}>
-                            <div>
-                                <h3>Economy Class</h3>
+                        <div className="flex flex-col lg:flex-row md:flex-row justify-center gap-x-20 w-full mt-5">
+                            <div className="space-y-2 flex-shrink-0 w-[300px]">
+                                <h3 className="text-center font-semibold text-lg">Hạng Phổ thông</h3>
+                                <div className="w-full h-64 flex items-center justify-center">
                                 <Pie
                                     data={{
-                                        labels: ["Occupied Seats", "Available Seats"],
-                                        datasets: [
-                                            {
-                                                data: [
-                                                    flightData.economyPassengers,
-                                                    flightData.economySeats - flightData.economyPassengers,
-                                                ],
-                                                backgroundColor: ["#FF6384", "#36A2EB"],
-                                            },
+                                    labels: ["Số ghế đã đặt", "Số ghế trống"],
+                                    datasets: [
+                                        {
+                                        data: [
+                                            flightData.economyPassengers,
+                                            flightData.economySeats - flightData.economyPassengers,
                                         ],
+                                        backgroundColor: ["#FF6384", "#36A2EB"],
+                                        },
+                                    ],
                                     }}
+                                    options={{ maintainAspectRatio: false }}
                                 />
+                                </div>
                             </div>
-                            <div>
-                                <h3>Business Class</h3>
+                            <div className="space-y-2 flex-shrink-0 w-[300px]">
+                                <h3 className="text-center font-semibold text-lg">Hạng Thương gia</h3>
+                                <div className="w-full h-64 flex items-center justify-center">
                                 <Pie
                                     data={{
-                                        labels: ["Occupied Seats", "Available Seats"],
-                                        datasets: [
-                                            {
-                                                data: [
-                                                    flightData.businessPassengers,
-                                                    flightData.businessSeats - flightData.businessPassengers,
-                                                ],
-                                                backgroundColor: ["#FF6384", "#36A2EB"],
-                                            },
+                                    labels: ["Số ghế đã đặt", "Số ghế trống"],
+                                    datasets: [
+                                        {
+                                        data: [
+                                            flightData.businessPassengers,
+                                            flightData.businessSeats - flightData.businessPassengers,
                                         ],
+                                        backgroundColor: ["#FF6384", "#36A2EB"],
+                                        },
+                                    ],
                                     }}
+                                    options={{ maintainAspectRatio: false }}
                                 />
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
+            </div>
+
+            <div className="mx-auto w-full space-y-5">
+                <h2 className="text-3xl font-bold">Top 3 điểm đến nổi bật nhất</h2>
+                <div className="flex flex-row w-full space-x-10 items-center justify-center text-sm">
+                    <button className="bg-blue-500 select-none hover:bg-blue-700 text-white py-2 px-4 rounded-full" onClick={handlePreviousMonth}>← Tháng trước</button>
+                    <span className="text-2xl text-blue-800 font-semibold">
+                        {month}/{year}
+                    </span>
+                    <button className="bg-blue-500 select-none hover:bg-blue-700 text-white py-2 px-4 rounded-full" onClick={handleNextMonth}>Tháng sau →</button>
+                </div>
+                <ol className="text-center text-2xl space-y-5 font-semibold">
+                    {destinations.map((destination, index) => (
+                        <li key={index}>
+                            {index === 0 && "🥇"}
+                            {index === 1 && "🥈"}
+                            {index === 2 && "🥉"}
+                            <span> {destination.city}</span>
+                        </li>
+                    ))}
+                </ol>
             </div>
         </div>
     );

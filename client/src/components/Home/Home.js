@@ -330,21 +330,22 @@ function Home() {
                 setFlight5(Flight5.data[0]);
 
                 const Flight6 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
-                    departureCity: "TP. Hồ Chí Minh",
-                    arrivalCity: "Hải Phòng",
+                    departureCity: "Hà Nội",
+                    arrivalCity: "Phú Quốc",
                 });
                 setFlight6(Flight6.data[0]);
 
                 const Flight7 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
-                    departureCity: "Hà Nội",
-                    arrivalCity: "Hải Phòng",
+                    departureCity: "TP. Hồ Chí Minh",
+                    arrivalCity: "Khánh Hòa",
                 });
                 setFlight7(Flight7.data[0]);
 
                 const Flight8 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
-                    departureCity: "TP. Hồ Chí Minh",
-                    arrivalCity: "Thanh Hóa",
+                    departureCity: "Hà Nội",
+                    arrivalCity: "Cần Thơ",
                 });
+                console.log(Flight8);
                 setFlight8(Flight8.data[0]);
             } catch (error) {
                 console.error("Error fetching popular flights:", error);
@@ -396,7 +397,7 @@ function Home() {
         },
         {
             route: 'TP. Hồ Chí Minh - Đà Nẵng',
-            destination: '',
+            destination: 'Da Nang',
             date: formatDate(flight5?.departure_time),
             price: new Intl.NumberFormat("en-US", {
                 style: "currency",
@@ -405,8 +406,8 @@ function Home() {
             type: 'MỘT CHIỀU',
         },
         {
-            route: 'TP. Hồ Chí Minh - Hải Phòng',
-            destination: '',
+            route: 'Hà Nội - Phú Quốc',
+            destination: 'Phu Quoc',
             date: formatDate(flight6?.departure_time),
             price: new Intl.NumberFormat("en-US", {
                 style: "currency",
@@ -415,8 +416,8 @@ function Home() {
             type: 'MỘT CHIỀU',
         },
         {
-            route: 'Hà Nội - Hải Phòng',
-            destination: '',
+            route: 'TP. Hồ Chí Minh - Khánh Hòa',
+            destination: 'Khanh Hoa',
             date: formatDate(flight7?.departure_time),
             price: new Intl.NumberFormat("en-US", {
                 style: "currency",
@@ -425,8 +426,8 @@ function Home() {
             type: 'MỘT CHIỀU',
         },
         {
-            route: 'TP. Hồ Chí Minh - Thanh Hóa',
-            destination: '',
+            route: 'Hà Nội - Cần Thơ',
+            destination: 'Can Tho',
             date: formatDate(flight8?.departure_time),
             price: new Intl.NumberFormat("en-US", {
                 style: "currency",
