@@ -176,6 +176,9 @@ function ManageBooking() {
                 <div className="lg:w-full md:w-full">
                     {activeTab === "outbound" && (
                         <div>
+                            {outboundFlight?.notification && (
+                                <div className="text-red-500 text-center text-lg font-semibold mb-5">{outboundFlight?.notification.slice(-1)[0]}</div>
+                            )}
                             {Array.from({length: booking?.outbound_tickets?.length}).map((_, index) => (
                             <TicketCard ticket={booking?.outbound_tickets[index]} flight={outboundFlight} class_type={booking?.class_type} cancel={cancelTicket}/>
                         ))}
@@ -183,6 +186,9 @@ function ManageBooking() {
                     )}
                     {activeTab === "return" && roundTrip && (
                         <div>
+                            {returnFlight?.notification && (
+                                <div className="text-red-500 text-center text-lg font-semibold mb-5">{returnFlight?.notification.slice(-1)[0]}</div>
+                            )}
                             {Array.from({length: booking?.return_tickets?.length}).map((_, index) => (
                             <TicketCard ticket={booking?.return_tickets[index]} flight={returnFlight} class_type={booking?.return_class_type} cancel={cancelTicket}/>
                         ))}
