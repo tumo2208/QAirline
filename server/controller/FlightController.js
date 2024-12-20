@@ -43,13 +43,39 @@ const updatePrepareFlight = async () => {
 const getFlightByID = async (req, res) => {
     try {
         const {flightID} = req.body;
-        const flight = await Flight.findOne({
-            flight_number: flightID
-        });
+        const flight = await Flight.aggregate([
+            {
+                $lookup: {
+                    from: 'airports',
+                    localField: 'departure_airport_id',
+                    foreignField: 'airport_code',
+                    as: 'departure_airport'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'airports',
+                    localField: 'arrival_airport_id',
+                    foreignField: 'airport_code',
+                    as: 'arrival_airport'
+                }
+            },
+            {
+                $match: {
+                    'flight_number': flightID,
+                }
+            },
+            {
+                $unwind: '$departure_airport'
+            },
+            {
+                $unwind: '$arrival_airport'
+            }
+        ]);
         if (!flight) {
             return res.status(404).json("Không tìm thấy chuyến bay");
         }
-        return res.status(200).json(flight);
+        return res.status(200).json(flight[0]);
     }  catch (error) {
         console.error("Lỗi lấy ID chuyến bay", error);
         return res.status(500).json({ status: false, message: error.message });
