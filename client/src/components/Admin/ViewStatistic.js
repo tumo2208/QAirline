@@ -172,7 +172,7 @@ function ViewStatistic() {
                 />
             </div>
 
-            <div style={{padding: "20px"}} className="mx-auto w-full space-y-5">
+            <div className="mx-auto w-full space-y-5">
                 <h1 className="text-3xl font-bold">Thống kê về chuyến bay</h1>
                 <div
                     className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
