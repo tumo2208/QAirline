@@ -5,10 +5,10 @@ const Aircraft = require('../models/Aircraft');
 
 const getMonthlyRevenue = async (req, res) => {
     const year = parseInt(req.params.year);
-    // const user = req.user;
-    // if (user.user_type !== 'Admin') {
-    //     return res.status(404).json({error: 'Bạn không có quyền để sử dụng chức năng này!'});
-    // }
+    const user = req.user;
+    if (user.user_type !== 'Admin') {
+        return res.status(404).json({error: 'Bạn không có quyền để sử dụng chức năng này!'});
+    }
     try {
         const data = await Booking.aggregate([
             {
@@ -47,10 +47,10 @@ const getTopDestination = async (req, res) => {
     try {
         const { month, year } = req.body;
 
-        // const user = req.user;
-        // if (user.user_type !== 'Admin') {
-        //     return res.status(404).json({error: 'Bạn không có quyền để sử dụng chức năng này!'});
-        // }
+        const user = req.user;
+        if (user.user_type !== 'Admin') {
+            return res.status(404).json({error: 'Bạn không có quyền để sử dụng chức năng này!'});
+        }
 
         const startDate = new Date(year, month - 1, 1);
         const endDate = new Date(year, month, 0);
@@ -131,10 +131,10 @@ const getTopDestination = async (req, res) => {
 
 const getFlightStatistic = async (req, res) => {
     try {
-        // const user = req.user;
-        // if (user.user_type !== 'Admin') {
-        //     return res.status(404).json({error: 'Bạn không có quyền để sử dụng chức năng này!'});
-        // }
+        const user = req.user;
+        if (user.user_type !== 'Admin') {
+            return res.status(404).json({error: 'Bạn không có quyền để sử dụng chức năng này!'});
+        }
         const { flightID } = req.body;
         const flight = await Flight.findOne({
             flight_number: flightID
@@ -171,7 +171,7 @@ const getFlightStatistic = async (req, res) => {
             departure_city: departureCity,
             arrival_city: arrivalCity,
             economySeats: economySeats,
-            businessSeats: economySeats,
+            businessSeats: businessSeats,
             economyPassengers: economySeats - availableEconomySeats,
             businessPassengers: businessSeats - availableBusinessSeats,
         }
