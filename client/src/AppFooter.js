@@ -46,7 +46,7 @@ function AppFooter() {
                         <div>
                             <p className="font-semibold text-gray-700">Chăm sóc khách hàng</p>
                             <a href="mailto:customercare@qairline.vn" className="text-blue-400 underline">
-                                customercare@qairline.vn
+                                qairline203@gmail.com
                             </a>
                         </div>
 
