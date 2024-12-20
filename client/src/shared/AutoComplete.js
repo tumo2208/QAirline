@@ -42,8 +42,8 @@ export function AutocompleteInput({ suggestions , style, value, onChange, onlyPl
                     border
                     border-gray-200
                     cursor-pointer
-                    bg-gray-300
-                    hover:bg-gray-400
+                    bg-sky-50
+                    hover:bg-sky-200
                     hover:text-gray-900
                 `;
                 return div;

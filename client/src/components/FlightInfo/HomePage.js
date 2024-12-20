@@ -15,14 +15,14 @@ function HomePage() {
     const [placeResults, setPlaceResults] = useState([]);
     const [dateResults, setDateResults] = useState([]);
     const [flight, setFlight] = useState(null);
-    const [noti, setNoti] = useState([]);
     const suggestions = FetchAirportInfo();
 
     const [placeTotalPages, setPlaceTotalPages] = useState(0);
     const [dateTotalPages, setDateTotalPages] = useState(0);
-    const [pageSize, setPageSize] = useState(5);
+    const [pageSize, setPageSize] = useState(4);
     const [currentPage, setCurrentPage] = useState(1);
-    
+
+    const [activeMenu, setActiveMenu] = useState("searchflight");
 
     /**
      * Fetches flights by arrival city
@@ -72,13 +72,11 @@ function HomePage() {
     const searchFlight = async() => {
         try {
             setFlight(null);
-            setNoti([]);
             setLoading(true);
             const response = await axios.post("http://localhost:3001/api/flights/getFlightByID", {
                 flightID: flightID,
             });
             setFlight(response.data);
-            setNoti(response.data.notification);
             setLoading(false);
         } catch (error) {
             console.error("Error fetching flights:", error);
@@ -135,190 +133,215 @@ function HomePage() {
     return (
         <div>
             <div className="py-10 justify-center items-center" style={{backgroundImage: "url('https://wallpapercat.com/w/full/3/b/d/21204-1920x1200-desktop-hd-clouds-background-photo.jpg')"}}>
-                <div className="bg-gray-100 max-w-6xl mx-auto justify-center rounded-2xl shadow-lg p-5 w-full">
-                    <h2 className="text-5xl font-bold text-center text-[#002D74]">Thông tin chuyến bay</h2>
-                    <div className="flex justify-center items-center space-x-4 m-6">
+                <div className="bg-gray-100 max-w-6xl flex flex-col mx-auto justify-center rounded-2xl shadow-lg border-4 pb-5 w-full">
+                    <div className="flex select-none cursor-pointer justify-between text-white text-center w-full font-bold">
                         <button
-                            className={`py-2 px-4 rounded-lg font-semibold ${
-                                activeTab === "byPlace"
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-300 text-gray-800"
+                            className={`text-lg rounded-tl-lg w-1/2 py-3 ${
+                                activeMenu === "searchflight"
+                                    ? "bg-sky-200 text-black"
+                                    : "bg-blue-800 text-white"
                             }`}
-                            onClick={() =>  {
-                                setActiveTab("byPlace");
-                                setCurrentPage(1);
-                            }}
+                            onClick={() => setActiveMenu("searchflight")}
                         >
-                            Theo điểm đến
+                            TÌM KIẾM CHUYẾN BAY
                         </button>
                         <button
-                            className={`py-2 px-4 rounded-lg font-semibold ${
-                                activeTab === "byDate"
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-300 text-gray-800"
+                            className={`text-lg rounded-tr-lg py-3 w-1/2 ${
+                                activeMenu === "followflight"
+                                    ? "bg-sky-200 text-black"
+                                    : "bg-blue-800 text-white"
                             }`}
-                            onClick={() => {
-                                setActiveTab("byDate");
-                                setCurrentPage(1);
-                            }}
+                            onClick={() => setActiveMenu("followflight")}
                         >
-                            Theo ngày bay
+                            THEO DÕI CHUYẾN BAY
                         </button>
                     </div>
-                    {activeTab==="byPlace" && (
-                        <div>
-                            <div
-                                className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
-                                <AutocompleteInput
-                                    suggestions={suggestions}
-                                    style={"destination w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"}
-                                    value={destination}
-                                    onChange={(e) => setDestination(e.target.value)}
-                                    onlyPlaces={true}
-                                />
-                                <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
-                                        onClick={searchByPlace}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
-                                         className="fill-white hover:scale-125">
-                                        <path
-                                            d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
-                                        </path>
-                                    </svg>
+                    {activeMenu === "searchflight" && (
+                        <div className="p-5">
+                            <h2 className="text-5xl font-bold text-center text-[#002D74]">Tìm kiếm chuyến bay</h2>
+                            <div className="flex justify-center items-center space-x-4 m-6">
+                                <button
+                                    className={`py-2 px-4 rounded-lg font-semibold ${
+                                        activeTab === "byPlace"
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-gray-300 text-gray-800"
+                                    }`}
+                                    onClick={() =>  {
+                                        setActiveTab("byPlace");
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    Theo điểm đến
+                                </button>
+                                <button
+                                    className={`py-2 px-4 rounded-lg font-semibold ${
+                                        activeTab === "byDate"
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-gray-300 text-gray-800"
+                                    }`}
+                                    onClick={() => {
+                                        setActiveTab("byDate");
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    Theo ngày bay
                                 </button>
                             </div>
-                            <div>
-                                {placeResults.length > 0 && (
-                                    <div>
-                                        {renderResults(placeResults)}
-                                        <div className="flex justify-center items-center gap-8">
-                                            <button
-                                                className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                                type="button"
-                                                onClick={() => handlePageChange(currentPage - 1)}
-                                                disabled={currentPage === 1}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                     fill="currentColor" className="w-4 h-4">
-                                                    <path fill-rule="evenodd"
-                                                          d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
-                                                          clip-rule="evenodd"/>
-                                                </svg>
-                                            </button>
-
-                                            <p className="text-slate-600">
-                                                Trang <strong
-                                                className="text-slate-800">{currentPage}</strong> trên&nbsp;<strong
-                                                className="text-slate-800">{placeTotalPages}</strong>
-                                            </p>
-
-                                            <button
-                                                className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                                type="button"
-                                                onClick={() => handlePageChange(currentPage + 1)}
-                                                disabled={currentPage === placeTotalPages}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                     fill="currentColor" className="w-4 h-4">
-                                                    <path fill-rule="evenodd"
-                                                          d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
-                                                          clip-rule="evenodd"/>
-                                                </svg>
-                                            </button>
-                                        </div>
+                            {activeTab==="byPlace" && (
+                                <div>
+                                    <div
+                                        className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
+                                        <AutocompleteInput
+                                            suggestions={suggestions}
+                                            style={"destination w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"}
+                                            value={destination}
+                                            onChange={(e) => setDestination(e.target.value)}
+                                            onlyPlaces={true}
+                                        />
+                                        <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
+                                                onClick={searchByPlace}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
+                                                className="fill-white hover:scale-125">
+                                                <path
+                                                    d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
+                                                </path>
+                                            </svg>
+                                        </button>
                                     </div>
-                                )}
-                            </div>
-                        </div>
-
-                    )}
-                    {activeTab === "byDate" && (
-                        <div>
-                            <div
-                                className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
-                                <input type="date"
-                                       value={departureDate}
-                                       onChange={(e) => setDepartureDate(e.target.value)}
-                                       className="w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"/>
-                                <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
-                                        onClick={searchByDate}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
-                                         className="fill-white hover:scale-125">
-                                        <path
-                                            d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div>
-                                {dateResults.length > 0 && (
                                     <div>
-                                        {renderResults(dateResults)}
-                                        <div className="flex justify-center items-center gap-8">
-                                            <button
-                                                className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                                type="button"
-                                                onClick={() => handlePageChange(currentPage - 1)}
-                                                disabled={currentPage === 1}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                     fill="currentColor" className="w-4 h-4">
-                                                    <path fill-rule="evenodd"
-                                                          d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
-                                                          clip-rule="evenodd"/>
-                                                </svg>
-                                            </button>
+                                        {placeResults.length > 0 && (
+                                            <div>
+                                                {renderResults(placeResults)}
+                                                <div className="flex justify-center items-center gap-8">
+                                                    <button
+                                                        className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                                        type="button"
+                                                        onClick={() => handlePageChange(currentPage - 1)}
+                                                        disabled={currentPage === 1}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="currentColor" className="w-4 h-4">
+                                                            <path fill-rule="evenodd"
+                                                                d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
+                                                                clip-rule="evenodd"/>
+                                                        </svg>
+                                                    </button>
 
-                                            <p className="text-slate-600">
-                                                Trang <strong
-                                                className="text-slate-800">{currentPage}</strong> trên&nbsp;<strong
-                                                className="text-slate-800">{dateTotalPages}</strong>
-                                            </p>
+                                                    <p className="text-slate-600">
+                                                        Trang <strong
+                                                        className="text-slate-800">{currentPage}</strong> trên&nbsp;<strong
+                                                        className="text-slate-800">{placeTotalPages}</strong>
+                                                    </p>
 
-                                            <button
-                                                className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                                type="button"
-                                                onClick={() => handlePageChange(currentPage + 1)}
-                                                disabled={currentPage === dateTotalPages}>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                     fill="currentColor" className="w-4 h-4">
-                                                    <path fill-rule="evenodd"
-                                                          d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
-                                                          clip-rule="evenodd"/>
-                                                </svg>
-                                            </button>
-                                        </div>
+                                                    <button
+                                                        className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                                        type="button"
+                                                        onClick={() => handlePageChange(currentPage + 1)}
+                                                        disabled={currentPage === placeTotalPages}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="currentColor" className="w-4 h-4">
+                                                            <path fill-rule="evenodd"
+                                                                d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
+                                                                clip-rule="evenodd"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
+                                </div>
+
+                            )}
+                            {activeTab === "byDate" && (
+                                <div>
+                                    <div
+                                        className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
+                                        <input type="date"
+                                            value={departureDate}
+                                            onChange={(e) => setDepartureDate(e.target.value)}
+                                            className="w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"/>
+                                        <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
+                                                onClick={searchByDate}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
+                                                className="fill-white hover:scale-125">
+                                                <path
+                                                    d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div>
+                                        {dateResults.length > 0 && (
+                                            <div>
+                                                {renderResults(dateResults)}
+                                                <div className="flex justify-center items-center gap-8">
+                                                    <button
+                                                        className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                                        type="button"
+                                                        onClick={() => handlePageChange(currentPage - 1)}
+                                                        disabled={currentPage === 1}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="currentColor" className="w-4 h-4">
+                                                            <path fill-rule="evenodd"
+                                                                d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
+                                                                clip-rule="evenodd"/>
+                                                        </svg>
+                                                    </button>
+
+                                                    <p className="text-slate-600">
+                                                        Trang <strong
+                                                        className="text-slate-800">{currentPage}</strong> trên&nbsp;<strong
+                                                        className="text-slate-800">{dateTotalPages}</strong>
+                                                    </p>
+
+                                                    <button
+                                                        className="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                                                        type="button"
+                                                        onClick={() => handlePageChange(currentPage + 1)}
+                                                        disabled={currentPage === dateTotalPages}>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="currentColor" className="w-4 h-4">
+                                                            <path fill-rule="evenodd"
+                                                                d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
+                                                                clip-rule="evenodd"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {activeMenu === "followflight" && (
+                        <div className="p-5">
+                            <h2 className="text-5xl font-bold text-center text-[#002D74]">Theo dõi chuyến bay</h2>
+                            <div className="mt-6">
+                                <div
+                                    className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
+                                    <input type="text" placeholder="Nhập mã chuyến bay"
+                                        value={flightID}
+                                        onChange={(e) => setFlightID(e.target.value)}
+                                        className="w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"/>
+                                    <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
+                                            onClick={searchFlight}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
+                                            className="fill-white hover:scale-125">
+                                            <path
+                                                d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div className="flex mx-auto max-w-5xl py-5 space-y-4 flex-col">
+                                    {flight ? <FlightCardOther flight={flight}></FlightCardOther> : 
+                                    <div>
+                                    </div>
+                                    }
+                                </div>
                             </div>
                         </div>
                     )}
-                </div>
-
-                <div className="bg-gray-100 max-w-6xl mx-auto justify-center rounded-2xl shadow-lg p-5 w-full mt-20">
-                    <h2 className="text-5xl font-bold text-center text-[#002D74]">Theo dõi chuyến bay</h2>
-
-                    <div className="mt-6">
-                        <div
-                            className="flex rounded-md border-2 border-blue-500 overflow-hidden max-w-md mx-auto font-[sans-serif]">
-                            <input type="text"
-                                   value={flightID}
-                                   onChange={(e) => setFlightID(e.target.value)}
-                                   className="w-full outline-none bg-white text-gray-600 text-sm px-4 py-3"/>
-                            <button type='button' className="flex items-center justify-center bg-[#007bff] px-5"
-                                    onClick={searchFlight}>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192.904 192.904" width="16px"
-                                     className="fill-white hover:scale-125">
-                                    <path
-                                        d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </div>
-                        <div>
-                            {flight ? <FlightCardOther flight={flight}></FlightCardOther> : <div></div>}
-                            {noti.map((notification) => (
-                                <div>{notification}</div>
-                            ))}
-
-                        </div>
-                    </div>
                 </div>
             </div>
             {loading && <Loading/>}
@@ -453,7 +476,16 @@ function FlightCardOther({flight}) {
                         </div>
                     </div>
                 </div>
-
+                <div className="text-red-500 font-semibold text-center">
+                    {flight?.notification?
+                    <div>
+                        {flight?.notification.slice(-1)[0]}
+                    </div>
+                    : 
+                    <div className="whitespace-nowrap">
+                        Không có thông báo !
+                    </div>}
+                </div>
             </div>
         </div>
     );

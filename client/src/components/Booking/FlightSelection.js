@@ -11,7 +11,7 @@ function FlightSelection() {
         window.scrollTo(0, 0);
     }, [location]);
 
-    const { flights, tripType, passengers, searchInfo } = state;
+    const { tripType, passengers, searchInfo } = state;
     const navigate = useNavigate();
 
     const [showOutbound, setShowOutbound] = useState(true);
@@ -23,18 +23,6 @@ function FlightSelection() {
 
     const [outboundFlights, setOutboundFlights] = useState([]);
     const [returnFlights, setReturnFlights] = useState([]);
-
-    // init outbound and return flights
-    useEffect(() => {
-        if (flights) {
-            if (tripType === "round-trip") {
-                setOutboundFlights(flights.outboundFlights);
-                setReturnFlights(flights.returnFlights);
-            } else if (tripType === "one-way") {
-                setOutboundFlights(flights);
-            }
-        }
-    }, []);
 
     // fetch flights when selectedDate changed
     const fetchFlights = async () => {
@@ -77,25 +65,6 @@ function FlightSelection() {
         fetchArrivalFlights();
     }, [selectedArrivalDate]);
 
-    // Nếu không có chuyến bay phù hợp
-    // if (!flights) {
-    //     return (
-    //         <div className="bg-white p-60 flex flex-col items-center justify-center space-y-10">
-    //             <h2 className="text-5xl font-bold text-center text-[#002D74]">Rất tiếc, không có chuyến bay phù hợp với tìm kiếm của bạn</h2>
-    //             <div className="text-left mx-8">
-    //                     <button
-    //                         type="button"
-    //                         className="text-white select-none bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg lg:hover:scale-110 px-5 py-2.5 text-center"
-    //                         onClick={() => window.history.back()}
-    //                     >
-    //                         <span className="mr-2 font-bold text-lg">←</span>
-    //                         Quay lại trang trước
-    //                     </button>
-    //                 </div>
-    //         </div>
-    //     )
-    // }
-
     const outboundCost = selectedOutbound?.flight?.available_seats.find(seat => seat.class_type === selectedOutbound.classType)?.price || 0;
     const returnCost = selectedReturn?.flight?.available_seats.find(seat => seat.class_type === selectedReturn.classType)?.price || 0;
 
@@ -107,12 +76,14 @@ function FlightSelection() {
         for (let i = -2; i <= 2; i++) {
             const date = new Date(selectedDate);
             date.setDate(date.getDate() + i);
-            dates.push({
-                day: date.toLocaleDateString("vi-VN", { weekday: "long" }),
-                date: date.getDate(),
-                month: date.getMonth() + 1,
-                fullDate: new Date(date),
-            });
+            if (date >= new Date()) {
+                dates.push({
+                    day: date.toLocaleDateString("vi-VN", { weekday: "long" }),
+                    date: date.getDate(),
+                    month: date.getMonth() + 1,
+                    fullDate: new Date(date),
+                });
+            }
         }
         return dates;
     };
@@ -122,12 +93,14 @@ function FlightSelection() {
         for (let i = -2; i <= 2; i++) {
             const date = new Date(selectedArrivalDate);
             date.setDate(date.getDate() + i);
-            dates.push({
-                day: date.toLocaleDateString("vi-VN", { weekday: "long" }),
-                date: date.getDate(),
-                month: date.getMonth() + 1,
-                fullDate: new Date(date),
-            });
+            if (date > new Date(selectedDate)) {
+                dates.push({
+                    day: date.toLocaleDateString("vi-VN", { weekday: "long" }),
+                    date: date.getDate(),
+                    month: date.getMonth() + 1,
+                    fullDate: new Date(date),
+                });
+            }
         }
         return dates;
     };
@@ -260,33 +233,40 @@ function FlightSelection() {
                                                 : "bg-gray-200"
                                         }`}
                                     >
-                                        <div>{item.day}</div>
-                                        <div>
-                                            {item.date} tháng {item.month}
+                                        <div className="text-sm whitespace-nowrap md:text-base lg:text-base">{item.day}</div>
+                                        <div className="text-sm md:text-base lg:text-base">
+                                            {item.date} <span className="hidden md:inline lg:inline">tháng</span> <span className="md:hidden lg:hidden">/</span> {item.month}
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="space-y-4">
-                                {outboundFlights.map((flight) => (
-                                    <FlightCard flight={flight} onSelect={handleSelect}/>
-                                ))}
-                            </div>
+                            {outboundFlights.length !== 0 ? (
+                                <div className="space-y-4">
+                                    {outboundFlights.map((flight) => (
+                                        <FlightCard flight={flight} onSelect={handleSelect}/>
+                                    ))}
+                                </div>
+                            ) : (
+                                <h2 className="text-4xl mx-auto max-w-3xl font-bold text-center text-[#002D74] mt-10">Rất tiếc, không có
+                                    chuyến bay phù hợp với tìm kiếm của bạn</h2>
+                            )}
+
                         </div>
                     ) : (
                         <div>
                             <div className="sticky top-20 z-8 bg-sky-200 p-6 rounded-lg shadow-lg mb-6">
                                 <div className="flex items-center justify-between"
                                      style={{fontFamily: "Barlow Condensed"}}>
-                                    <div className="lg:flex flex-col whitespace-nowrap hidden items-center justify-center">
+                                    <div
+                                        className="lg:flex flex-col whitespace-nowrap hidden items-center justify-center">
                                         <div className="text-2xl font-semibold">
                                             📅 Ngày
                                         </div>
                                         <p className="text-lg">{convertDateFormat(selectedArrivalDate)}</p>
                                     </div>
                                     <div className="flex items-center justify-center mx-auto space-x-4">
-                                        <div className="text-3xl font-bold">
+                                    <div className="text-3xl font-bold">
                                             {searchInfo.arriveCity}
                                         </div>
                                         <div className="lg:px-10 sm:px-5 text-blue-600">
@@ -326,19 +306,25 @@ function FlightSelection() {
                                                 : "bg-gray-200"
                                         }`}
                                     >
-                                        <div>{item.day}</div>
-                                        <div>
-                                            {item.date} tháng {item.month}
+                                        <div className="text-sm whitespace-nowrap md:text-base lg:text-base">{item.day}</div>
+                                        <div className="text-sm md:text-base lg:text-base">
+                                            {item.date} <span className="hidden md:inline lg:inline">tháng</span> <span className="md:hidden lg:hidden">/</span> {item.month}
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="space-y-4">
-                                {returnFlights.map((flight) => (
-                                    <FlightCard flight={flight} onSelect={handleSelect}/>
-                                ))}
-                            </div>
+                            {returnFlights.length !== 0 ? (
+                                <div className="space-y-4">
+                                    {returnFlights.map((flight) => (
+                                        <FlightCard flight={flight} onSelect={handleSelect}/>
+                                    ))}
+                                </div>
+                            ) : (
+                                <h2 className="text-5xl font-bold text-center text-[#002D74] mt-10">Rất tiếc, không có
+                                    chuyến bay phù hợp với tìm kiếm của bạn</h2>
+                            )}
+
                         </div>
                     )}
                 </div>

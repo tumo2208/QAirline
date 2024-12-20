@@ -18,10 +18,10 @@ function PostDetail() {
                 <div>
                     <iframe src={post.content.slice(3, -6)} className='w-full h-screen max-w-6xl mx-auto rounded-lg'></iframe>
                 </div>
-            ) : <div>
-                    <h1>{post.title}</h1>
-                    <img src={post.thumbnail} alt={post.title} />
-                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
+            ) : <div className="bg-gray-100 max-w-6xl  flex flex-col mx-auto justify-center rounded-2xl shadow-lg border-4 p-5 w-full space-y-7">
+                    <h1 className='font-bold text-center text-3xl'>{post.title}</h1>
+                    <img src={post.thumbnail} alt={post.title} className='w-full max-w-2xl h-96 mx-auto' />
+                    <div dangerouslySetInnerHTML={{ __html: post.content }} className='max-h-96 overflow-y-auto' />
                 </div>
             }
         </div>
