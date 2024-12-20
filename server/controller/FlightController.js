@@ -532,13 +532,14 @@ const setDelayTime = async (req, res) => {
         // const timeDif = oldArrivalDate - oldDepartDate;
 
         const newDepartDate = new Date(newTime);
-        // const newArrivalDate = new Date(newDepartDate.getTime() + timeDif);
+        const formattedDate = `${newDepartDate.getDate().toString().padStart(2, '0')}/${
+            (newDepartDate.getMonth() + 1).toString().padStart(2, '0')}/${
+            newDepartDate.getFullYear()}, ${
+            newDepartDate.getHours().toString().padStart(2, '0')}:${
+            newDepartDate.getMinutes().toString().padStart(2, '0')}`;
 
-        // flight.departure_date = newDepartDate;
-        // flight.arrival_date = newArrivalDate;
-
-        const delayMessage = `Chuyến bay của bạn đã bị delay sang ${newDepartDate.toISOString()}`;
-        flight.notification = flight.notification.filter(notification => !notification.includes("Chuyến bay của bạn đã bị delay sang"));
+        const delayMessage = `Chuyến bay của bạn đã bị hoãn đến ${formattedDate}`;
+        flight.notification = flight.notification.filter(notification => !notification.includes("Chuyến bay của bạn đã bị hoãn đến"));
         flight.notification.push(delayMessage);
 
         await flight.save();
