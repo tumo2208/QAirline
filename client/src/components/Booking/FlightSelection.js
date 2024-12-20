@@ -233,9 +233,9 @@ function FlightSelection() {
                                                 : "bg-gray-200"
                                         }`}
                                     >
-                                        <div>{item.day}</div>
-                                        <div>
-                                            {item.date} tháng {item.month}
+                                        <div className="text-sm whitespace-nowrap md:text-base lg:text-base">{item.day}</div>
+                                        <div className="text-sm md:text-base lg:text-base">
+                                            {item.date} <span className="hidden md:inline lg:inline">tháng</span> <span className="md:hidden lg:hidden">/</span> {item.month}
                                         </div>
                                     </div>
                                 ))}
@@ -248,7 +248,7 @@ function FlightSelection() {
                                     ))}
                                 </div>
                             ) : (
-                                <h2 className="text-5xl font-bold text-center text-[#002D74] mt-10">Rất tiếc, không có
+                                <h2 className="text-4xl mx-auto max-w-3xl font-bold text-center text-[#002D74] mt-10">Rất tiếc, không có
                                     chuyến bay phù hợp với tìm kiếm của bạn</h2>
                             )}
 
@@ -306,9 +306,9 @@ function FlightSelection() {
                                                 : "bg-gray-200"
                                         }`}
                                     >
-                                        <div>{item.day}</div>
-                                        <div>
-                                            {item.date} tháng {item.month}
+                                        <div className="text-sm whitespace-nowrap md:text-base lg:text-base">{item.day}</div>
+                                        <div className="text-sm md:text-base lg:text-base">
+                                            {item.date} <span className="hidden md:inline lg:inline">tháng</span> <span className="md:hidden lg:hidden">/</span> {item.month}
                                         </div>
                                     </div>
                                 ))}
