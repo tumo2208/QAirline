@@ -3,9 +3,7 @@ import React, {useEffect, useState, useMemo} from "react";
 import {AutocompleteInput} from "../../shared/AutoComplete";
 import axios from "axios";
 import {useNavigate, useLocation, Link} from "react-router-dom";
-import Loading from '../../shared/Loading';
 import FetchAirportInfo from "../../shared/AirportInfo";
-import { set } from 'mongoose';
 
 function Home() {
     const location = useLocation();
@@ -159,7 +157,7 @@ function Home() {
 
     const [destinations, setDestinations] = useState([]);
     const [loadingDestination, setLoadingDestination] = useState(true);
-    const [banners, setBanners] = useState([]);
+    const [posts, setPosts] = useState([]);
 
     useEffect(() => {
         const fetchDestinations = async () => {
@@ -176,37 +174,44 @@ function Home() {
             }
         };
 
-        const fetchBanners = async () => {
+        const fetchPosts = async () => {
             try {
-                const response = await axios.post('http://localhost:3001/api/post/listPost', {
+                const banner = await axios.post('http://localhost:3001/api/post/listPost', {
                     category: "banner",
                 });
-                setBanners(response.data);
+                const offer = await axios.post('http://localhost:3001/api/post/listPost', {
+                    category: "offer",
+                });
+        
+                const combinedPosts = [...offer.data, ...banner.data];
+        
+                setPosts(combinedPosts);
             } catch (error) {
                 console.error('Lỗi khi lấy bài đăng:', error);
             }
         };
+        
 
         fetchDestinations();
-        fetchBanners();
+        fetchPosts();
     }, []);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % posts.length);
         }, 3000); // 3000ms = 3s
 
         return () => clearInterval(interval); // Dọn dẹp khi component bị unmount
-    }, [banners.length]);
+    }, [posts.length]);
 
     const getVisiblePosts = () => {
-        if (banners.length === 0) return [];
+        if (posts.length === 0) return [];
 
         const visiblePosts = [];
         for (let i = 0; i < 3; i++) {
-            const index = (currentIndex + i) % banners.length; // Đảm bảo quay lại đầu khi đến cuối
-            visiblePosts.push(banners[index]);
+            const index = (currentIndex + i) % posts.length; // Đảm bảo quay lại đầu khi đến cuối
+            visiblePosts.push(posts[index]);
         }
 
         return visiblePosts;
@@ -701,7 +706,51 @@ function Home() {
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div className="container mx-auto p-6">
+                <h1 className="text-4xl font-bold text-black mb-4">
+                📢 What's new ?
+                </h1>
+                <div className="flex justify-center space-x-4 overflow-hidden">
+                    {getVisiblePosts().length > 0 && getVisiblePosts().map((post, index) => {
+                        const isMainPost = index === 0;
+                        return (
+                            post && (
+                                <div
+                                    key={post._id}
+                                    className={`${
+                                        isMainPost ? 'lg:w-3/4 w-full' : 'lg:w-1/4 w-full'
+                                    } bg-white rounded-lg shadow-lg p-4 text-center transition-transform duration-1000 ease-in-out transform`}
+                                >
+                                    <img
+                                        src={post.thumbnail}
+                                        alt={post.title}
+                                        className="w-full h-48 object-cover rounded-md"
+                                    />
+                                    <h3 className={`${isMainPost ? 'text-xl' : 'text-md'} font-semibold mt-4`}>{post.title}</h3>
+                                    {post.category === "banner" && (
+                                        <Link
+                                            to={`/banner/${post.id}`}
+                                            className="text-blue-500 font-medium hover:underline"
+                                        >
+                                            Xem Chi Tiết
+                                        </Link>
+                                    )}
+                                    {post.category === "offer" && (
+                                        <Link
+                                            to={`/offer/${post.id}`}
+                                            className="text-blue-500 font-medium hover:underline"
+                                        >
+                                            Xem Chi Tiết
+                                        </Link>
+                                    )}
+                                    
+                                </div>
+                            )
+                        );                        
+                    })}
+                </div>
             </div>
 
             <div className="section2 max-w-screen-xl mx-auto p-6">
@@ -741,44 +790,6 @@ function Home() {
                             <span className="ml-2">&rarr;</span>
                         </button>
                     </div>
-                </div>
-            </div>
-
-            <div className="container mx-auto p-6">
-            <h1 className="text-4xl font-bold text-black mb-4">
-                    🤝 Trải nghiệm cùng QAirline
-                </h1>
-                <div className="flex justify-center space-x-4 overflow-hidden">
-                    {getVisiblePosts().length > 0 && getVisiblePosts().map((post, index) => {
-                        const isMainPost = index === 0;
-                        return (
-                            post && (
-                                <div
-                                    key={post._id}
-                                    className={`${
-                                        isMainPost ? 'lg:w-3/4 w-full' : 'lg:w-1/4 w-full'
-                                    } bg-white rounded-lg shadow-lg p-4 text-center transition-transform duration-1000 ease-in-out transform`}
-                                    style={{
-                                        // transform: isMainPost ? 'scale(1.1)' : 'scale(0.9)',
-                                        // opacity: isMainPost ? 1 : 0.7,
-                                    }}
-                                >
-                                    <img
-                                        src={post.thumbnail}
-                                        alt={post.title}
-                                        className="w-full h-48 object-cover rounded-md"
-                                    />
-                                    <h3 className="text-xl font-semibold mt-4">{post.title}</h3>
-                                    <Link
-                                        to={`/banner/${post.id}`}
-                                        className="text-blue-500 font-medium hover:underline"
-                                    >
-                                        Xem Chi Tiết
-                                    </Link>
-                                </div>
-                            )
-                        );                        
-                    })}
                 </div>
             </div>
 
