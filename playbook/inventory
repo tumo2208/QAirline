@@ -1,2 +1,0 @@
-[redis]
-34.126.131.154 ansible_connection=ssh ansible_user=nguyentankdb17 ansible_ssh_private_key_file=~/.ssh/id_rsa
