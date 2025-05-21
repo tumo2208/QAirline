@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const redisClient = require("../redisClient");
-const {nationalities} = require('../../client/src/shared/SharedData');
+const {nationalities} = require('../shared/SharedData');
 
 const validateUserData = (data, isUpdate = false) => {
     if (!isUpdate) {
