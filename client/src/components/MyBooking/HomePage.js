@@ -24,7 +24,7 @@ function HomePage(){
 
         try {
             const response = await axios.post(
-                "http://localhost:3001/api/bookings/getBookingByID", 
+                `${process.env.REACT_APP_API_URL}/api/bookings/getBookingByID`, 
                 {bookingID : bookingID},
                 {
                     withCredentials: true

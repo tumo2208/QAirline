@@ -11,7 +11,7 @@ function Destination() {
         const fetchDestinations = async () => {
             try {
                 setLoading(true);
-                const response = await axios.post("http://localhost:3001/api/post/listPost", {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/post/listPost`, {
                     category: "destination",
                 });
                 setDestinations(response.data);

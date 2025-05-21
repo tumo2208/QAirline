@@ -33,7 +33,7 @@ function ManageBooking() {
             if (booking?.flight_id) {
                 try {
                     const response = await axios.post(
-                        "http://localhost:3001/api/flights/getFlightByID",
+                        `${process.env.REACT_APP_API_URL}/api/flights/getFlightByID`,
                         { flightID: booking.flight_id },
                         {
                             withCredentials: true,
@@ -51,7 +51,7 @@ function ManageBooking() {
             if (booking?.return_flight_id) {
                 try {
                     const response = await axios.post(
-                        "http://localhost:3001/api/flights/getFlightByID",
+                        `${process.env.REACT_APP_API_URL}/api/flights/getFlightByID`,
                         { flightID: booking.return_flight_id },
                         {
                             withCredentials: true,
@@ -81,7 +81,7 @@ function ManageBooking() {
                 if (userInput) {
                     setLoading(true);
                     const response = await axios.post(
-                        "http://localhost:3001/api/bookings/cancelTicket",
+                        `${process.env.REACT_APP_API_URL}/api/bookings/cancelTicket`,
                         { 
                             ticketID: ticket._id,
                             confirmation: userInput,
@@ -207,7 +207,7 @@ function TicketCard({ticket, flight, class_type, cancel}) {
     useEffect(() => {
         const fetchAirportInfo = async () => {
             try {
-                const response = await axios.get("http://localhost:3001/api/airportAircraft/allAirports");
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/airportAircraft/allAirports`);
                 setAirportInfo(response.data.map((airport) => ({
                     name: airport.name,
                     city: airport.city,

@@ -141,7 +141,7 @@ function Home() {
         setLoading(true);
         try {
             const response = await axios.post(
-                "http://localhost:3001/api/bookings/getBookingByID", 
+                `${process.env.REACT_APP_API_URL}/api/bookings/getBookingByID`, 
                 {bookingID : bookingID},
                 {
                     withCredentials: true
@@ -170,7 +170,7 @@ function Home() {
         const fetchDestinations = async () => {
             try {
                 setLoadingDestination(true);
-                const response = await axios.post("http://localhost:3001/api/post/listPost", {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/post/listPost`, {
                     category: "destination",
                 });
                 setDestinations(response.data);
@@ -183,10 +183,10 @@ function Home() {
 
         const fetchPosts = async () => {
             try {
-                const banner = await axios.post('http://localhost:3001/api/post/listPost', {
+                const banner = await axios.post(`${process.env.REACT_APP_API_URL}/api/post/listPost`, {
                     category: "banner",
                 });
-                const offer = await axios.post('http://localhost:3001/api/post/listPost', {
+                const offer = await axios.post(`${process.env.REACT_APP_API_URL}/api/post/listPost`, {
                     category: "offer",
                 });
         
@@ -284,49 +284,49 @@ function Home() {
     useEffect(() => {
         const fetchPopularFlights = async () => {
             try {
-                const Flight1 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                const Flight1 = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByDepartureAndArrival`, {
                     departureCity: "Hà Nội",
                     arrivalCity: "TP. Hồ Chí Minh"
                 });
                 setFlight1(Flight1.data[0]);
     
-                const Flight2 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                const Flight2 = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByDepartureAndArrival`, {
                     departureCity: "TP. Hồ Chí Minh",
                     arrivalCity: "Hà Nội",  
                 });
                 setFlight2(Flight2.data[0]);
     
-                const Flight3 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                const Flight3 = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByDepartureAndArrival`, {
                     departureCity: "Hà Nội",
                     arrivalCity: "Đà Nẵng",
                 });
                 setFlight3(Flight3.data[0]);
     
-                const Flight4 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {  
+                const Flight4 = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByDepartureAndArrival`, {  
                     departureCity: "TP. Hồ Chí Minh",
                     arrivalCity: "Phú Quốc",
                 });
                 setFlight4(Flight4.data[0]);
 
-                const Flight5 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                const Flight5 = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByDepartureAndArrival`, {
                     departureCity: "TP. Hồ Chí Minh",
                     arrivalCity: "Đà Nẵng",
                 });
                 setFlight5(Flight5.data[0]);
 
-                const Flight6 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                const Flight6 = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByDepartureAndArrival`, {
                     departureCity: "Hà Nội",
                     arrivalCity: "Phú Quốc",
                 });
                 setFlight6(Flight6.data[0]);
 
-                const Flight7 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                const Flight7 = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByDepartureAndArrival`, {
                     departureCity: "TP. Hồ Chí Minh",
                     arrivalCity: "Khánh Hòa",
                 });
                 setFlight7(Flight7.data[0]);
 
-                const Flight8 = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureAndArrival", {
+                const Flight8 = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByDepartureAndArrival`, {
                     departureCity: "Hà Nội",
                     arrivalCity: "Cần Thơ",
                 });

@@ -13,7 +13,7 @@ function Login() {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:3001/login', { email, password }, { withCredentials: true });
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, { email, password }, { withCredentials: true });
             if (response.status === 200) {
                 window.location.href = 'http://localhost:3000/';
             }

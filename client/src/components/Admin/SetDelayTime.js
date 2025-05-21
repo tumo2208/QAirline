@@ -20,7 +20,7 @@ function SetDelayTime() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3001/api/flights/setDelayTime', formData, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/setDelayTime`, formData, {
                 withCredentials: true,
             });
 

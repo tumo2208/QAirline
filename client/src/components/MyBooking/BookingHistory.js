@@ -17,7 +17,7 @@ function BookingHistory() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`http://localhost:3001/api/bookings/myBookings`, {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/bookings/myBookings`, {
                     withCredentials: true,
                 });
                 setBookings(response.data);
@@ -70,7 +70,7 @@ function BookingHistory() {
     const handleSelect = async (bookingID) => {
         try {
             const response = await axios.post(
-                "http://localhost:3001/api/bookings/getBookingByID", 
+                `${process.env.REACT_APP_API_URL}/api/bookings/getBookingByID`, 
                 {bookingID : bookingID},
                 {
                     withCredentials: true

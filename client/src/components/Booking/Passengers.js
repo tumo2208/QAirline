@@ -82,7 +82,7 @@ function Passengers() {
                 };
 
                 const response = await axios.post(
-                    "http://localhost:3001/api/bookings/newBooking", 
+                    `${process.env.REACT_APP_API_URL}/api/bookings/newBooking`, 
                     BookingData,
                     {
                         withCredentials: true
@@ -124,7 +124,7 @@ function Passengers() {
                                     </div>
                                 `
                             };
-                            await axios.post("http://localhost:3001/email/send", emailData, { withCredentials: true });
+                            await axios.post(`${process.env.REACT_APP_API_URL}/email/send`, emailData, { withCredentials: true });
                         }
                     }
                     navigate("/booking/booking-successfully", { state: { bookingID: result.bookingID }});

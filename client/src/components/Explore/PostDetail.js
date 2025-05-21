@@ -7,7 +7,7 @@ function PostDetail() {
     const [post, setPost] = useState(null);
 
     useEffect(() => {
-        axios.get(`http://localhost:3001/api/post/getPost/${id}`).then((res) => setPost(res.data));
+        axios.get(`${process.env.REACT_APP_API_URL}/api/post/getPost/${id}`).then((res) => setPost(res.data));
     }, [id]);
 
     if (!post) return <div>Đang tải dữ liệu...</div>;
