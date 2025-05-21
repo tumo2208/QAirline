@@ -29,7 +29,7 @@ app.use(cookieParser());
 
 const cors = require("cors");
 app.use(cors({
-    origin: '*',
+    origin: 'http://localhost:3000',
     credentials: true,
 }));
 

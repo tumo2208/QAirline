@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const {nationalities} = require('../../client/src/shared/SharedData');
+const {nationalities} = require('../shared/SharedData');
 
 const userSchema = new Schema({
     full_name: { type: String, required: true },
