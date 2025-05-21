@@ -32,7 +32,7 @@ function ViewStatistic() {
 
     const fetchData = async (year) => {
         try {
-            const response = await axios.get(`http://localhost:3001/api/statistic/monthlyRevenue/${year}`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/statistic/monthlyRevenue/${year}`, {
                 withCredentials: true
             });
             const data = await response.data;
@@ -81,7 +81,7 @@ function ViewStatistic() {
 
     const fetchTopDestinations = async (month, year) => {
         try {
-            const response = await axios.post('http://localhost:3001/api/statistic/topDestination', {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/statistic/topDestination`, {
                 month: month,
                 year: year
             }, {
@@ -129,7 +129,7 @@ function ViewStatistic() {
 
     const handleSearch = async () => {
         try {
-            const response = await axios.post("http://localhost:3001/api/statistic/flightDetail", {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/statistic/flightDetail`, {
                 flightID,
             }, {
                 withCredentials: true

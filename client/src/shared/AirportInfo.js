@@ -7,7 +7,7 @@ const FetchAirportInfo = () => {
     useEffect(() => {
       const fetchSuggestions = async () => {
         try {
-          const response = await axios.get("http://localhost:3001/api/airportAircraft/allAirports");
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/airportAircraft/allAirports`);
           setSuggestions(response.data.map((airport) => ({
               name: airport.name,
               city: airport.city,

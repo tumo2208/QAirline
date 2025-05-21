@@ -37,7 +37,7 @@ function AddFlight() {
         };
 
         try {
-            const response = await axios.post('http://localhost:3001/api/flights/addflight', payload, { withCredentials: true });
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/addflight`, payload, { withCredentials: true });
             if (response.status === 200) {
                 setSuccess(response.data);
                 setTimeout(() => {

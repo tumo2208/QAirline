@@ -23,7 +23,7 @@ function Signup() {
           return;
         }
         try {
-            const response = await axios.post("http://localhost:3001/register", {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`, {
                 full_name,
                 gender,
                 dob,

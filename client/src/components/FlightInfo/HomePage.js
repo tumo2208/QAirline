@@ -33,7 +33,7 @@ function HomePage() {
         try {
             setPlaceResults([]);
             setLoading(true);
-            const response = await axios.post("http://localhost:3001/api/flights/getFlightByArrival", {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByArrival`, {
                 arrivalCity: destination,
             });
             setPlaceResults(response.data);
@@ -54,7 +54,7 @@ function HomePage() {
         try {
             setDateResults([]);
             setLoading(true);
-            const response = await axios.post("http://localhost:3001/api/flights/getFlightByDepartureTime", {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByDepartureTime`, {
                 departDate: departureDate,
             });
             setDateResults(response.data);
@@ -73,7 +73,7 @@ function HomePage() {
         try {
             setFlight(null);
             setLoading(true);
-            const response = await axios.post("http://localhost:3001/api/flights/getFlightByID", {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/flights/getFlightByID`, {
                 flightID: flightID,
             });
             setFlight(response.data);

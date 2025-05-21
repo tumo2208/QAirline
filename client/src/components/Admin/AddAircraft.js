@@ -21,7 +21,7 @@ function AddAircraft() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3001/api/airportAircraft/addAircraft",formData, { withCredentials: true });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/airportAircraft/addAircraft`,formData, { withCredentials: true });
 
       if (response.status === 200) {
         setSuccess(response.data);

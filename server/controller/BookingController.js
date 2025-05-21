@@ -2,7 +2,8 @@ const Booking = require('../models/Booking');
 const Flight = require('../models/Flight');
 const Ticket = require('../models/Ticket');
 const Aircraft = require('../models/Aircraft');
-const {Adult, Children, Infant} = require('../../client/src/shared/SharedData');
+const {Adult, Children, Infant} = require('../shared/SharedData');
+
 const {ObjectId} = require("mongodb");
 
 /**

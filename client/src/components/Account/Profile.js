@@ -19,7 +19,7 @@ function Profile() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.get('http://localhost:3001/profile', {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile`, {
                     withCredentials: true,
                 });
                 setUser(response.data.user);
@@ -66,7 +66,7 @@ function Profile() {
 
         try {
             const response = await axios.post(
-                'http://localhost:3001/update',
+                `${process.env.REACT_APP_API_URL}/update`,
                 updatedUser,
                 {
                     withCredentials: true,

@@ -32,7 +32,7 @@ function FlightSelection() {
                 arriveCity: searchInfo.arriveCity,
                 departDate: selectedDate,
             };
-            const response = await axios.post("http://localhost:3001/api/flights/oneway", reqBody);
+            const response = await axios.post(`http://${process.env.REACT_APP_API_URL}:3001/api/flights/oneway`, reqBody);
             setOutboundFlights(response.data);
         } catch (err) {
             console.error("Error fetching flights:", err);
@@ -52,7 +52,7 @@ function FlightSelection() {
                 arriveCity: searchInfo.departCity,
                 departDate: selectedArrivalDate,
             };
-            const response = await axios.post("http://localhost:3001/api/flights/oneway", reqBody);
+            const response = await axios.post(`http://${process.env.REACT_APP_API_URL}:3001/api/flights/oneway`, reqBody);
             setReturnFlights(response.data);
         } catch (err) {
             console.error("Error fetching flights:", err);

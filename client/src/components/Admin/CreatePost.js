@@ -30,7 +30,7 @@ function CreatePost() {
         formData.append('content', content);
 
         try {
-            const response = await axios.post('http://localhost:3001/api/post/createPost', formData, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/post/createPost`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
                 withCredentials: true
             });
